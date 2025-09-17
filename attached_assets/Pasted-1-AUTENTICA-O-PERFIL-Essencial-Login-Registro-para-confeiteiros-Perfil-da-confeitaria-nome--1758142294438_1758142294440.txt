@@ -1,0 +1,273 @@
+1. AUTENTICAÇÃO & PERFIL (Essencial)
+
+Login/Registro para confeiteiros
+Perfil da confeitaria (nome, especialidades, localização)
+Planos de assinatura (Gratuito/Profissional/Premium/Master)
+Onboarding guiado (5 passos iniciais)
+
+2. GESTÃO DE RECEITAS (Core Principal)
+
+Biblioteca de receitas com categorias (bolos, doces, salgados)
+Editor de receitas com modo de preparo passo-a-passo
+Calculadora de proporções (multiplicar receita por X)
+Templates prontos (brigadeiro, bolo de chocolate, etc.)
+Sistema de tags para organização
+Tempo de preparo e rendimento por receita
+Nível de dificuldade (iniciante, intermediário, avançado)
+
+3. GESTÃO DE INGREDIENTES & ESTOQUE
+
+Cadastro de ingredientes com preços atualizáveis
+Unidades de medida flexíveis (kg, g, litros, unidades, xícaras)
+Controle de estoque básico
+Alertas de reposição
+Histórico de preços para análise de variação
+Calculadora de conversões (xícara → gramas)
+Fornecedores e locais de compra
+
+4. CALCULADORA DE CUSTOS & PRECIFICAÇÃO
+
+Custo por receita automático
+Margem de lucro configurável
+Custos fixos (gás, energia, mão de obra por hora)
+Simulador de preços com diferentes margens
+Comparativo de mercado (preços sugeridos por região)
+Calculadora de tempo x valor/hora
+Breakdown detalhado de custos por ingrediente
+
+5. GESTÃO DE PEDIDOS & ORÇAMENTOS
+
+Cadastro de clientes com histórico
+Criação de orçamentos profissionais
+Agenda de entregas com calendário
+Status de pedidos (orçamento, confirmado, produção, entregue)
+Controle de pagamentos (pendente, pago, parcelado)
+Templates de orçamento personalizáveis
+Sistema de aprovação de orçamentos
+
+6. RELATÓRIOS & ANALYTICS
+
+Dashboard principal com métricas do mês
+Relatório de vendas por período
+Produtos mais rentáveis
+Análise de custos vs receitas
+Calendário financeiro (entradas e gastos)
+Gráficos de performance mensal/anual
+Exportação PDF/Excel dos relatórios
+
+7. FERRAMENTAS AUXILIARES
+
+Conversor de medidas inteligente
+Calculadora nutricional básica
+Gerador de etiquetas para produtos
+Lista de compras automática baseada nas receitas
+Backup automático na nuvem
+Modo offline para receitas essenciais
+
+
+🔐 PLANOS DE ASSINATURA
+GRATUITO - R$ 0/mês
+✅ Até 5 receitas cadastradas
+✅ Calculadora básica de custos
+✅ 3 orçamentos por mês
+✅ Biblioteca com 20 ingredientes padrão
+✅ Acesso web básico
+❌ App mobile
+❌ Relatórios avançados
+❌ Backup automático
+❌ Templates premium
+PROFISSIONAL - R$ 39,90/mês
+✅ Receitas ilimitadas
+✅ Gestão completa de ingredientes
+✅ Orçamentos ilimitados
+✅ Controle básico de pedidos
+✅ Relatórios essenciais
+✅ Backup automático
+✅ Suporte por email
+✅ Templates profissionais
+❌ App mobile
+❌ Integrações avançadas
+PREMIUM - R$ 69,90/mês
+✅ Tudo do Profissional
+✅ App mobile completo
+✅ Gestão avançada de clientes
+✅ Agenda de entregas
+✅ Relatórios avançados
+✅ Integração WhatsApp Business
+✅ Calculadora nutricional
+✅ Suporte prioritário
+✅ API básica
+❌ White label
+MASTER - R$ 119,90/mês
+✅ Tudo do Premium
+✅ Multi-usuários (até 5 funcionários)
+✅ White label (sua marca)
+✅ Integrações avançadas
+✅ Consultoria mensal (1h)
+✅ Relatórios personalizados
+✅ API completa
+✅ Setup personalizado
+✅ Suporte por telefone
+
+📱 INTERFACE PRINCIPAL (COMPONENTES CORE)
+1. Landing Page
+
+Hero section com calculadora demo
+Vídeo explicativo (2 minutos)
+Depoimentos de confeiteiras reais
+Comparativo de planos interativo
+CTA principal: "Comece grátis agora"
+Blog integrado com dicas de precificação
+FAQ com dúvidas mais comuns
+
+2. Dashboard Principal
+
+Métricas do mês: vendas, lucro, pedidos
+Próximas entregas (próximos 7 dias)
+Receitas mais vendidas do período
+Alertas importantes (estoque baixo, pagamentos pendentes)
+Ações rápidas: nova receita, novo orçamento, ver agenda
+Gráfico de performance mensal
+Dicas personalizadas baseadas no uso
+
+3. Gestão de Receitas
+
+Biblioteca visual com fotos das receitas
+Sistema de busca por nome, categoria, ingrediente
+Editor completo com:
+
+Lista de ingredientes com quantidades
+Modo de preparo step-by-step
+Fotos do processo
+Tempo total e rendimento
+Notas e variações
+
+
+Calculadora de proporções
+Duplicar/Criar variações de receitas existentes
+
+4. Calculadora de Custos
+
+Interface intuitiva com breakdown visual
+Sliders para margem de lucro
+Comparativo entre diferentes margens
+Gráfico pizza mostrando composição do preço
+Sugestão de preço baseada na região
+Histórico de cálculos salvos
+Exportar cálculo em PDF
+
+5. Gestão de Pedidos
+
+Kanban board (orçamento → confirmado → produção → entregue)
+Calendário de entregas com vista mensal/semanal
+Ficha completa do cliente com histórico
+Gerador de orçamentos profissional com logo
+Sistema de aprovação por WhatsApp/email
+Controle de pagamentos e status
+Lembretes automáticos para cliente
+
+6. Relatórios & Analytics
+
+Dashboard financeiro com gráficos interativos
+Relatório de vendas filtráveis por período
+Análise de produtos (mais vendidos, mais rentáveis)
+Comparativo mensal de performance
+Previsão de faturamento baseada em pedidos confirmados
+Exportação em PDF/Excel
+Gráficos de tendência de crescimento
+
+
+🗄️ ESTRUTURA DO BANCO DE DADOS
+Tabelas Principais:
+sql-- Usuários (Confeiteiros)
+usuarios: 
+id, email, senha, nome_completo, telefone, 
+plano_id, data_cadastro, ativo, avatar
+
+-- Perfil Confeitaria
+confeitarias: 
+id, usuario_id, nome_fantasia, especialidades, 
+cidade, estado, instagram, whatsapp, logo
+
+-- Planos
+planos: 
+id, nome, preco_mensal, limite_receitas, 
+limite_orcamentos, funcionalidades_json
+
+-- Categorias de Receitas
+categorias: 
+id, usuario_id, nome, cor_hex, icone, ordem
+
+-- Receitas
+receitas: 
+id, usuario_id, categoria_id, nome, descricao,
+modo_preparo, tempo_preparo_mins, rendimento,
+dificuldade, foto_principal, ativo, criado_em
+
+-- Ingredientes Padrão (sistema)
+ingredientes_sistema: 
+id, nome, unidade_padrao, categoria, preco_medio_nacional
+
+-- Ingredientes do Usuário
+ingredientes_usuario: 
+id, usuario_id, ingrediente_sistema_id, nome_personalizado,
+preco_atual, preco_anterior, fornecedor, data_atualizacao
+
+-- Receita + Ingredientes (relacionamento)
+receita_ingredientes: 
+id, receita_id, ingrediente_id, quantidade, 
+unidade, observacoes, ordem
+
+-- Clientes
+clientes: 
+id, usuario_id, nome, telefone, whatsapp, email,
+endereco_completo, data_nascimento, observacoes,
+criado_em, ativo
+
+-- Orçamentos
+orcamentos: 
+id, usuario_id, cliente_id, numero_orcamento,
+data_criacao, data_validade, status, valor_total,
+descricao, observacoes
+
+-- Itens do Orçamento
+orcamento_itens: 
+id, orcamento_id, receita_id, quantidade, 
+valor_unitario, valor_total, observacoes
+
+-- Pedidos (orçamentos aprovados)
+pedidos: 
+id, orcamento_id, data_confirmacao, data_entrega,
+status, forma_pagamento, valor_pago, observacoes_entrega
+
+-- Histórico de Preços
+historico_precos: 
+id, ingrediente_id, preco_anterior, preco_novo,
+data_alteracao, motivo
+
+-- Relatórios Salvos
+relatorios_salvos: 
+id, usuario_id, nome_relatorio, parametros_json,
+data_criacao, favorito
+
+-- Configurações do Usuário
+configuracoes: 
+id, usuario_id, moeda, fuso_horario, margem_padrao,
+custo_hora_trabalho, notificacoes_email, 
+notificacoes_whatsapp
+
+-- Templates de Orçamento
+templates_orcamento: 
+id, usuario_id, nome_template, conteudo_html,
+padrao, ativo
+
+-- Backup/Logs
+logs_atividade: 
+id, usuario_id, acao, tabela_afetada, 
+dados_anteriores_json, timestamp
+Relacionamentos Principais:
+
+1 Usuário → N Receitas → N Ingredientes
+1 Cliente → N Orçamentos → N Pedidos
+1 Receita → N Itens de Orçamento
+1 Orçamento → 1 Pedido (quando aprovado)
