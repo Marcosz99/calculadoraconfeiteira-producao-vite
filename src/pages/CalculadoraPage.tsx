@@ -1,6 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Calculator, Plus, Minus } from 'lucide-react'
+import { ArrowLeft, Calculator, Plus, Minus, Save, History, Download, PieChart } from 'lucide-react'
+import { useAuth } from '../contexts/AuthContext'
+import { IngredienteUsuario, Receita, CalculoPreco } from '../types'
+import { LOCAL_STORAGE_KEYS, getFromLocalStorage, saveToLocalStorage } from '../utils/localStorage'
 
 interface Ingrediente {
   id: string
@@ -11,9 +14,9 @@ interface Ingrediente {
 }
 
 export default function CalculadoraPage() {
-  // TODO: [REMOVIDO] Integração com banco de dados estava aqui
-  // Implementar: localStorage para salvar receitas
-  
+  const { user } = useAuth()
+  const [ingredientesDisponiveis, setIngredientesDisponiveis] = useState<IngredienteUsuario[]>([])
+  const [receitas, setReceitas] = useState<Receita[]>([])
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([
     {
       id: '1',
@@ -23,9 +26,30 @@ export default function CalculadoraPage() {
       precoUnitario: 0.006
     }
   ])
+  const [nomeReceita, setNomeReceita] = useState('')
+  const [receitaSelecionada, setReceitaSelecionada] = useState('')
+  const [showSaveModal, setShowSaveModal] = useState(false)
+  const [historico, setHistorico] = useState<CalculoPreco[]>([])
+  const [showHistorico, setShowHistorico] = useState(false)
+  const [showBreakdown, setShowBreakdown] = useState(false)
+  
+  useEffect(() => {
+    if (user) {
+      const savedIngredientes = getFromLocalStorage<IngredienteUsuario[]>(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [])
+      const savedReceitas = getFromLocalStorage<Receita[]>(LOCAL_STORAGE_KEYS.RECEITAS, [])
+      const savedHistorico = getFromLocalStorage<CalculoPreco[]>('doce_historico_calculos', [])
+      
+      setIngredientesDisponiveis(savedIngredientes.filter(i => i.usuario_id === user.id))
+      setReceitas(savedReceitas.filter(r => r.usuario_id === user.id && r.ativo))
+      setHistorico(savedHistorico)
+    }
+  }, [user])
 
   const [margem, setMargem] = useState(30)
   const [custoFixo, setCustoFixo] = useState(5.00)
+  const [custoMaoObra, setCustoMaoObra] = useState(0)
+  const [tempoPreparoHoras, setTempoPreparoHoras] = useState(1)
+  const [custoHora, setCustoHora] = useState(25)
 
   const adicionarIngrediente = () => {
     const novoIngrediente: Ingrediente = {
@@ -56,8 +80,85 @@ export default function CalculadoraPage() {
 
   const calcularPrecoFinal = () => {
     const custoIngredientes = calcularCustoIngredientes()
-    const custoTotal = custoIngredientes + custoFixo
+    const custoMaoObraTotal = tempoPreparoHoras * custoHora
+    const custoTotal = custoIngredientes + custoFixo + custoMaoObraTotal
     return custoTotal * (1 + margem / 100)
+  }
+  
+  const salvarCalculo = () => {
+    if (!user) return
+    
+    const calculo: CalculoPreco = {
+      receita_id: nomeReceita || 'Cálculo Manual',
+      custo_ingredientes: calcularCustoIngredientes(),
+      custo_fixo: custoFixo,
+      custo_mao_obra: tempoPreparoHoras * custoHora,
+      margem_lucro: margem,
+      preco_final: calcularPrecoFinal(),
+      breakdown: ingredientes.map(ing => ({
+        ingrediente_id: ing.id,
+        nome: ing.nome,
+        quantidade: ing.quantidade,
+        custo: ing.quantidade * ing.precoUnitario
+      }))
+    }
+    
+    const novoHistorico = [calculo, ...historico.slice(0, 9)] // Manter apenas 10 cálculos
+    setHistorico(novoHistorico)
+    saveToLocalStorage('doce_historico_calculos', novoHistorico)
+    
+    if (nomeReceita) {
+      setShowSaveModal(false)
+      alert('Cálculo salvo no histórico!')
+    }
+  }
+  
+  const carregarReceita = (receitaId: string) => {
+    const receita = receitas.find(r => r.id === receitaId)
+    if (receita && receita.ingredientes) {
+      const novosIngredientes = receita.ingredientes.map(ri => {
+        const ingredienteUser = ingredientesDisponiveis.find(iu => iu.id === ri.ingrediente_id)
+        return {
+          id: ri.id,
+          nome: ingredienteUser?.nome || 'Ingrediente não encontrado',
+          quantidade: ri.quantidade,
+          unidade: ri.unidade,
+          precoUnitario: ingredienteUser?.preco_atual || 0
+        }
+      })
+      setIngredientes(novosIngredientes)
+      setNomeReceita(receita.nome)
+    }
+  }
+  
+  const exportarCalculo = () => {
+    const relatorio = {
+      nome: nomeReceita || 'Cálculo DoceCalc',
+      data: new Date().toLocaleDateString('pt-BR'),
+      ingredientes: ingredientes.map(ing => ({
+        nome: ing.nome,
+        quantidade: ing.quantidade,
+        unidade: ing.unidade,
+        preco_unitario: ing.precoUnitario,
+        custo_total: ing.quantidade * ing.precoUnitario
+      })),
+      custos: {
+        ingredientes: calcularCustoIngredientes(),
+        fixo: custoFixo,
+        mao_obra: tempoPreparoHoras * custoHora,
+        total: calcularCustoIngredientes() + custoFixo + (tempoPreparoHoras * custoHora)
+      },
+      margem_lucro: margem,
+      preco_final: calcularPrecoFinal()
+    }
+    
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(relatorio, null, 2))
+    const downloadAnchor = document.createElement('a')
+    downloadAnchor.setAttribute("href", dataStr)
+    downloadAnchor.setAttribute("download", `calculo-${new Date().toISOString().split('T')[0]}.json`)
+    document.body.appendChild(downloadAnchor)
+    downloadAnchor.click()
+    downloadAnchor.remove()
   }
 
   return (
@@ -85,13 +186,30 @@ export default function CalculadoraPage() {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-gray-900">Ingredientes</h2>
-              <button
-                onClick={adicionarIngrediente}
-                className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-              >
-                <Plus className="h-4 w-4" />
-                <span>Adicionar</span>
-              </button>
+              <div className="flex items-center space-x-2">
+                <select
+                  value={receitaSelecionada}
+                  onChange={(e) => {
+                    setReceitaSelecionada(e.target.value)
+                    if (e.target.value) carregarReceita(e.target.value)
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Carregar receita existente</option>
+                  {receitas.map(receita => (
+                    <option key={receita.id} value={receita.id}>
+                      {receita.nome}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={adicionarIngrediente}
+                  className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Adicionar</span>
+                </button>
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -116,13 +234,21 @@ export default function CalculadoraPage() {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Nome
                       </label>
-                      <input
-                        type="text"
-                        value={ingrediente.nome}
-                        onChange={(e) => atualizarIngrediente(ingrediente.id, 'nome', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Ex: Açúcar"
-                      />
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={ingrediente.nome}
+                          onChange={(e) => atualizarIngrediente(ingrediente.id, 'nome', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Ex: Açúcar"
+                          list={`ingredientes-${ingrediente.id}`}
+                        />
+                        <datalist id={`ingredientes-${ingrediente.id}`}>
+                          {ingredientesDisponiveis.map(ing => (
+                            <option key={ing.id} value={ing.nome} />
+                          ))}
+                        </datalist>
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -178,6 +304,32 @@ export default function CalculadoraPage() {
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Configurações</h2>
               
               <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Tempo de Preparo (horas)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.5"
+                      value={tempoPreparoHoras}
+                      onChange={(e) => setTempoPreparoHoras(parseFloat(e.target.value) || 0)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Custo/Hora (R$)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={custoHora}
+                      onChange={(e) => setCustoHora(parseFloat(e.target.value) || 0)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Margem de Lucro (%)
@@ -221,18 +373,166 @@ export default function CalculadoraPage() {
                   <span className="font-medium">R$ {custoFixo.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="text-gray-600">Mão de Obra ({tempoPreparoHoras}h x R${custoHora}):</span>
+                  <span className="font-medium">R$ {(tempoPreparoHoras * custoHora).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Subtotal:</span>
+                  <span className="font-medium">R$ {(calcularCustoIngredientes() + custoFixo + (tempoPreparoHoras * custoHora)).toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
                   <span className="text-gray-600">Margem ({margem}%):</span>
-                  <span className="font-medium">R$ {((calcularCustoIngredientes() + custoFixo) * (margem / 100)).toFixed(2)}</span>
+                  <span className="font-medium">R$ {((calcularCustoIngredientes() + custoFixo + (tempoPreparoHoras * custoHora)) * (margem / 100)).toFixed(2)}</span>
                 </div>
                 <hr />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Preço Final:</span>
                   <span className="text-green-600">R$ {calcularPrecoFinal().toFixed(2)}</span>
                 </div>
+                
+                <div className="flex flex-col space-y-2 pt-4">
+                  <button
+                    onClick={() => setShowBreakdown(!showBreakdown)}
+                    className="flex items-center justify-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    <PieChart className="h-4 w-4" />
+                    <span>{showBreakdown ? 'Ocultar' : 'Ver'} Breakdown</span>
+                  </button>
+                  
+                  {showBreakdown && (
+                    <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                      <h4 className="font-medium text-gray-700 mb-2">Breakdown por Ingrediente:</h4>
+                      {ingredientes.map(ing => (
+                        <div key={ing.id} className="flex justify-between text-sm">
+                          <span className="text-gray-600">{ing.nome} ({ing.quantidade}{ing.unidade}):</span>
+                          <span>R$ {(ing.quantidade * ing.precoUnitario).toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      onClick={() => setShowSaveModal(true)}
+                      className="flex items-center justify-center space-x-1 bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm"
+                    >
+                      <Save className="h-3 w-3" />
+                      <span>Salvar</span>
+                    </button>
+                    
+                    <button
+                      onClick={() => setShowHistorico(true)}
+                      className="flex items-center justify-center space-x-1 bg-purple-500 text-white px-3 py-2 rounded-lg hover:bg-purple-600 transition-colors text-sm"
+                    >
+                      <History className="h-3 w-3" />
+                      <span>Histórico</span>
+                    </button>
+                    
+                    <button
+                      onClick={exportarCalculo}
+                      className="flex items-center justify-center space-x-1 bg-green-500 text-white px-3 py-2 rounded-lg hover:bg-green-600 transition-colors text-sm"
+                    >
+                      <Download className="h-3 w-3" />
+                      <span>Exportar</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
+        
+        {/* Modal Salvar */}
+        {showSaveModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-8 max-w-md w-full m-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Salvar Cálculo
+              </h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nome do Cálculo
+                  </label>
+                  <input
+                    type="text"
+                    value={nomeReceita}
+                    onChange={(e) => setNomeReceita(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Ex: Bolo de Chocolate - Festa 50 pessoas"
+                  />
+                </div>
+                
+                <div className="flex justify-end space-x-4">
+                  <button
+                    onClick={() => setShowSaveModal(false)}
+                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={salvarCalculo}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                  >
+                    Salvar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Modal Histórico */}
+        {showHistorico && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-8 max-w-2xl w-full m-4 max-h-96 overflow-y-auto">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Histórico de Cálculos
+              </h3>
+              
+              {historico.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">Nenhum cálculo salvo ainda</p>
+              ) : (
+                <div className="space-y-4">
+                  {historico.map((calc, index) => (
+                    <div key={index} className="border border-gray-200 p-4 rounded-lg">
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-medium text-gray-900">{calc.receita_id}</h4>
+                        <span className="text-xl font-bold text-green-600">
+                          R$ {calc.preco_final.toFixed(2)}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-4 text-sm text-gray-600">
+                        <div>
+                          <span className="block">Ingredientes:</span>
+                          <span className="font-medium">R$ {calc.custo_ingredientes.toFixed(2)}</span>
+                        </div>
+                        <div>
+                          <span className="block">Mão de Obra:</span>
+                          <span className="font-medium">R$ {calc.custo_mao_obra.toFixed(2)}</span>
+                        </div>
+                        <div>
+                          <span className="block">Margem:</span>
+                          <span className="font-medium">{calc.margem_lucro}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              <div className="flex justify-end mt-6">
+                <button
+                  onClick={() => setShowHistorico(false)}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                >
+                  Fechar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

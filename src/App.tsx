@@ -9,6 +9,7 @@ import OrcamentosPage from './pages/OrcamentosPage'
 import RelatoriosPage from './pages/RelatoriosPage'
 import UpgradePage from './pages/UpgradePage'
 import LandingPage from './pages/LandingPage'
+import FerramentasPage from './pages/FerramentasPage'
 import LoginPage from './pages/LoginPage'
 import './App.css'
 
@@ -27,6 +28,7 @@ function App() {
             <Route path="/clientes" element={<ClientesPage />} />
             <Route path="/orcamentos" element={<OrcamentosPage />} />
             <Route path="/relatorios" element={<RelatoriosPage />} />
+            <Route path="/ferramentas" element={<FerramentasPage />} />
             <Route path="/upgrade" element={<UpgradePage />} />
           </Routes>
         </div>
