@@ -1,34 +1,33 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-
-// TODO: [REMOVIDO] Supabase auth e JWT complexo estavam aqui
-// Implementar: Sistema simples com localStorage para demo
-
-type User = {
-  id: string
-  nome: string
-  email: string
-  plano: string
-}
+import { User, PerfilConfeitaria } from '../types'
+import { LOCAL_STORAGE_KEYS, saveToLocalStorage, getFromLocalStorage, initializeDefaultData, clearAllUserData } from '../utils/localStorage'
 
 type AuthContextType = {
   user: User | null
+  perfilConfeitaria: PerfilConfeitaria | null
   loading: boolean
   signOut: () => void
-  signUp: (email: string, password: string, nome: string) => Promise<void>
+  signUp: (email: string, password: string, nome: string, nomeConfeitaria: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
+  updatePerfil: (perfil: Partial<PerfilConfeitaria>) => void
+  upgradeUser: (novoPlano: User['plano']) => void
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  perfilConfeitaria: null,
   loading: true,
   signOut: () => {},
   signUp: async () => {},
   signIn: async () => {},
+  updatePerfil: () => {},
+  upgradeUser: () => {},
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [perfilConfeitaria, setPerfilConfeitaria] = useState<PerfilConfeitaria | null>(null)
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
@@ -36,13 +35,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Verificar se usuário está logado no localStorage
     const checkAuth = () => {
       try {
-        const savedUser = localStorage.getItem('doce_user')
+        const savedUser = getFromLocalStorage<User | null>(LOCAL_STORAGE_KEYS.USER, null)
+        const savedPerfil = getFromLocalStorage<PerfilConfeitaria | null>(LOCAL_STORAGE_KEYS.PERFIL_CONFEITARIA, null)
+        
         if (savedUser) {
-          setUser(JSON.parse(savedUser))
+          setUser(savedUser)
+          setPerfilConfeitaria(savedPerfil)
         }
       } catch (error) {
         console.error('Erro ao verificar autenticação:', error)
-        localStorage.removeItem('doce_user')
+        clearAllUserData()
       } finally {
         setLoading(false)
       }
@@ -51,27 +53,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     checkAuth()
   }, [])
 
-  const signUp = async (email: string, password: string, nome: string) => {
+  const signUp = async (email: string, password: string, nome: string, nomeConfeitaria: string) => {
     try {
       setLoading(true)
-      
-      // TODO: [REMOVIDO] API endpoints de auth estavam aqui
-      // Simulação simples para demo - em produção conectar com Supabase/Firebase
       
       // Simular delay de rede
       await new Promise(resolve => setTimeout(resolve, 1000))
       
-      // Criar usuário mock
+      const userId = Date.now().toString()
+      
+      // Criar usuário
       const newUser: User = {
-        id: Date.now().toString(),
+        id: userId,
         nome,
         email,
-        plano: 'free'
+        plano: 'free',
+        data_cadastro: new Date().toISOString(),
+        ativo: true
       }
       
-      // Salvar no localStorage
-      localStorage.setItem('doce_user', JSON.stringify(newUser))
+      // Criar perfil da confeitaria
+      const newPerfil: PerfilConfeitaria = {
+        id: (Date.now() + 1).toString(),
+        usuario_id: userId,
+        nome_fantasia: nomeConfeitaria,
+        especialidades: [],
+        cidade: '',
+        estado: ''
+      }
+      
+      // Salvar dados
+      saveToLocalStorage(LOCAL_STORAGE_KEYS.USER, newUser)
+      saveToLocalStorage(LOCAL_STORAGE_KEYS.PERFIL_CONFEITARIA, newPerfil)
+      
+      // Inicializar dados padrão
+      initializeDefaultData(userId)
+      
       setUser(newUser)
+      setPerfilConfeitaria(newPerfil)
       
       // Navegar para dashboard
       navigate('/dashboard')
@@ -87,23 +106,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true)
       
-      // TODO: [REMOVIDO] Validação de senha com bcrypt estava aqui
-      // Simulação simples para demo
-      
       // Simular delay de rede
       await new Promise(resolve => setTimeout(resolve, 1000))
       
-      // Login simples para demo (qualquer email/senha funciona)
-      const mockUser: User = {
-        id: Date.now().toString(),
-        nome: 'Usuário Demo',
-        email,
-        plano: 'free'
-      }
+      // Verificar se usuário já existe
+      const existingUser = getFromLocalStorage<User | null>(LOCAL_STORAGE_KEYS.USER, null)
+      const existingPerfil = getFromLocalStorage<PerfilConfeitaria | null>(LOCAL_STORAGE_KEYS.PERFIL_CONFEITARIA, null)
       
-      // Salvar no localStorage
-      localStorage.setItem('doce_user', JSON.stringify(mockUser))
-      setUser(mockUser)
+      if (existingUser && existingUser.email === email) {
+        setUser(existingUser)
+        setPerfilConfeitaria(existingPerfil)
+      } else {
+        // Criar usuário demo
+        const userId = Date.now().toString()
+        const mockUser: User = {
+          id: userId,
+          nome: 'Usuário Demo',
+          email,
+          plano: 'free',
+          data_cadastro: new Date().toISOString(),
+          ativo: true
+        }
+        
+        const mockPerfil: PerfilConfeitaria = {
+          id: (Date.now() + 1).toString(),
+          usuario_id: userId,
+          nome_fantasia: 'Confeitaria Demo',
+          especialidades: ['Bolos', 'Doces'],
+          cidade: 'São Paulo',
+          estado: 'SP'
+        }
+        
+        saveToLocalStorage(LOCAL_STORAGE_KEYS.USER, mockUser)
+        saveToLocalStorage(LOCAL_STORAGE_KEYS.PERFIL_CONFEITARIA, mockPerfil)
+        initializeDefaultData(userId)
+        
+        setUser(mockUser)
+        setPerfilConfeitaria(mockPerfil)
+      }
       
       // Navegar para dashboard
       navigate('/dashboard')
@@ -116,13 +156,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = () => {
-    localStorage.removeItem('doce_user')
+    clearAllUserData()
     setUser(null)
+    setPerfilConfeitaria(null)
     navigate('/')
+  }
+  
+  const updatePerfil = (perfil: Partial<PerfilConfeitaria>) => {
+    if (perfilConfeitaria) {
+      const updatedPerfil = { ...perfilConfeitaria, ...perfil }
+      setPerfilConfeitaria(updatedPerfil)
+      saveToLocalStorage(LOCAL_STORAGE_KEYS.PERFIL_CONFEITARIA, updatedPerfil)
+    }
+  }
+  
+  const upgradeUser = (novoPlano: User['plano']) => {
+    if (user) {
+      const updatedUser = { ...user, plano: novoPlano }
+      setUser(updatedUser)
+      saveToLocalStorage(LOCAL_STORAGE_KEYS.USER, updatedUser)
+    }
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, signOut, signUp, signIn }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      perfilConfeitaria, 
+      loading, 
+      signOut, 
+      signUp, 
+      signIn, 
+      updatePerfil, 
+      upgradeUser 
+    }}>
       {children}
     </AuthContext.Provider>
   )

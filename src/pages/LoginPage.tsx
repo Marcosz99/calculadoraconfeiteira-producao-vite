@@ -7,6 +7,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [nome, setNome] = useState('')
+  const [nomeConfeitaria, setNomeConfeitaria] = useState('')
   const [error, setError] = useState('')
   const { signIn, signUp, loading } = useAuth()
 
@@ -18,7 +19,7 @@ export default function LoginPage() {
       if (isLogin) {
         await signIn(email, password)
       } else {
-        await signUp(email, password, nome)
+        await signUp(email, password, nome, nomeConfeitaria)
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Erro desconhecido')
@@ -38,22 +39,41 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nome
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="text"
-                  value={nome}
-                  onChange={(e) => setNome(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                  placeholder="Seu nome"
-                  required={!isLogin}
-                />
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Seu Nome
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    placeholder="Seu nome completo"
+                    required={!isLogin}
+                  />
+                </div>
               </div>
-            </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nome da Confeitaria
+                </label>
+                <div className="relative">
+                  <Calculator className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={nomeConfeitaria}
+                    onChange={(e) => setNomeConfeitaria(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    placeholder="Nome da sua confeitaria"
+                    required={!isLogin}
+                  />
+                </div>
+              </div>
+            </>
           )}
 
           <div>
