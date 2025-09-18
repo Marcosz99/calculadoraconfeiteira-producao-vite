@@ -21,6 +21,14 @@
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules", "archived-nextjs", "lib", "app", "server", "sql", "components", "hooks"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "exclude": [
+    "node_modules",
+    "archived-nextjs",
+    "lib",
+    "app",
+    "server",
+    "sql",
+    "components",
+    "hooks"
+  ]
 }
