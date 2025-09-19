@@ -191,7 +191,23 @@ export default function DashboardPage() {
           </p>
         </div>
         
-        {/* Alertas */}
+        {/* Alertas de Boas-Vindas para Usuários Novos */}
+        {profile && !profile.nome_negocio && (
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+            <div className="flex items-center">
+              <BookOpen className="h-5 w-5 text-blue-400 mr-3" />
+              <div>
+                <p className="text-sm text-blue-700">
+                  <strong>👋 Novo por aqui?</strong> Acesse o 
+                  <Link to="/como-usar" className="ml-1 underline hover:no-underline font-medium">
+                    Guia "Como Usar"
+                  </Link>
+                  {" "}para aprender a dominar o DoceCalc!
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         {alertasEstoque.length > 0 && (
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
             <div className="flex">
@@ -410,6 +426,19 @@ export default function DashboardPage() {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">Backup Emergencial</h3>
                     <p className="text-gray-600">Proteja seus dados</p>
+                  </div>
+                </div>
+              </Link>
+
+              <Link 
+                to="/como-usar"
+                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-yellow-500 block"
+              >
+                <div className="flex items-center space-x-4">
+                  <BookOpen className="h-10 w-10 text-yellow-500" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Como Usar</h3>
+                    <p className="text-red-600 font-medium">NOVO! Guia completo</p>
                   </div>
                 </div>
               </Link>
