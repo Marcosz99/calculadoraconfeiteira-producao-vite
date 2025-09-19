@@ -47,6 +47,62 @@ export type Database = {
         }
         Relationships: []
       }
+      pagamentos: {
+        Row: {
+          created_at: string
+          dados_pagamento: Json | null
+          data_pagamento: string | null
+          data_vencimento: string | null
+          id: string
+          observacoes: string | null
+          plano: string
+          referencia_externa: string | null
+          status: string
+          tipo_pagamento: string
+          updated_at: string
+          user_id: string
+          valor: number
+        }
+        Insert: {
+          created_at?: string
+          dados_pagamento?: Json | null
+          data_pagamento?: string | null
+          data_vencimento?: string | null
+          id?: string
+          observacoes?: string | null
+          plano: string
+          referencia_externa?: string | null
+          status?: string
+          tipo_pagamento: string
+          updated_at?: string
+          user_id: string
+          valor: number
+        }
+        Update: {
+          created_at?: string
+          dados_pagamento?: Json | null
+          data_pagamento?: string | null
+          data_vencimento?: string | null
+          id?: string
+          observacoes?: string | null
+          plano?: string
+          referencia_externa?: string | null
+          status?: string
+          tipo_pagamento?: string
+          updated_at?: string
+          user_id?: string
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagamentos_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       perfis_profissionais: {
         Row: {
           ativo: boolean | null
@@ -91,31 +147,67 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ativo: boolean | null
+          bio: string | null
+          cep: string | null
+          cidade: string | null
           created_at: string | null
           email: string
+          endereco: string | null
+          estado: string | null
+          foto_perfil: string | null
           id: string
+          instagram: string | null
           nome: string
+          nome_negocio: string | null
           password: string
           plano: string | null
+          telefone: string | null
           updated_at: string | null
+          valor_hora: number | null
+          whatsapp: string | null
         }
         Insert: {
+          ativo?: boolean | null
+          bio?: string | null
+          cep?: string | null
+          cidade?: string | null
           created_at?: string | null
           email: string
+          endereco?: string | null
+          estado?: string | null
+          foto_perfil?: string | null
           id?: string
+          instagram?: string | null
           nome: string
+          nome_negocio?: string | null
           password: string
           plano?: string | null
+          telefone?: string | null
           updated_at?: string | null
+          valor_hora?: number | null
+          whatsapp?: string | null
         }
         Update: {
+          ativo?: boolean | null
+          bio?: string | null
+          cep?: string | null
+          cidade?: string | null
           created_at?: string | null
           email?: string
+          endereco?: string | null
+          estado?: string | null
+          foto_perfil?: string | null
           id?: string
+          instagram?: string | null
           nome?: string
+          nome_negocio?: string | null
           password?: string
           plano?: string | null
+          telefone?: string | null
           updated_at?: string | null
+          valor_hora?: number | null
+          whatsapp?: string | null
         }
         Relationships: []
       }
