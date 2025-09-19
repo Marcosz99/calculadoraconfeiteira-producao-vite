@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown } from 'lucide-react'
+import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown, MessageSquare } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function DashboardPage() {
@@ -46,6 +46,13 @@ export default function DashboardPage() {
               </div>
               
               <div className="flex items-center space-x-2">
+                <Link
+                  to="/comunidade"
+                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Comunidade"
+                >
+                  <MessageSquare className="h-5 w-5" />
+                </Link>
                 <Link
                   to="/upgrade"
                   className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
@@ -157,6 +164,19 @@ export default function DashboardPage() {
                 </div>
               </div>
             </Link>
+
+            <Link 
+              to="/comunidade"
+              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-teal-500"
+            >
+              <div className="flex items-center space-x-4">
+                <MessageSquare className="h-10 w-10 text-teal-500" />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Comunidade</h3>
+                  <p className="text-gray-600">Troque ideias e dicas</p>
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
 
@@ -181,6 +201,11 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
+
+        {/* Footer de suporte */}
+        <footer className="mt-12 border-t pt-4 text-center text-gray-500 text-sm">
+          Suporte/Feedbacks: 15 9512....
+        </footer>
       </div>
     </div>
   )
