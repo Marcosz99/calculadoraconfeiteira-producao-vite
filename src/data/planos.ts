@@ -22,55 +22,20 @@ export const planos: Plano[] = [
     preco_mensal: 39.90,
     limite_receitas: null,
     limite_orcamentos: null,
-    descricao: 'Para confeitarias em crescimento',
+    descricao: 'Acesso completo a todas as funcionalidades',
     popular: true,
     funcionalidades: [
       'Receitas ilimitadas',
-      'Gestão completa de ingredientes',
       'Orçamentos ilimitados',
-      'Controle básico de pedidos',
-      'Relatórios essenciais',
+      'Gestão completa de ingredientes',
+      'Gestão completa de clientes',
+      'Controle completo de pedidos',
+      'Relatórios completos',
       'Backup automático',
-      'Suporte por email',
-      'Templates profissionais'
-    ]
-  },
-  {
-    id: 'premium',
-    nome: 'Premium',
-    preco_mensal: 69.90,
-    limite_receitas: null,
-    limite_orcamentos: null,
-    descricao: 'Recursos avançados',
-    funcionalidades: [
-      'Tudo do Profissional',
-      'App mobile completo',
-      'Gestão avançada de clientes',
-      'Agenda de entregas',
-      'Relatórios avançados',
-      'Integração WhatsApp Business',
-      'Calculadora nutricional',
-      'Suporte prioritário',
-      'API básica'
-    ]
-  },
-  {
-    id: 'master',
-    nome: 'Master',
-    preco_mensal: 119.90,
-    limite_receitas: null,
-    limite_orcamentos: null,
-    descricao: 'Solução completa',
-    funcionalidades: [
-      'Tudo do Premium',
-      'Multi-usuários (até 5 funcionários)',
-      'White label (sua marca)',
-      'Integrações avançadas',
-      'Consultoria mensal (1h)',
-      'Relatórios personalizados',
-      'API completa',
-      'Setup personalizado',
-      'Suporte por telefone'
+      'Catálogo público ilimitado',
+      'Comunidade completa',
+      'Todas as ferramentas',
+      'Suporte prioritário'
     ]
   }
 ]

@@ -1,16 +1,27 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { ArrowLeft, Check, Star, Zap, Crown } from 'lucide-react'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { ArrowLeft, Check, Crown, Zap, Shield, Star, QrCode, CreditCard } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { planos } from '../data/planos'
 
 export default function UpgradePage() {
-  const { user, upgradeUser } = useAuth()
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState<'pix' | 'card' | null>(null)
 
-  const handleUpgrade = (planoId: string) => {
-    if (user) {
-      upgradeUser(planoId as any)
-      alert(`Plano ${planos.find(p => p.id === planoId)?.nome} ativado com sucesso!`)
+  const handleUpgrade = async (method: 'pix' | 'card') => {
+    setLoading(method)
+    
+    try {
+      if (method === 'pix') {
+        navigate('/upgrade/pix')
+      } else {
+        navigate('/upgrade/stripe')
+      }
+    } catch (error) {
+      console.error('Erro no upgrade:', error)
+    } finally {
+      setLoading(null)
     }
   }
 
@@ -84,86 +95,111 @@ export default function UpgradePage() {
         )}
 
         {/* Comparativo de Planos */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
           {planos.map(plano => {
             const isPlanoAtual = user?.plano === plano.id
-            const podeUpgrade = user && user.plano !== plano.id
             
             return (
               <div 
                 key={plano.id} 
-                className={`relative rounded-lg border-2 p-6 ${getPlanoColor(plano.id)} ${
-                  plano.popular ? 'ring-2 ring-purple-500' : ''
+                className={`relative rounded-lg border-2 p-8 ${getPlanoColor(plano.id)} ${
+                  plano.popular ? 'ring-2 ring-purple-500 transform scale-105' : ''
                 }`}
               >
                 {plano.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-purple-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                    <span className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1 rounded-full text-sm font-medium">
                       Mais Popular
                     </span>
                   </div>
                 )}
                 
-                <div className="text-center mb-6">
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                <div className="text-center mb-8">
+                  <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${
                     plano.id === 'free' ? 'bg-gray-100 text-gray-600' :
-                    plano.id === 'professional' ? 'bg-blue-100 text-blue-600' :
-                    plano.id === 'premium' ? 'bg-purple-100 text-purple-600' :
-                    'bg-yellow-100 text-yellow-600'
+                    'bg-blue-100 text-blue-600'
                   }`}>
                     {getPlanoIcon(plano.id)}
                   </div>
                   
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
                     {plano.nome}
                   </h3>
                   
                   <div className="mb-4">
                     {plano.preco_mensal === 0 ? (
-                      <span className="text-3xl font-bold text-gray-900">Grátis</span>
+                      <span className="text-4xl font-bold text-gray-900">Grátis</span>
                     ) : (
                       <div>
-                        <span className="text-3xl font-bold text-gray-900">
+                        <span className="text-4xl font-bold text-gray-900">
                           R$ {plano.preco_mensal.toFixed(2).replace('.', ',')}
                         </span>
-                        <span className="text-gray-600">/mês</span>
+                        <span className="text-xl text-gray-600 font-normal">/mês</span>
                       </div>
                     )}
                   </div>
                   
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-gray-600">
                     {plano.descricao}
                   </p>
                 </div>
 
-                <div className="space-y-3 mb-6">
+                <div className="space-y-3 mb-8">
                   {plano.funcionalidades.map((funcionalidade, index) => (
-                    <div key={index} className="flex items-center space-x-2">
-                      <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
-                      <span className="text-sm text-gray-700">{funcionalidade}</span>
+                    <div key={index} className="flex items-start space-x-3">
+                      <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700">{funcionalidade}</span>
                     </div>
                   ))}
                 </div>
 
                 <div className="mt-auto">
                   {isPlanoAtual ? (
-                    <div className="w-full py-2 px-4 bg-gray-100 text-gray-600 rounded-lg text-center font-medium">
+                    <div className="w-full py-3 px-4 bg-gray-100 text-gray-600 rounded-lg text-center font-medium">
                       Plano Atual
                     </div>
-                  ) : podeUpgrade ? (
+                  ) : plano.id === 'free' ? (
                     <button
-                      onClick={() => handleUpgrade(plano.id)}
-                      className={`w-full py-2 px-4 text-white rounded-lg font-medium transition-colors ${getPlanoButtonColor(plano.id)}`}
+                      disabled
+                      className="w-full py-3 px-4 bg-gray-100 text-gray-400 rounded-lg font-medium cursor-not-allowed"
                     >
-                      {plano.preco_mensal === 0 ? 'Voltar ao Gratuito' : 'Fazer Upgrade'}
+                      Plano Gratuito
                     </button>
                   ) : (
-                    <button
-                      onClick={() => handleUpgrade(plano.id)}
-                      className={`w-full py-2 px-4 text-white rounded-lg font-medium transition-colors ${getPlanoButtonColor(plano.id)}`}
-                    >
-                      Selecionar Plano
-                    </button>
+                    <div className="space-y-3">
+                      <div className="text-center text-sm font-medium text-gray-700 mb-4">
+                        Escolha sua forma de pagamento:
+                      </div>
+                      
+                      <button
+                        onClick={() => handleUpgrade('pix')}
+                        disabled={loading !== null}
+                        className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                      >
+                        {loading === 'pix' ? (
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <QrCode className="w-5 h-5" />
+                        )}
+                        Pagar com PIX
+                        {loading !== 'pix' && (
+                          <span className="bg-green-500 px-2 py-1 rounded text-xs ml-2">Instantâneo</span>
+                        )}
+                      </button>
+                      
+                      <button
+                        onClick={() => handleUpgrade('card')}
+                        disabled={loading !== null}
+                        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+                      >
+                        {loading === 'card' ? (
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <CreditCard className="w-5 h-5" />
+                        )}
+                        Pagar com Cartão
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

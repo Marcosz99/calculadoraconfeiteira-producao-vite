@@ -8,6 +8,8 @@ import ClientesPage from './pages/ClientesPage'
 import OrcamentosPage from './pages/OrcamentosPage'
 import RelatoriosPage from './pages/RelatoriosPage'
 import UpgradePage from './pages/UpgradePage'
+import { UpgradePixPage } from './pages/UpgradePixPage'
+import { UpgradeStripePage } from './pages/UpgradeStripePage'
 import ComunidadePage from './pages/ComunidadePage'
 import BackupEmergencialPage from './pages/BackupEmergencialPage'
 import LandingPage from './pages/LandingPage'
@@ -35,6 +37,8 @@ function App() {
             <Route path="/relatorios" element={<RelatoriosPage />} />
             <Route path="/ferramentas" element={<FerramentasPage />} />
             <Route path="/upgrade" element={<UpgradePage />} />
+            <Route path="/upgrade/pix" element={<UpgradePixPage />} />
+            <Route path="/upgrade/stripe" element={<UpgradeStripePage />} />
             <Route path="/comunidade" element={<ComunidadePage />} />
             <Route path="/backup-emergencial" element={<BackupEmergencialPage />} />
             <Route path="/meu-catalogo" element={<MeuCatalogoPage />} />

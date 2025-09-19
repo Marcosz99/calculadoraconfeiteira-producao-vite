@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Plus, Search, Filter, Clock, Users, Star, Edit, Trash2, Eye, X } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { Receita, Categoria, ReceitaIngrediente, IngredienteUsuario } from '../types'
 import { LOCAL_STORAGE_KEYS, saveToLocalStorage, getFromLocalStorage } from '../utils/localStorage'
+import { useSubscriptionLimits } from '../hooks/useSubscriptionLimits'
+import { UpgradeModal } from '../components/UpgradeModal'
+import { LimitBadge } from '../components/LimitBadge'
 
 export default function ReceitasPage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
+  const { canAddReceita, isProfessional, usage, limits } = useSubscriptionLimits()
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [receitas, setReceitas] = useState<Receita[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [ingredientes, setIngredientes] = useState<IngredienteUsuario[]>([])
@@ -241,13 +247,27 @@ export default function ReceitasPage() {
             </div>
           </div>
           
-          <button
-            onClick={() => setShowModal(true)}
-            className="flex items-center space-x-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors"
-          >
-            <Plus className="h-5 w-5" />
-            <span>Nova Receita</span>
-          </button>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => {
+                if (canAddReceita()) {
+                  setShowModal(true)
+                } else {
+                  setShowUpgradeModal(true)
+                }
+              }}
+              className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-colors ${
+                canAddReceita() 
+                  ? 'bg-pink-500 text-white hover:bg-pink-600' 
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              <Plus className="h-5 w-5" />
+              <span>Nova Receita</span>
+            </button>
+            
+            <LimitBadge type="receitas" />
+          </div>
         </div>
 
         {/* Filtros */}
@@ -730,6 +750,20 @@ export default function ReceitasPage() {
           </div>
         )}
       </div>
+
+      {/* Upgrade Modal */}
+      <UpgradeModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        feature="receitas"
+        onUpgrade={(method) => {
+          if (method === 'pix') {
+            navigate('/upgrade/pix')
+          } else {
+            navigate('/upgrade/stripe')
+          }
+        }}
+      />
     </div>
   )
 }
