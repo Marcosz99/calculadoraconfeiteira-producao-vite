@@ -140,18 +140,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Escutar mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setUser(session?.user ?? null)
         setLoading(false)
         
         if (session?.user) {
-          await fetchProfile(session.user.id)
-          // Verificar assinatura após login
-          if (event === 'SIGNED_IN') {
-            setTimeout(() => {
+          // Buscar perfil de forma assíncrona sem bloquear o callback
+          setTimeout(() => {
+            fetchProfile(session.user!.id)
+            // Verificar assinatura após login
+            if (event === 'SIGNED_IN') {
               checkSubscription()
-            }, 1000)
-          }
+              navigate('/dashboard', { replace: true })
+            }
+          }, 0)
         } else {
           setProfile(null)
         }
@@ -199,7 +201,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         toast({
           title: "Conta criada com sucesso!",
-          description: "Verifique seu email para confirmar a conta.",
+          description: "Bem-vinda ao DoceCalc. Sua conta já está pronta para uso.",
         })
       }
     } catch (error: any) {
@@ -208,9 +210,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: error.message,
         variant: "destructive",
       })
-      throw error
-    } finally {
       setLoading(false)
+      throw error
     }
   }
 
@@ -230,16 +231,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         description: "Bem-vindo de volta!",
       })
 
-      navigate('/dashboard')
+      // Navegação acontece no onAuthStateChange quando o evento é SIGNED_IN
+      return
     } catch (error: any) {
       toast({
         title: "Erro no login",
         description: error.message,
         variant: "destructive",
       })
-      throw error
-    } finally {
       setLoading(false)
+      throw error
     }
   }
 
