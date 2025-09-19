@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      backups_usuarios: {
+        Row: {
+          created_at: string | null
+          dados: Json
+          dispositivo: string | null
+          id: string
+          observacoes: string | null
+          resolvido: boolean | null
+          usuario_email: string
+          versao: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          dados: Json
+          dispositivo?: string | null
+          id?: string
+          observacoes?: string | null
+          resolvido?: boolean | null
+          usuario_email: string
+          versao?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          dados?: Json
+          dispositivo?: string | null
+          id?: string
+          observacoes?: string | null
+          resolvido?: boolean | null
+          usuario_email?: string
+          versao?: string | null
+        }
+        Relationships: []
+      }
+      perfis_profissionais: {
+        Row: {
+          ativo: boolean | null
+          cidade: string | null
+          created_at: string | null
+          email: string
+          especialidades: string[] | null
+          estado: string | null
+          id: string
+          instagram: string | null
+          nome: string
+          nome_negocio: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          cidade?: string | null
+          created_at?: string | null
+          email: string
+          especialidades?: string[] | null
+          estado?: string | null
+          id?: string
+          instagram?: string | null
+          nome: string
+          nome_negocio?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          cidade?: string | null
+          created_at?: string | null
+          email?: string
+          especialidades?: string[] | null
+          estado?: string | null
+          id?: string
+          instagram?: string | null
+          nome?: string
+          nome_negocio?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
