@@ -206,7 +206,7 @@ export default function LandingPage() {
               <div className="text-sm sm:text-base text-gray-600">Confeiteiras BR</div>
             </div>
             <div className="text-center hover-lift p-4 rounded-lg">
-              <div className="text-2xl sm:text-3xl font-bold text-pink-600">R$ 29</div>
+              <div className="text-2xl sm:text-3xl font-bold text-pink-600">R$ 39,90</div>
               <div className="text-sm sm:text-base text-gray-600">Por mês apenas</div>
             </div>
           </div>
@@ -445,30 +445,16 @@ export default function LandingPage() {
               </div>
               <div className="text-center mb-6">
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Plano Profissional</h3>
-                <div className="text-3xl sm:text-4xl font-bold text-pink-500">R$ 29</div>
+                <div className="text-3xl sm:text-4xl font-bold text-pink-500">R$ 39,90</div>
                 <p className="text-gray-600">Por mês</p>
               </div>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-sm sm:text-base">Receitas ilimitadas</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-sm sm:text-base">Calculadora avançada</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-sm sm:text-base">Orçamentos profissionais</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-sm sm:text-base">Relatórios avançados</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-sm sm:text-base">Suporte prioritário</span>
-                </li>
+               <ul className="space-y-3 mb-8">
+                {planos.find(p => p.id === 'professional')?.funcionalidades.slice(0, 8).map((funcionalidade, index) => (
+                  <li key={index} className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                    <span className="text-sm sm:text-base text-gray-700">{funcionalidade}</span>
+                  </li>
+                ))}
               </ul>
               <Link
                 to="/login"
