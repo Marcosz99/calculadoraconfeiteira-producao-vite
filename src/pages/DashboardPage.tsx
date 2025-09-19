@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown } from 'lucide-react'
+import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown, MessageCircle, Shield } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { Receita, IngredienteUsuario, Cliente, Orcamento } from '../types'
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../utils/localStorage'
@@ -304,6 +304,32 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </Link>
+
+              <Link 
+                to="/comunidade"
+                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-cyan-500"
+              >
+                <div className="flex items-center space-x-4">
+                  <MessageCircle className="h-10 w-10 text-cyan-500" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Comunidade</h3>
+                    <p className="text-gray-600">Converse com confeiteiros</p>
+                  </div>
+                </div>
+              </Link>
+
+              <button 
+                onClick={() => window.open('/backup-emergencial', '_blank')}
+                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-red-500 text-left"
+              >
+                <div className="flex items-center space-x-4">
+                  <Shield className="h-10 w-10 text-red-500" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Backup Emergencial</h3>
+                    <p className="text-gray-600">Salve seus dados</p>
+                  </div>
+                </div>
+              </button>
             </div>
           </div>
           

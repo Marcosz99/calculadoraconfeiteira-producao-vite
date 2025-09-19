@@ -8,6 +8,8 @@ import ClientesPage from './pages/ClientesPage'
 import OrcamentosPage from './pages/OrcamentosPage'
 import RelatoriosPage from './pages/RelatoriosPage'
 import UpgradePage from './pages/UpgradePage'
+import ComunidadePage from './pages/ComunidadePage'
+import BackupEmergencialPage from './pages/BackupEmergencialPage'
 import LandingPage from './pages/LandingPage'
 import FerramentasPage from './pages/FerramentasPage'
 import LoginPage from './pages/LoginPage'
@@ -30,6 +32,8 @@ function App() {
             <Route path="/relatorios" element={<RelatoriosPage />} />
             <Route path="/ferramentas" element={<FerramentasPage />} />
             <Route path="/upgrade" element={<UpgradePage />} />
+            <Route path="/comunidade" element={<ComunidadePage />} />
+            <Route path="/backup-emergencial" element={<BackupEmergencialPage />} />
           </Routes>
         </div>
       </AuthProvider>
