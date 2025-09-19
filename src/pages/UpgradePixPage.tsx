@@ -46,7 +46,20 @@ export const UpgradePixPage = () => {
       
       if (error) {
         console.error('Error creating PIX:', error)
-        alert('Erro ao criar pagamento PIX: ' + error.message)
+        
+        // Mensagens mais claras para o usuário
+        let userMessage = "Erro ao criar pagamento PIX"
+        if (error.message && error.message.includes("CPF inválido")) {
+          userMessage = "CPF inválido. Digite um CPF válido no formato: 000.000.000-00"
+        } else if (error.message && error.message.includes("Telefone inválido")) {
+          userMessage = "Telefone inválido. Use o formato: (11) 99999-9999"
+        } else if (error.message && error.message.includes("Email inválido")) {
+          userMessage = "Email inválido. Verifique o endereço de email"
+        } else if (error.message && error.message.includes("Invalid taxId")) {
+          userMessage = "CPF inválido. Digite um CPF válido no formato: 000.000.000-00"
+        }
+        
+        alert(userMessage)
         return
       }
       
@@ -76,7 +89,16 @@ export const UpgradePixPage = () => {
       
       if (error) {
         console.error('Error checking payment:', error)
-        alert('Erro ao verificar pagamento: ' + error.message)
+        
+        // Mensagem mais clara para o usuário
+        let userMessage = "Erro ao verificar pagamento"
+        if (error.message && error.message.includes("expired")) {
+          userMessage = "O PIX expirou. Gere um novo QR Code."
+        } else if (error.message && error.message.includes("not found")) {
+          userMessage = "PIX não encontrado. Tente gerar um novo."
+        }
+        
+        alert(userMessage)
         return
       }
       

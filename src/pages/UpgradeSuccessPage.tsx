@@ -27,9 +27,9 @@ export const UpgradeSuccessPage = () => {
       
       // Verificar o status da subscription
       const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
+        body: {
+          userEmail: user?.email
+        }
       })
       
       if (error) {

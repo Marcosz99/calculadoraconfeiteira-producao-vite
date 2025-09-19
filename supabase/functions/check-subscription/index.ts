@@ -17,12 +17,6 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders })
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-    { auth: { persistSession: false } }
-  )
-
   try {
     logStep("Function started")
 
@@ -30,24 +24,25 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set")
     logStep("Stripe key verified")
 
-    const authHeader = req.headers.get("Authorization")
-    if (!authHeader) throw new Error("No authorization header provided")
-    logStep("Authorization header found")
-
-    const token = authHeader.replace("Bearer ", "")
-    logStep("Authenticating user with token")
+    // Get user email from request body instead of JWT
+    const requestBody = await req.json()
+    const { userEmail } = requestBody
     
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token)
-    if (userError) throw new Error(`Authentication error: ${userError.message}`)
-    const user = userData.user
-    if (!user?.email) throw new Error("User not authenticated or email not available")
-    logStep("User authenticated", { userId: user.id, email: user.email })
+    if (!userEmail) {
+      logStep("ERROR: Missing user email")
+      return new Response(JSON.stringify({ error: "Email do usuário é obrigatório" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+
+    logStep("User email received", { email: userEmail })
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" })
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 })
+    const customers = await stripe.customers.list({ email: userEmail, limit: 1 })
     
     if (customers.data.length === 0) {
-      logStep("No customer found, updating unsubscribed state")
+      logStep("No customer found, returning unsubscribed state")
       return new Response(JSON.stringify({ subscribed: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -72,32 +67,8 @@ serve(async (req) => {
       logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd })
       productId = subscription.items.data[0].price.product
       logStep("Determined subscription tier", { productId })
-
-      // Update user plan in Supabase
-      const { error: updateError } = await supabaseClient
-        .from('profiles')
-        .update({ plano: 'professional', updated_at: new Date().toISOString() })
-        .eq('email', user.email)
-
-      if (updateError) {
-        logStep("Error updating user plan", { error: updateError })
-      } else {
-        logStep("User plan updated to professional")
-      }
     } else {
       logStep("No active subscription found")
-      
-      // Reset user plan to free
-      const { error: updateError } = await supabaseClient
-        .from('profiles')
-        .update({ plano: 'free', updated_at: new Date().toISOString() })
-        .eq('email', user.email)
-
-      if (updateError) {
-        logStep("Error updating user plan to free", { error: updateError })
-      } else {
-        logStep("User plan updated to free")
-      }
     }
 
     return new Response(JSON.stringify({
@@ -111,7 +82,17 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
     logStep("ERROR in check-subscription", { message: errorMessage })
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    
+    // Return user-friendly error messages
+    let userMessage = "Erro ao verificar assinatura"
+    if (errorMessage.includes("STRIPE_SECRET_KEY")) {
+      userMessage = "Erro na configuração. Entre em contato com o suporte."
+    }
+    
+    return new Response(JSON.stringify({ 
+      error: userMessage,
+      details: errorMessage 
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     })

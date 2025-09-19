@@ -30,12 +30,13 @@ serve(async (req) => {
 
     console.log('Calling Abacate Pay check API for PIX:', pixId)
     
-    const abacateResponse = await fetch(`https://api.abacatepay.com/v1/pixQrCode/check/${pixId}`, {
-      method: 'GET',
+    const abacateResponse = await fetch(`https://api.abacatepay.com/v1/pixQrCode/check`, {
+      method: 'POST',
       headers: {
         'Authorization': `Bearer ${abacatePayToken}`,
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ id: pixId }),
     })
 
     const responseData = await abacateResponse.json()

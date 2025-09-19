@@ -65,10 +65,22 @@ serve(async (req) => {
 
     if (responseData.error) {
       console.error('Abacate Pay returned error:', responseData.error)
-      return new Response(
-        JSON.stringify({ error: 'Erro na API Abacate Pay', details: responseData.error }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+    // Return user-friendly error messages
+    let userMessage = "Erro ao criar pagamento PIX";
+    if (responseData.error === "Invalid taxId") {
+      userMessage = "CPF inválido. Por favor, digite um CPF válido no formato: 000.000.000-00";
+    } else if (responseData.error === "Invalid cellphone") {
+      userMessage = "Telefone inválido. Use o formato: (11) 99999-9999";
+    } else if (responseData.error === "Invalid email") {
+      userMessage = "Email inválido. Verifique o endereço de email";
+    } else if (responseData.error === "Invalid amount") {
+      userMessage = "Valor do pagamento inválido";
+    }
+    
+    return new Response(
+      JSON.stringify({ error: userMessage, details: responseData.error }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
     }
 
     // Salvar informações do pagamento no banco

@@ -27,9 +27,9 @@ export const UpgradeStripePage = () => {
       console.log('Checking subscription status...')
       
       const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
+        body: {
+          userEmail: user.email
+        }
       })
       
       if (error) {
@@ -69,14 +69,15 @@ export const UpgradeStripePage = () => {
       console.log('Creating Stripe checkout session...')
       
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
+        body: {
+          userEmail: user.email,
+          userName: user.nome
+        }
       })
       
       if (error) {
         console.error('Error creating checkout:', error)
-        alert('Erro ao criar sessão de pagamento: ' + error.message)
+        alert('Erro ao criar sessão de pagamento: ' + (error.message || 'Erro desconhecido'))
         return
       }
       
@@ -89,7 +90,7 @@ export const UpgradeStripePage = () => {
       
     } catch (error) {
       console.error('Error:', error)
-      alert('Erro ao processar pagamento')
+      alert('Erro interno. Tente novamente em alguns segundos.')
     } finally {
       setLoading(false)
     }
