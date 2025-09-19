@@ -113,67 +113,67 @@ export default function DashboardPage() {
   }
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-card shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div className="flex items-center space-x-4">
-              <Calculator className="h-8 w-8 text-pink-500" />
+              <Calculator className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">DoceCalc</h1>
-                <p className="text-sm text-gray-600">{perfilConfeitaria?.nome_fantasia || 'Minha Confeitaria'}</p>
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground">DoceCalc</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground">{perfilConfeitaria?.nome_fantasia || 'Minha Confeitaria'}</p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Crown className={`h-5 w-5 ${
-                  profile?.plano === 'free' ? 'text-gray-400' :
+            <div className="flex items-center justify-between sm:justify-end space-x-2 sm:space-x-4 overflow-x-auto">
+              <div className="flex items-center space-x-2 flex-shrink-0">
+                <Crown className={`h-4 w-4 sm:h-5 sm:w-5 ${
+                  profile?.plano === 'free' ? 'text-muted-foreground' :
                   profile?.plano === 'professional' ? 'text-blue-500' :
                   profile?.plano === 'premium' ? 'text-purple-500' :
                   'text-yellow-500'
                 }`} />
-                <span className="text-sm font-medium text-gray-700">
-                  Plano {planoAtual?.nome}
+                <span className="text-xs sm:text-sm font-medium text-foreground">
+                  {planoAtual?.nome}
                 </span>
               </div>
               
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1 sm:space-x-2">
                 <Link
                   to="/subscription"
-                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="p-2 text-muted-foreground hover:text-foreground transition-colors"
                   title="Assinatura"
                 >
-                  <Crown className="h-5 w-5" />
+                  <Crown className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Link>
                 <Link
                   to="/upgrade"
-                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="p-2 text-muted-foreground hover:text-foreground transition-colors"
                   title="Configurações"
                 >
-                  <Settings className="h-5 w-5" />
+                  <Settings className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Link>
                 <button
                   onClick={() => setShowOnboarding(true)}
-                  className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                  className="p-2 text-muted-foreground hover:text-primary transition-colors"
                   title="Tutorial"
                 >
-                  <BookOpen className="h-5 w-5" />
+                  <BookOpen className="h-4 w-4 sm:h-5 sm:w-5" />
                 </button>
                 <button
                   onClick={() => setShowMigration(true)}
-                  className="p-2 text-gray-400 hover:text-green-600 transition-colors"
+                  className="p-2 text-muted-foreground hover:text-success transition-colors"
                   title="Migrar dados"
                 >
-                  <Cloud className="h-5 w-5" />
+                  <Cloud className="h-4 w-4 sm:h-5 sm:w-5" />
                 </button>
                 <button
                   onClick={signOut}
-                  className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                  className="p-2 text-muted-foreground hover:text-destructive transition-colors"
                   title="Sair"
                 >
-                  <LogOut className="h-5 w-5" />
+                  <LogOut className="h-4 w-4 sm:h-5 sm:w-5" />
                 </button>
               </div>
             </div>
@@ -181,23 +181,23 @@ export default function DashboardPage() {
         </div>
       </header>
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+      <div className="container mx-auto px-4 py-6 lg:py-8">
+        <div className="mb-6 lg:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-1 lg:mb-2">
             Olá, {profile?.nome}! 👋
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground text-sm lg:text-base">
             Bem-vinda ao seu painel de controle
           </p>
         </div>
         
         {/* Alertas de Boas-Vindas para Usuários Novos */}
         {profile && !profile.nome_negocio && (
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
-            <div className="flex items-center">
-              <BookOpen className="h-5 w-5 text-blue-400 mr-3" />
+          <div className="bg-accent border-l-4 border-primary p-4 mb-6 rounded-r-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0">
+              <BookOpen className="h-5 w-5 text-primary mr-0 sm:mr-3 flex-shrink-0" />
               <div>
-                <p className="text-sm text-blue-700">
+                <p className="text-sm text-accent-foreground">
                   <strong>👋 Novo por aqui?</strong> Acesse o 
                   <Link to="/como-usar" className="ml-1 underline hover:no-underline font-medium">
                     Guia "Como Usar"
@@ -209,11 +209,11 @@ export default function DashboardPage() {
           </div>
         )}
         {alertasEstoque.length > 0 && (
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-            <div className="flex">
-              <Package className="h-5 w-5 text-yellow-400" />
-              <div className="ml-3">
-                <p className="text-sm text-yellow-700">
+          <div className="bg-accent border-l-4 border-warning p-4 mb-6 rounded-r-lg">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0">
+              <Package className="h-5 w-5 text-warning flex-shrink-0" />
+              <div className="ml-0 sm:ml-3">
+                <p className="text-sm text-accent-foreground">
                   <strong>{alertasEstoque.length} ingredientes</strong> com estoque baixo precisam de reposição.
                   <Link to="/ingredientes" className="ml-2 underline hover:no-underline">
                     Ver agora
@@ -225,7 +225,7 @@ export default function DashboardPage() {
         )}
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-6 mb-6 lg:mb-8">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="flex items-center justify-between">
               <div>

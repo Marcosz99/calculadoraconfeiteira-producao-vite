@@ -190,20 +190,20 @@ export default function ComunidadePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-6 lg:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+        <div className="mb-6 lg:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-1 lg:mb-2">
             Comunidade DoceCalc 👥
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground text-sm lg:text-base">
             Conecte-se com outros confeiteiros, compartilhe experiências e aprenda juntos!
           </p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mb-6 lg:mb-8">
           <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="flex items-center space-x-4">
               <Users className="h-10 w-10 text-blue-500" />
@@ -236,20 +236,20 @@ export default function ComunidadePage() {
         </div>
 
         {/* Barra de Pesquisa */}
-        <div className="mb-8">
+        <div className="mb-6 lg:mb-8">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 lg:h-5 lg:w-5" />
             <input
               type="text"
               placeholder="Pesquisar posts, autores ou conteúdo..."
               value={termoPesquisa}
               onChange={(e) => setTermoPesquisa(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 lg:py-3 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Filtros e Novo Post */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">

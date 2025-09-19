@@ -181,38 +181,38 @@ export default function CalculadoraPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex items-center space-x-4">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-6 lg:py-8">
+        <div className="mb-6 lg:mb-8 flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
           <Link 
             to="/dashboard"
-            className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+            className="p-2 hover:bg-muted rounded-lg transition-colors w-fit"
           >
             <ArrowLeft className="h-6 w-6" />
           </Link>
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-1 lg:mb-2">
               Calculadora de Preços
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground text-sm lg:text-base">
               Calcule o preço correto dos seus doces
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
           {/* Ingredientes */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900">Ingredientes</h2>
-              <div className="flex items-center space-x-2">
+          <div className="bg-card p-4 lg:p-6 rounded-lg shadow-md">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 space-y-4 sm:space-y-0">
+              <h2 className="text-lg lg:text-xl font-semibold text-card-foreground">Ingredientes</h2>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
                 <select
                   value={receitaSelecionada}
                   onChange={(e) => {
                     setReceitaSelecionada(e.target.value)
                     if (e.target.value) carregarReceita(e.target.value)
                   }}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground"
                 >
                   <option value="">Carregar receita existente</option>
                   {receitas.map(receita => (
@@ -223,22 +223,22 @@ export default function CalculadoraPage() {
                 </select>
                 <button
                   onClick={adicionarIngrediente}
-                  className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                  className="flex items-center justify-center space-x-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
                 >
                   <Plus className="h-4 w-4" />
-                  <span>Adicionar</span>
+                  <span className="hidden sm:inline">Adicionar</span>
                 </button>
               </div>
             </div>
 
             <div className="space-y-4">
               {ingredientes.length === 0 ? (
-                <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
-                  <Calculator className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-4">Nenhum ingrediente adicionado</p>
+                <div className="text-center py-8 lg:py-12 border-2 border-dashed border-border rounded-lg">
+                  <Calculator className="h-10 w-10 lg:h-12 lg:w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground mb-4 text-sm lg:text-base">Nenhum ingrediente adicionado</p>
                   <button
                     onClick={adicionarIngrediente}
-                    className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors mx-auto"
+                    className="flex items-center space-x-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors mx-auto text-sm lg:text-base"
                   >
                     <Plus className="h-4 w-4" />
                     <span>Adicionar Primeiro Ingrediente</span>
@@ -246,22 +246,22 @@ export default function CalculadoraPage() {
                 </div>
               ) : (
                 ingredientes.map((ingrediente, index) => (
-                  <div key={ingrediente.id} className="border border-gray-200 p-4 rounded-lg">
+                  <div key={ingrediente.id} className="border border-border p-4 rounded-lg bg-background">
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium text-foreground">
                         Ingrediente #{index + 1}
                       </span>
                       <button
                         onClick={() => removerIngrediente(ingrediente.id)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-destructive hover:text-destructive/80 p-1"
                       >
                         <Minus className="h-4 w-4" />
                       </button>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="sm:col-span-2">
+                        <label className="block text-sm font-medium text-foreground mb-2">
                           Nome
                         </label>
                         <div className="relative">
@@ -269,7 +269,7 @@ export default function CalculadoraPage() {
                             type="text"
                             value={ingrediente.nome}
                             onChange={(e) => atualizarIngrediente(ingrediente.id, 'nome', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                             placeholder="Ex: Açúcar"
                             list={`ingredientes-${ingrediente.id}`}
                           />
@@ -280,26 +280,28 @@ export default function CalculadoraPage() {
                           </datalist>
                         </div>
                       </div>
+                      
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-foreground mb-2">
                           Quantidade
                         </label>
                         <input
                           type="number"
                           value={ingrediente.quantidade}
                           onChange={(e) => atualizarIngrediente(ingrediente.id, 'quantidade', parseFloat(e.target.value) || 0)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                           placeholder="500"
                         />
                       </div>
+                      
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-foreground mb-2">
                           Unidade
                         </label>
                         <select
                           value={ingrediente.unidade}
                           onChange={(e) => atualizarIngrediente(ingrediente.id, 'unidade', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                         >
                           <option value="g">gramas (g)</option>
                           <option value="kg">quilos (kg)</option>
@@ -308,8 +310,9 @@ export default function CalculadoraPage() {
                           <option value="unidade">unidade</option>
                         </select>
                       </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                      
+                      <div className="sm:col-span-2">
+                        <label className="block text-sm font-medium text-foreground mb-2">
                           Preço por unidade (R$)
                         </label>
                         <input
@@ -317,7 +320,7 @@ export default function CalculadoraPage() {
                           step="0.01"
                           value={ingrediente.precoUnitario}
                           onChange={(e) => atualizarIngrediente(ingrediente.id, 'precoUnitario', parseFloat(e.target.value) || 0)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                           placeholder="0.006"
                         />
                       </div>
@@ -331,13 +334,13 @@ export default function CalculadoraPage() {
           {/* Cálculo */}
           <div className="space-y-6">
             {/* Configurações */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Configurações</h2>
+            <div className="bg-card p-4 lg:p-6 rounded-lg shadow-md">
+              <h2 className="text-lg lg:text-xl font-semibold text-card-foreground mb-6">Configurações</h2>
               
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Tempo de Preparo (horas)
                     </label>
                     <input
@@ -345,11 +348,11 @@ export default function CalculadoraPage() {
                       step="0.5"
                       value={tempoPreparoHoras}
                       onChange={(e) => setTempoPreparoHoras(parseFloat(e.target.value) || 0)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Custo/Hora (R$)
                     </label>
                     <input
@@ -357,23 +360,23 @@ export default function CalculadoraPage() {
                       step="0.01"
                       value={custoHora}
                       onChange={(e) => setCustoHora(parseFloat(e.target.value) || 0)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Margem de Lucro (%)
                   </label>
                   <input
                     type="number"
                     value={margem}
                     onChange={(e) => setMargem(parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Custo Fixo (R$)
                   </label>
                   <input
@@ -381,34 +384,34 @@ export default function CalculadoraPage() {
                     step="0.01"
                     value={custoFixo}
                     onChange={(e) => setCustoFixo(parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                   />
                 </div>
               </div>
             </div>
 
             {/* Resultado */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-card p-4 lg:p-6 rounded-lg shadow-md">
               <div className="flex items-center space-x-3 mb-6">
-                <Calculator className="h-6 w-6 text-green-500" />
-                <h2 className="text-xl font-semibold text-gray-900">Resultado</h2>
+                <Calculator className="h-5 w-5 lg:h-6 lg:w-6 text-success" />
+                <h2 className="text-lg lg:text-xl font-semibold text-card-foreground">Resultado</h2>
               </div>
               
-              <div className="space-y-4">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Custo dos Ingredientes:</span>
-                  <span className="font-medium">R$ {calcularCustoIngredientes().toFixed(2)}</span>
+              <div className="space-y-3 lg:space-y-4 text-sm lg:text-base">
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Custo dos Ingredientes:</span>
+                  <span className="font-medium text-foreground">R$ {calcularCustoIngredientes().toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Custo Fixo:</span>
-                  <span className="font-medium">R$ {custoFixo.toFixed(2)}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Custo Fixo:</span>
+                  <span className="font-medium text-foreground">R$ {custoFixo.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Mão de Obra ({tempoPreparoHoras}h x R${custoHora}):</span>
-                  <span className="font-medium">R$ {(tempoPreparoHoras * custoHora).toFixed(2)}</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground text-xs lg:text-sm">Mão de Obra ({tempoPreparoHoras}h x R${custoHora}):</span>
+                  <span className="font-medium text-foreground">R$ {(tempoPreparoHoras * custoHora).toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal:</span>
+                <div className="flex justify-between items-center border-t border-border pt-2">
+                  <span className="text-muted-foreground">Subtotal:</span>
                   <span className="font-medium">R$ {(calcularCustoIngredientes() + custoFixo + (tempoPreparoHoras * custoHora)).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
