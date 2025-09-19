@@ -1,55 +1,57 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
-import DashboardPage from './pages/DashboardPage'
+import ProtectedRoute from './components/ProtectedRoute'
+import ResetPasswordPage from './pages/ResetPasswordPage'
+import './App.css'
+
+// Páginas
+import LandingPage from './pages/LandingPage'
+import LoginPage from './pages/LoginPage'
+import DashboardSimplePage from './pages/DashboardSimplePage'
 import CalculadoraPage from './pages/CalculadoraPage'
 import ReceitasPage from './pages/ReceitasPage'
 import IngredientesPage from './pages/IngredientesPage'
 import ClientesPage from './pages/ClientesPage'
 import OrcamentosPage from './pages/OrcamentosPage'
 import RelatoriosPage from './pages/RelatoriosPage'
+import FerramentasPage from './pages/FerramentasPage'
 import UpgradePage from './pages/UpgradePage'
 import { UpgradePixPage } from './pages/UpgradePixPage'
 import { UpgradeStripePage } from './pages/UpgradeStripePage'
-import { UpgradeSuccessPage } from './pages/UpgradeSuccessPage'
+import MeuCatalogoPage from './pages/MeuCatalogoPage'
+import CatalogoPublicoPage from './pages/CatalogoPublicoPage'
+import EncomendasPage from './pages/EncomendasPage'
 import ComunidadePage from './pages/ComunidadePage'
 import BackupEmergencialPage from './pages/BackupEmergencialPage'
-import LandingPage from './pages/LandingPage'
-import FerramentasPage from './pages/FerramentasPage'
-import LoginPage from './pages/LoginPage'
-import MeuCatalogoPage from './pages/MeuCatalogoPage'
-import EncomendasPage from './pages/EncomendasPage'
-import CatalogoPublicoPage from './pages/CatalogoPublicoPage'
 import { ResetPlanButton } from './components/ResetPlanButton'
-import './App.css'
 
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-50">
+        <div className="w-full min-h-screen bg-background text-foreground">
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/calculadora" element={<CalculadoraPage />} />
-            <Route path="/receitas" element={<ReceitasPage />} />
-            <Route path="/ingredientes" element={<IngredientesPage />} />
-            <Route path="/clientes" element={<ClientesPage />} />
-            <Route path="/orcamentos" element={<OrcamentosPage />} />
-            <Route path="/relatorios" element={<RelatoriosPage />} />
-            <Route path="/ferramentas" element={<FerramentasPage />} />
-            <Route path="/upgrade" element={<UpgradePage />} />
-            <Route path="/upgrade/pix" element={<UpgradePixPage />} />
-            <Route path="/upgrade/stripe" element={<UpgradeStripePage />} />
-            <Route path="/upgrade-success" element={<UpgradeSuccessPage />} />
-            <Route path="/comunidade" element={<ComunidadePage />} />
-            <Route path="/backup-emergencial" element={<BackupEmergencialPage />} />
-            <Route path="/meu-catalogo" element={<MeuCatalogoPage />} />
-            <Route path="/encomendas" element={<EncomendasPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/dashboard" element={<ProtectedRoute><DashboardSimplePage /></ProtectedRoute>} />
+            <Route path="/calculadora" element={<ProtectedRoute><CalculadoraPage /></ProtectedRoute>} />
+            <Route path="/receitas" element={<ProtectedRoute><ReceitasPage /></ProtectedRoute>} />
+            <Route path="/ingredientes" element={<ProtectedRoute><IngredientesPage /></ProtectedRoute>} />
+            <Route path="/clientes" element={<ProtectedRoute><ClientesPage /></ProtectedRoute>} />
+            <Route path="/orcamentos" element={<ProtectedRoute><OrcamentosPage /></ProtectedRoute>} />
+            <Route path="/relatorios" element={<ProtectedRoute requiresPro={true}><RelatoriosPage /></ProtectedRoute>} />
+            <Route path="/ferramentas" element={<ProtectedRoute><FerramentasPage /></ProtectedRoute>} />
+            <Route path="/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
+            <Route path="/upgrade/pix" element={<ProtectedRoute><UpgradePixPage /></ProtectedRoute>} />
+            <Route path="/upgrade/stripe" element={<ProtectedRoute><UpgradeStripePage /></ProtectedRoute>} />
+            <Route path="/meu-catalogo" element={<ProtectedRoute><MeuCatalogoPage /></ProtectedRoute>} />
             <Route path="/catalogo/:userId" element={<CatalogoPublicoPage />} />
+            <Route path="/encomendas" element={<ProtectedRoute><EncomendasPage /></ProtectedRoute>} />
+            <Route path="/comunidade" element={<ProtectedRoute><ComunidadePage /></ProtectedRoute>} />
+            <Route path="/backup-emergencial" element={<ProtectedRoute><BackupEmergencialPage /></ProtectedRoute>} />
           </Routes>
           
-          {/* Botão para resetar plano (apenas para testes) */}
           <ResetPlanButton />
         </div>
       </AuthProvider>

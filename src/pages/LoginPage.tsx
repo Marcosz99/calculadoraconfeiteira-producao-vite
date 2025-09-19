@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { Calculator, Mail, Lock, User, ArrowLeft } from 'lucide-react'
+import { Calculator, Mail, Lock, User, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 export default function LoginPage() {
@@ -9,8 +9,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [nome, setNome] = useState('')
   const [nomeConfeitaria, setNomeConfeitaria] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showForgotPassword, setShowForgotPassword] = useState(false)
+  const [resetEmail, setResetEmail] = useState('')
   const [error, setError] = useState('')
-  const { signIn, signUp, loading } = useAuth()
+  const { signIn, signUp, resetPassword, loading } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -24,6 +27,19 @@ export default function LoginPage() {
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Erro desconhecido')
+    }
+  }
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!resetEmail) return
+    
+    try {
+      await resetPassword(resetEmail)
+      setShowForgotPassword(false)
+      setResetEmail('')
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Erro ao enviar email')
     }
   }
 

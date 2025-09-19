@@ -1,17 +1,43 @@
 import { useAuth } from '@/contexts/AuthContext'
-import { getFromLocalStorage, LOCAL_STORAGE_KEYS } from '@/utils/localStorage'
+import { supabase } from '@/integrations/supabase/client'
+import { useState, useEffect } from 'react'
 
 export const useSubscriptionLimits = () => {
-  const { user } = useAuth()
-  
-  const plano = user?.plano || 'free'
-  const isProfessional = plano === 'professional'
-  
-  // Contadores atuais (do localStorage)
-  const receitas = getFromLocalStorage(LOCAL_STORAGE_KEYS.RECEITAS, [])
-  const orcamentos = getFromLocalStorage(LOCAL_STORAGE_KEYS.ORCAMENTOS, [])
-  const clientes = getFromLocalStorage(LOCAL_STORAGE_KEYS.CLIENTES, [])
-  const ingredientesCustom = getFromLocalStorage(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [])
+  const { user, profile } = useAuth()
+  const [usage, setUsage] = useState({
+    receitas: 0,
+    orcamentos: 0,
+    clientes: 0,
+    ingredientes: 0
+  })
+
+  const isProfessional = profile?.plano === 'professional'
+
+  useEffect(() => {
+    if (!user) return
+
+    const fetchUsage = async () => {
+      try {
+        const [receitas, ingredientes, clientes, orcamentos] = await Promise.all([
+          supabase.from('receitas').select('id', { count: 'exact' }).eq('user_id', user.id),
+          supabase.from('ingredientes_usuario').select('id', { count: 'exact' }).eq('user_id', user.id),
+          supabase.from('clientes').select('id', { count: 'exact' }).eq('user_id', user.id),
+          supabase.from('orcamentos').select('id', { count: 'exact' }).eq('user_id', user.id)
+        ])
+
+        setUsage({
+          receitas: receitas.count || 0,
+          orcamentos: orcamentos.count || 0,
+          clientes: clientes.count || 0,
+          ingredientes: ingredientes.count || 0
+        })
+      } catch (error) {
+        console.error('Erro ao buscar uso:', error)
+      }
+    }
+
+    fetchUsage()
+  }, [user])
   
   const limits = {
     receitas: isProfessional ? null : 5,
@@ -23,13 +49,6 @@ export const useSubscriptionLimits = () => {
     relatorios: isProfessional,
     comunidade: isProfessional,
     ferramentas: isProfessional
-  }
-  
-  const usage = {
-    receitas: receitas.length,
-    orcamentos: orcamentos.length,
-    clientes: clientes.length,
-    ingredientes: ingredientesCustom.length
   }
   
   const canAddReceita = () => {
@@ -72,7 +91,7 @@ export const useSubscriptionLimits = () => {
   }
   
   return {
-    plano,
+    plano: profile?.plano || 'free',
     isProfessional,
     limits,
     usage,

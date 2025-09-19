@@ -1,112 +1,201 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User, PerfilConfeitaria } from '../types'
-import { LOCAL_STORAGE_KEYS, saveToLocalStorage, getFromLocalStorage, initializeDefaultData, clearAllUserData } from '../utils/localStorage'
+import { User } from '@supabase/supabase-js'
 import { supabase } from '@/integrations/supabase/client'
+import { useToast } from '@/hooks/use-toast'
+
+type UserProfile = {
+  id: string
+  nome: string
+  email: string
+  plano: 'free' | 'professional'
+  nome_negocio?: string
+  whatsapp?: string
+  instagram?: string
+  endereco?: string
+  cidade?: string
+  estado?: string
+  bio?: string
+  foto_perfil?: string
+}
 
 type AuthContextType = {
   user: User | null
-  perfilConfeitaria: PerfilConfeitaria | null
+  profile: UserProfile | null
   loading: boolean
-  signOut: () => void
-  signUp: (email: string, password: string, nome: string, nomeConfeitaria: string) => Promise<void>
+  signOut: () => Promise<void>
+  signUp: (email: string, password: string, nome: string, nomeNegocio?: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
-  updatePerfil: (perfil: Partial<PerfilConfeitaria>) => void
-  upgradeUser: (novoPlano: 'free' | 'professional') => void
-  checkSubscriptionStatus: () => Promise<void>
+  resetPassword: (email: string) => Promise<void>
+  updateProfile: (updates: Partial<UserProfile>) => Promise<void>
+  checkSubscription: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  perfilConfeitaria: null,
+  profile: null,
   loading: true,
-  signOut: () => {},
+  signOut: async () => {},
   signUp: async () => {},
   signIn: async () => {},
-  updatePerfil: () => {},
-  upgradeUser: () => {},
-  checkSubscriptionStatus: async () => {},
+  resetPassword: async () => {},
+  updateProfile: async () => {},
+  checkSubscription: async () => {},
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [perfilConfeitaria, setPerfilConfeitaria] = useState<PerfilConfeitaria | null>(null)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
+  const { toast } = useToast()
 
-  useEffect(() => {
-    // Verificar se usuário está logado no localStorage
-    const checkAuth = () => {
-      try {
-        const savedUser = getFromLocalStorage<User | null>(LOCAL_STORAGE_KEYS.USER, null)
-        const savedPerfil = getFromLocalStorage<PerfilConfeitaria | null>(LOCAL_STORAGE_KEYS.PERFIL_CONFEITARIA, null)
-        
-        if (savedUser) {
-          setUser(savedUser)
-          setPerfilConfeitaria(savedPerfil)
-        }
-      } catch (error) {
-        console.error('Erro ao verificar autenticação:', error)
-        clearAllUserData()
-      } finally {
-        setLoading(false)
+  // Inicializar dados padrão do usuário
+  const initializeUserData = async (userId: string) => {
+    try {
+      // Criar categorias padrão
+      const categoriasPadrao = [
+        { nome: 'Bolos', cor_hex: '#FF6B6B', icone: '🎂', ordem: 1 },
+        { nome: 'Doces', cor_hex: '#4ECDC4', icone: '🍬', ordem: 2 },
+        { nome: 'Salgados', cor_hex: '#45B7D1', icone: '🥧', ordem: 3 },
+        { nome: 'Tortas', cor_hex: '#96CEB4', icone: '🥧', ordem: 4 },
+        { nome: 'Sobremesas', cor_hex: '#FFEAA7', icone: '🍰', ordem: 5 }
+      ]
+
+      // Inserir categorias
+      for (const categoria of categoriasPadrao) {
+        await supabase.from('categorias').insert({
+          user_id: userId,
+          ...categoria
+        })
       }
-    }
 
-    checkAuth()
+      // Criar configuração padrão
+      await supabase.from('configuracoes_usuario').insert({
+        user_id: userId,
+        moeda: 'BRL',
+        fuso_horario: 'America/Sao_Paulo',
+        margem_padrao: 30,
+        custo_hora_trabalho: 25.00,
+        notificacoes_email: true,
+        notificacoes_whatsapp: true
+      })
+
+    } catch (error) {
+      console.error('Erro ao inicializar dados do usuário:', error)
+    }
+  }
+
+  // Buscar perfil do usuário
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+
+      if (error && error.code !== 'PGRST116') {
+        throw error
+      }
+
+      if (data) {
+        const profile: UserProfile = {
+          id: data.id,
+          nome: data.nome,
+          email: data.email,
+          plano: (data.plano as 'free' | 'professional') || 'free',
+          nome_negocio: data.nome_negocio || undefined,
+          whatsapp: data.whatsapp || undefined,
+          instagram: data.instagram || undefined,
+          endereco: data.endereco || undefined,
+          cidade: data.cidade || undefined,
+          estado: data.estado || undefined,
+          bio: data.bio || undefined,
+          foto_perfil: data.foto_perfil || undefined
+        }
+        setProfile(profile)
+      }
+    } catch (error) {
+      console.error('Erro ao buscar perfil:', error)
+    }
+  }
+
+  // Configurar listener de autenticação
+  useEffect(() => {
+    // Verificar sessão atual
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+      if (session?.user) {
+        fetchProfile(session.user.id)
+      }
+      setLoading(false)
+    })
+
+    // Escutar mudanças de autenticação
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setUser(session?.user ?? null)
+        setLoading(false)
+        
+        if (session?.user) {
+          await fetchProfile(session.user.id)
+        } else {
+          setProfile(null)
+        }
+      }
+    )
+
+    return () => subscription.unsubscribe()
   }, [])
 
-  const signUp = async (email: string, password: string, nome: string, nomeConfeitaria: string) => {
+  const signUp = async (email: string, password: string, nome: string, nomeNegocio?: string) => {
     try {
       setLoading(true)
       
-      // Simular delay de rede
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      const userId = Date.now().toString()
-      
-      // Criar usuário
-      const newUser: User = {
-        id: userId,
-        nome,
+      const { data, error } = await supabase.auth.signUp({
         email,
-        plano: 'free',
-        data_cadastro: new Date().toISOString(),
-        ativo: true,
-        catalogo_ativo: false,
-        dados_confeitaria: {
-          nomeFantasia: nome,
-          whatsapp: '',
-          instagram: '',
-          endereco: '',
-          descricao: ''
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+          data: {
+            nome,
+            nome_negocio: nomeNegocio
+          }
         }
+      })
+
+      if (error) throw error
+
+      if (data.user) {
+        // Criar perfil do usuário
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            email,
+            nome,
+            nome_negocio: nomeNegocio || '',
+            plano: 'free',
+            password: 'supabase_managed' // Campo obrigatório mas gerenciado pelo Supabase Auth
+          })
+
+        if (profileError) throw profileError
+
+        // Inicializar dados padrão
+        await initializeUserData(data.user.id)
+
+        toast({
+          title: "Conta criada com sucesso!",
+          description: "Verifique seu email para confirmar a conta.",
+        })
       }
-      
-      // Criar perfil da confeitaria
-      const newPerfil: PerfilConfeitaria = {
-        id: (Date.now() + 1).toString(),
-        usuario_id: userId,
-        nome_fantasia: nomeConfeitaria,
-        especialidades: [],
-        cidade: '',
-        estado: ''
-      }
-      
-      // Salvar dados
-      saveToLocalStorage(LOCAL_STORAGE_KEYS.USER, newUser)
-      saveToLocalStorage(LOCAL_STORAGE_KEYS.PERFIL_CONFEITARIA, newPerfil)
-      
-      // Inicializar dados padrão
-      initializeDefaultData(userId)
-      
-      setUser(newUser)
-      setPerfilConfeitaria(newPerfil)
-      
-      // Navegar para dashboard
-      navigate('/dashboard')
-    } catch (error) {
-      console.error('Erro no cadastro:', error)
+    } catch (error: any) {
+      toast({
+        title: "Erro ao criar conta",
+        description: error.message,
+        variant: "destructive",
+      })
       throw error
     } finally {
       setLoading(false)
@@ -117,140 +206,131 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true)
       
-      // Simular delay de rede
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Verificar se usuário já existe
-      const existingUser = getFromLocalStorage<User | null>(LOCAL_STORAGE_KEYS.USER, null)
-      const existingPerfil = getFromLocalStorage<PerfilConfeitaria | null>(LOCAL_STORAGE_KEYS.PERFIL_CONFEITARIA, null)
-      
-      if (existingUser && existingUser.email === email) {
-        setUser(existingUser)
-        setPerfilConfeitaria(existingPerfil)
-      } else {
-        // Criar usuário demo
-        const userId = Date.now().toString()
-        const mockUser: User = {
-          id: userId,
-          nome: 'Usuário Demo',
-          email,
-          plano: 'free',
-          data_cadastro: new Date().toISOString(),
-          ativo: true,
-          catalogo_ativo: false,
-          dados_confeitaria: {
-            nomeFantasia: 'Usuário Demo',
-            whatsapp: '',
-            instagram: '',
-            endereco: '',
-            descricao: ''
-          }
-        }
-        
-        const mockPerfil: PerfilConfeitaria = {
-          id: (Date.now() + 1).toString(),
-          usuario_id: userId,
-          nome_fantasia: 'Confeitaria Demo',
-          especialidades: ['Bolos', 'Doces'],
-          cidade: 'São Paulo',
-          estado: 'SP'
-        }
-        
-        saveToLocalStorage(LOCAL_STORAGE_KEYS.USER, mockUser)
-        saveToLocalStorage(LOCAL_STORAGE_KEYS.PERFIL_CONFEITARIA, mockPerfil)
-        initializeDefaultData(userId)
-        
-        setUser(mockUser)
-        setPerfilConfeitaria(mockPerfil)
-      }
-      
-      // Navegar para dashboard
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) throw error
+
+      toast({
+        title: "Login realizado!",
+        description: "Bem-vindo de volta!",
+      })
+
       navigate('/dashboard')
-    } catch (error) {
-      console.error('Erro no login:', error)
+    } catch (error: any) {
+      toast({
+        title: "Erro no login",
+        description: error.message,
+        variant: "destructive",
+      })
       throw error
     } finally {
       setLoading(false)
     }
   }
 
-  const signOut = () => {
-    clearAllUserData()
-    setUser(null)
-    setPerfilConfeitaria(null)
-    navigate('/')
-  }
-  
-  const updatePerfil = (perfil: Partial<PerfilConfeitaria>) => {
-    if (perfilConfeitaria) {
-      const updatedPerfil = { ...perfilConfeitaria, ...perfil }
-      setPerfilConfeitaria(updatedPerfil)
-      saveToLocalStorage(LOCAL_STORAGE_KEYS.PERFIL_CONFEITARIA, updatedPerfil)
-    }
-  }
-  
-  const upgradeUser = (novoPlano: 'free' | 'professional') => {
-    if (user) {
-      const updatedUser = { ...user, plano: novoPlano }
-      setUser(updatedUser)
-      saveToLocalStorage(LOCAL_STORAGE_KEYS.USER, updatedUser)
-      
-      // Verificar subscription status após upgrade
-      if (novoPlano === 'professional') {
-        checkSubscriptionStatus()
-      }
-    }
-  }
-
-  const checkSubscriptionStatus = async () => {
-    if (!user) return
-    
+  const signOut = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        body: {
-          userEmail: user.email
-        }
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+      
+      setUser(null)
+      setProfile(null)
+      navigate('/')
+      
+      toast({
+        title: "Logout realizado",
+        description: "Até logo!",
       })
-      
-      if (error) {
-        console.error('Error checking subscription:', error)
-        return
-      }
-      
-      // Update user plan based on subscription status
-      if (data.subscribed && user.plano !== 'professional') {
-        const updatedUser = { ...user, plano: 'professional' as const }
-        setUser(updatedUser)
-        saveToLocalStorage(LOCAL_STORAGE_KEYS.USER, updatedUser)
-      } else if (!data.subscribed && user.plano !== 'free') {
-        const updatedUser = { ...user, plano: 'free' as const }
-        setUser(updatedUser)
-        saveToLocalStorage(LOCAL_STORAGE_KEYS.USER, updatedUser)
-      }
-      
-    } catch (error) {
-      console.error('Error checking subscription:', error)
+    } catch (error: any) {
+      toast({
+        title: "Erro no logout",
+        description: error.message,
+        variant: "destructive",
+      })
     }
   }
 
-  // Check subscription status when user logs in
-  useEffect(() => {
-    if (user && user.plano === 'professional') {
-      checkSubscriptionStatus()
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
+
+      if (error) throw error
+
+      toast({
+        title: "Email enviado!",
+        description: "Verifique sua caixa de entrada para redefinir a senha.",
+      })
+    } catch (error: any) {
+      toast({
+        title: "Erro ao enviar email",
+        description: error.message,
+        variant: "destructive",
+      })
+      throw error
     }
-  }, [user?.id])
+  }
+
+  const updateProfile = async (updates: Partial<UserProfile>) => {
+    if (!user || !profile) return
+
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id)
+
+      if (error) throw error
+
+      setProfile({ ...profile, ...updates })
+
+      toast({
+        title: "Perfil atualizado!",
+        description: "Suas informações foram salvas.",
+      })
+    } catch (error: any) {
+      toast({
+        title: "Erro ao atualizar perfil",
+        description: error.message,
+        variant: "destructive",
+      })
+      throw error
+    }
+  }
+
+  const checkSubscription = async () => {
+    if (!user) return
+
+    try {
+      const { data, error } = await supabase.functions.invoke('check-subscription')
+      
+      if (error) throw error
+
+      if (data?.subscribed && profile?.plano !== 'professional') {
+        await updateProfile({ plano: 'professional' })
+      } else if (!data?.subscribed && profile?.plano !== 'free') {
+        await updateProfile({ plano: 'free' })
+      }
+    } catch (error) {
+      console.error('Erro ao verificar assinatura:', error)
+    }
+  }
 
   return (
     <AuthContext.Provider value={{ 
       user, 
-      perfilConfeitaria, 
+      profile, 
       loading, 
       signOut, 
       signUp, 
       signIn, 
-      updatePerfil, 
-      upgradeUser,
-      checkSubscriptionStatus
+      resetPassword,
+      updateProfile,
+      checkSubscription
     }}>
       {children}
     </AuthContext.Provider>

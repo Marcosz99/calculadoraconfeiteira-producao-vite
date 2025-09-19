@@ -47,6 +47,236 @@ export type Database = {
         }
         Relationships: []
       }
+      categorias: {
+        Row: {
+          cor_hex: string
+          created_at: string
+          icone: string
+          id: string
+          nome: string
+          ordem: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cor_hex: string
+          created_at?: string
+          icone: string
+          id?: string
+          nome: string
+          ordem?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cor_hex?: string
+          created_at?: string
+          icone?: string
+          id?: string
+          nome?: string
+          ordem?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      clientes: {
+        Row: {
+          ativo: boolean | null
+          cidade: string | null
+          created_at: string
+          data_nascimento: string | null
+          email: string | null
+          endereco: string | null
+          estado: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          telefone: string | null
+          updated_at: string
+          user_id: string
+          whatsapp: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          cidade?: string | null
+          created_at?: string
+          data_nascimento?: string | null
+          email?: string | null
+          endereco?: string | null
+          estado?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          telefone?: string | null
+          updated_at?: string
+          user_id: string
+          whatsapp?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          cidade?: string | null
+          created_at?: string
+          data_nascimento?: string | null
+          email?: string | null
+          endereco?: string | null
+          estado?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          telefone?: string | null
+          updated_at?: string
+          user_id?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      configuracoes_usuario: {
+        Row: {
+          created_at: string
+          custo_hora_trabalho: number | null
+          fuso_horario: string | null
+          id: string
+          margem_padrao: number | null
+          moeda: string | null
+          notificacoes_email: boolean | null
+          notificacoes_whatsapp: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          custo_hora_trabalho?: number | null
+          fuso_horario?: string | null
+          id?: string
+          margem_padrao?: number | null
+          moeda?: string | null
+          notificacoes_email?: boolean | null
+          notificacoes_whatsapp?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          custo_hora_trabalho?: number | null
+          fuso_horario?: string | null
+          id?: string
+          margem_padrao?: number | null
+          moeda?: string | null
+          notificacoes_email?: boolean | null
+          notificacoes_whatsapp?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ingredientes_usuario: {
+        Row: {
+          categoria: string
+          created_at: string
+          data_ultima_compra: string | null
+          estoque: number | null
+          fornecedor: string | null
+          id: string
+          nome: string
+          preco_medio: number
+          unidade_padrao: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          categoria: string
+          created_at?: string
+          data_ultima_compra?: string | null
+          estoque?: number | null
+          fornecedor?: string | null
+          id?: string
+          nome: string
+          preco_medio?: number
+          unidade_padrao: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          data_ultima_compra?: string | null
+          estoque?: number | null
+          fornecedor?: string | null
+          id?: string
+          nome?: string
+          preco_medio?: number
+          unidade_padrao?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      orcamentos: {
+        Row: {
+          cliente_id: string | null
+          created_at: string
+          data_evento: string | null
+          desconto: number | null
+          id: string
+          itens: Json
+          local_evento: string | null
+          numero: string
+          observacoes: string | null
+          quantidade_pessoas: number | null
+          status: string
+          updated_at: string
+          user_id: string
+          valido_ate: string | null
+          valor_final: number | null
+          valor_total: number | null
+        }
+        Insert: {
+          cliente_id?: string | null
+          created_at?: string
+          data_evento?: string | null
+          desconto?: number | null
+          id?: string
+          itens?: Json
+          local_evento?: string | null
+          numero: string
+          observacoes?: string | null
+          quantidade_pessoas?: number | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          valido_ate?: string | null
+          valor_final?: number | null
+          valor_total?: number | null
+        }
+        Update: {
+          cliente_id?: string | null
+          created_at?: string
+          data_evento?: string | null
+          desconto?: number | null
+          id?: string
+          itens?: Json
+          local_evento?: string | null
+          numero?: string
+          observacoes?: string | null
+          quantidade_pessoas?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          valido_ate?: string | null
+          valor_final?: number | null
+          valor_total?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orcamentos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pagamentos: {
         Row: {
           created_at: string
@@ -210,6 +440,68 @@ export type Database = {
           whatsapp?: string | null
         }
         Relationships: []
+      }
+      receitas: {
+        Row: {
+          categoria_id: string | null
+          created_at: string
+          custo_total: number | null
+          descricao: string | null
+          id: string
+          ingredientes: Json
+          margem_lucro: number | null
+          modo_preparo: string | null
+          nome: string
+          observacoes: string | null
+          preco_sugerido: number | null
+          rendimento: string | null
+          tempo_preparo: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          categoria_id?: string | null
+          created_at?: string
+          custo_total?: number | null
+          descricao?: string | null
+          id?: string
+          ingredientes?: Json
+          margem_lucro?: number | null
+          modo_preparo?: string | null
+          nome: string
+          observacoes?: string | null
+          preco_sugerido?: number | null
+          rendimento?: string | null
+          tempo_preparo?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          categoria_id?: string | null
+          created_at?: string
+          custo_total?: number | null
+          descricao?: string | null
+          id?: string
+          ingredientes?: Json
+          margem_lucro?: number | null
+          modo_preparo?: string | null
+          nome?: string
+          observacoes?: string | null
+          preco_sugerido?: number | null
+          rendimento?: string | null
+          tempo_preparo?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "receitas_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

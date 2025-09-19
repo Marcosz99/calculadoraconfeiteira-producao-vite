@@ -1,18 +1,22 @@
 import { useAuth } from '@/contexts/AuthContext'
 
 export const ResetPlanButton = () => {
-  const { user, upgradeUser } = useAuth()
+  const { profile, updateProfile } = useAuth()
 
-  if (!user) return null
+  if (!profile) return null
 
-  const resetToFree = () => {
+  const resetToFree = async () => {
     if (confirm('Resetar seu plano para FREE para testar a funcionalidade de upgrade?')) {
-      upgradeUser('free')
-      alert('Plano resetado para FREE! Agora você pode testar o upgrade.')
+      try {
+        await updateProfile({ plano: 'free' })
+        alert('Plano resetado para FREE! Agora você pode testar o upgrade.')
+      } catch (error) {
+        console.error('Erro ao resetar plano:', error)
+      }
     }
   }
 
-  if (user.plano === 'free') return null
+  if (profile.plano === 'free') return null
 
   return (
     <button
