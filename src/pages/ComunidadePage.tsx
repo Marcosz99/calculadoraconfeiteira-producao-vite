@@ -208,7 +208,7 @@ export default function ComunidadePage() {
             <div className="flex items-center space-x-4">
               <Users className="h-10 w-10 text-blue-500" />
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">1.234</h3>
+                <h3 className="text-2xl font-bold text-gray-900 filter blur-sm select-none">1.234</h3>
                 <p className="text-gray-600">Confeiteiros ativos</p>
               </div>
             </div>
@@ -218,7 +218,7 @@ export default function ComunidadePage() {
             <div className="flex items-center space-x-4">
               <MessageCircle className="h-10 w-10 text-green-500" />
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">567</h3>
+                <h3 className="text-2xl font-bold text-gray-900 filter blur-sm select-none">567</h3>
                 <p className="text-gray-600">Posts este mês</p>
               </div>
             </div>
@@ -228,7 +228,7 @@ export default function ComunidadePage() {
             <div className="flex items-center space-x-4">
               <ThumbsUp className="h-10 w-10 text-pink-500" />
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">2.891</h3>
+                <h3 className="text-2xl font-bold text-gray-900 filter blur-sm select-none">2.891</h3>
                 <p className="text-gray-600">Interações hoje</p>
               </div>
             </div>
