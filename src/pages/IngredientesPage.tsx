@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Plus, Search, Package, AlertTriangle, TrendingUp, Edit, Trash2, DollarSign } from 'lucide-react'
+import { ArrowLeft, Plus, Search, Package, AlertTriangle, TrendingUp, Edit, Trash2, DollarSign, Star } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { IngredienteUsuario } from '../types'
 import { LOCAL_STORAGE_KEYS, saveToLocalStorage, getFromLocalStorage } from '../utils/localStorage'
-import { ingredientesSistema } from '../data/ingredientes-sistema'
+import { INGREDIENTES_CONFEITARIA, INGREDIENTES_MAIS_USADOS, CATEGORIAS_INGREDIENTES, IngredienteConfeitaria } from '../data/ingredientes-confeitaria'
 
 export default function IngredientesPage() {
   const { user } = useAuth()
@@ -12,6 +12,10 @@ export default function IngredientesPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [categoriaFiltro, setCategoriaFiltro] = useState('todas')
   const [showModal, setShowModal] = useState(false)
+  const [showIngredientesPopulares, setShowIngredientesPopulares] = useState(false)
+  const [showOvoModal, setShowOvoModal] = useState(false)
+  const [searchIngredientesPopulares, setSearchIngredientesPopulares] = useState('')
+  const [ovoData, setOvoData] = useState({ valorPago: 0, quantidade: 0 })
   const [editingIngrediente, setEditingIngrediente] = useState<IngredienteUsuario | null>(null)
   const [formData, setFormData] = useState({
     nome: '',
@@ -31,7 +35,7 @@ export default function IngredientesPage() {
     }
   }, [user])
 
-  const categorias = [...new Set(ingredientesSistema.map(i => i.categoria))]
+  const categorias = CATEGORIAS_INGREDIENTES
 
   const filteredIngredientes = ingredientes.filter(ingrediente => {
     const matchesSearch = ingrediente.nome.toLowerCase().includes(searchTerm.toLowerCase())
@@ -125,17 +129,22 @@ export default function IngredientesPage() {
     }
   }
 
-  const adicionarIngredienteSistema = (ingredienteSistema: any) => {
+  const adicionarIngredientePopular = (ingrediente: IngredienteConfeitaria) => {
     if (!user) return
+
+    // Verificar se é ovo
+    if (ingrediente.id === 'ovos') {
+      setShowOvoModal(true)
+      return
+    }
 
     const novoIngrediente: IngredienteUsuario = {
       id: Date.now().toString(),
       usuario_id: user.id,
-      ingrediente_sistema_id: ingredienteSistema.id,
-      nome: ingredienteSistema.nome,
-      preco_atual: ingredienteSistema.preco_medio_nacional,
-      unidade: ingredienteSistema.unidade_padrao,
-      categoria: ingredienteSistema.categoria,
+      nome: ingrediente.nome,
+      preco_atual: ingrediente.preco_medio_nacional,
+      unidade: ingrediente.unidade_padrao,
+      categoria: ingrediente.categoria,
       data_atualizacao: new Date().toISOString()
     }
 
@@ -145,7 +154,45 @@ export default function IngredientesPage() {
     const allIngredientes = getFromLocalStorage<IngredienteUsuario[]>(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [])
     const otherUsersIngredientes = allIngredientes.filter(i => i.usuario_id !== user.id)
     saveToLocalStorage(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [...otherUsersIngredientes, ...updatedIngredientes])
+    
+    setShowIngredientesPopulares(false)
   }
+
+  const handleOvoSubmit = () => {
+    if (!user || ovoData.valorPago <= 0 || ovoData.quantidade <= 0) return
+
+    const precoUnitario = ovoData.valorPago / ovoData.quantidade
+
+    const novoIngrediente: IngredienteUsuario = {
+      id: Date.now().toString(),
+      usuario_id: user.id,
+      nome: 'Ovos',
+      preco_atual: precoUnitario,
+      unidade: 'unidade',
+      categoria: 'Ovos',
+      data_atualizacao: new Date().toISOString()
+    }
+
+    const updatedIngredientes = [...ingredientes, novoIngrediente]
+    setIngredientes(updatedIngredientes)
+
+    const allIngredientes = getFromLocalStorage<IngredienteUsuario[]>(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [])
+    const otherUsersIngredientes = allIngredientes.filter(i => i.usuario_id !== user.id)
+    saveToLocalStorage(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [...otherUsersIngredientes, ...updatedIngredientes])
+    
+    setShowOvoModal(false)
+    setShowIngredientesPopulares(false)
+    setOvoData({ valorPago: 0, quantidade: 0 })
+  }
+
+  const ingredientesPopularesFiltrados = INGREDIENTES_CONFEITARIA
+    .filter(ing => INGREDIENTES_MAIS_USADOS.includes(ing.id))
+    .filter(ing => 
+      searchIngredientesPopulares === '' || 
+      ing.nome.toLowerCase().includes(searchIngredientesPopulares.toLowerCase()) ||
+      ing.categoria.toLowerCase().includes(searchIngredientesPopulares.toLowerCase())
+    )
+    .filter(ing => !ingredientes.some(i => i.nome.toLowerCase() === ing.nome.toLowerCase()))
 
   const getVariacaoPreco = (ingrediente: IngredienteUsuario) => {
     if (!ingrediente.preco_anterior) return null
@@ -175,13 +222,23 @@ export default function IngredientesPage() {
             </div>
           </div>
           
-          <button
-            onClick={() => setShowModal(true)}
-            className="flex items-center space-x-2 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            <Plus className="h-5 w-5" />
-            <span>Novo Ingrediente</span>
-          </button>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex items-center space-x-2 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
+            >
+              <Plus className="h-5 w-5" />
+              <span>Novo Ingrediente</span>
+            </button>
+            
+            <button
+              onClick={() => setShowIngredientesPopulares(true)}
+              className="flex items-center space-x-2 bg-yellow-500 text-white px-6 py-3 rounded-lg hover:bg-yellow-600 transition-colors"
+            >
+              <Star className="h-5 w-5" />
+              <span>Ingredientes Populares</span>
+            </button>
+          </div>
         </div>
 
         {/* Alertas */}
@@ -232,36 +289,6 @@ export default function IngredientesPage() {
           </div>
         </div>
 
-        {/* Sugestões de Ingredientes do Sistema */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Ingredientes Sugeridos</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {ingredientesSistema.slice(0, 8).map(ingrediente => {
-              const jaAdicionado = ingredientes.some(i => i.ingrediente_sistema_id === ingrediente.id)
-              
-              return (
-                <div key={ingrediente.id} className="border border-gray-200 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-900">{ingrediente.nome}</h4>
-                  <p className="text-sm text-gray-600">{ingrediente.categoria}</p>
-                  <p className="text-sm font-medium text-green-600 mb-2">
-                    R$ {ingrediente.preco_medio_nacional.toFixed(2)}/{ingrediente.unidade_padrao}
-                  </p>
-                  <button
-                    onClick={() => adicionarIngredienteSistema(ingrediente)}
-                    disabled={jaAdicionado}
-                    className={`w-full px-3 py-1 rounded text-sm ${
-                      jaAdicionado 
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                        : 'bg-blue-500 text-white hover:bg-blue-600'
-                    }`}
-                  >
-                    {jaAdicionado ? 'Já adicionado' : 'Adicionar'}
-                  </button>
-                </div>
-              )
-            })}
-          </div>
-        </div>
 
         {/* Lista de Ingredientes */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -505,6 +532,129 @@ export default function IngredientesPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal Ingredientes Populares */}
+        {showIngredientesPopulares && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-8 max-w-4xl w-full m-4 max-h-[80vh] overflow-y-auto">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Ingredientes Mais Utilizados por Confeiteiras
+                </h3>
+                <button
+                  onClick={() => setShowIngredientesPopulares(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
+              
+              <div className="mb-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Buscar ingredientes..."
+                    value={searchIngredientesPopulares}
+                    onChange={(e) => setSearchIngredientesPopulares(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {ingredientesPopularesFiltrados.map(ingrediente => (
+                  <div key={ingrediente.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <h4 className="font-medium text-gray-900">{ingrediente.nome}</h4>
+                    <p className="text-sm text-gray-600">{ingrediente.categoria}</p>
+                    <p className="text-sm font-medium text-green-600 mb-3">
+                      R$ {ingrediente.preco_medio_nacional.toFixed(ingrediente.id === 'ovos' ? 2 : 3)}/{ingrediente.unidade_padrao}
+                    </p>
+                    <button
+                      onClick={() => adicionarIngredientePopular(ingrediente)}
+                      className="w-full px-3 py-2 bg-blue-500 text-white rounded text-sm hover:bg-blue-600 transition-colors"
+                    >
+                      Adicionar
+                    </button>
+                  </div>
+                ))}
+              </div>
+              
+              {ingredientesPopularesFiltrados.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  Nenhum ingrediente encontrado ou todos já foram adicionados.
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Modal Para Ovos */}
+        {showOvoModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-8 max-w-md w-full m-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                Calcular Preço dos Ovos
+              </h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Quanto você pagou? (R$)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={ovoData.valorPago}
+                    onChange={(e) => setOvoData({...ovoData, valorPago: parseFloat(e.target.value) || 0})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Ex: 30.00"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Por quantos ovos?
+                  </label>
+                  <input
+                    type="number"
+                    value={ovoData.quantidade}
+                    onChange={(e) => setOvoData({...ovoData, quantidade: parseInt(e.target.value) || 0})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Ex: 30"
+                  />
+                </div>
+                
+                {ovoData.valorPago > 0 && ovoData.quantidade > 0 && (
+                  <div className="bg-green-50 p-3 rounded-lg">
+                    <p className="text-sm text-green-700">
+                      <strong>Preço por ovo: R$ {(ovoData.valorPago / ovoData.quantidade).toFixed(2)}</strong>
+                    </p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex justify-end space-x-4 mt-6">
+                <button
+                  onClick={() => {
+                    setShowOvoModal(false)
+                    setOvoData({ valorPago: 0, quantidade: 0 })
+                  }}
+                  className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleOvoSubmit}
+                  disabled={ovoData.valorPago <= 0 || ovoData.quantidade <= 0}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Adicionar Ovos
+                </button>
+              </div>
             </div>
           </div>
         )}
