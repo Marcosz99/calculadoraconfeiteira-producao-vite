@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import { Calculator, Mail, Lock, User } from 'lucide-react'
+import { Calculator, Mail, Lock, User, ArrowLeft } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -27,20 +28,39 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+    <div className="min-h-screen bg-gradient-to-br from-pink-100 via-purple-100 to-indigo-100 flex items-center justify-center p-4">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-10 left-10 text-6xl">🧁</div>
+        <div className="absolute top-20 right-20 text-4xl">🍰</div>
+        <div className="absolute bottom-20 left-20 text-5xl">🎂</div>
+        <div className="absolute bottom-10 right-10 text-3xl">🍪</div>
+        <div className="absolute top-1/2 left-1/3 text-2xl">🥧</div>
+      </div>
+
+      <div className="max-w-md w-full bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 animate-scale-in relative z-10">
+        {/* Back to Home */}
+        <Link 
+          to="/" 
+          className="absolute top-6 left-6 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5" />
+        </Link>
+
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <Calculator className="h-12 w-12 text-pink-500" />
+            <div className="p-3 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full animate-bounce-in">
+              <Calculator className="h-12 w-12 text-white" />
+            </div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">DoceCalc</h1>
           <p className="text-gray-600">Calculadora de Preços para Confeiteiras</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {!isLogin && (
             <>
-              <div>
+              <div className="animate-fade-in">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Seu Nome
                 </label>
@@ -50,14 +70,14 @@ export default function LoginPage() {
                     type="text"
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 bg-white/50"
                     placeholder="Seu nome completo"
                     required={!isLogin}
                   />
                 </div>
               </div>
               
-              <div>
+              <div className="animate-fade-in">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Nome da Confeitaria
                 </label>
@@ -67,7 +87,7 @@ export default function LoginPage() {
                     type="text"
                     value={nomeConfeitaria}
                     onChange={(e) => setNomeConfeitaria(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 bg-white/50"
                     placeholder="Nome da sua confeitaria"
                     required={!isLogin}
                   />
@@ -76,7 +96,7 @@ export default function LoginPage() {
             </>
           )}
 
-          <div>
+          <div className="animate-fade-in">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Email
             </label>
@@ -86,14 +106,14 @@ export default function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 bg-white/50"
                 placeholder="seu@email.com"
                 required
               />
             </div>
           </div>
 
-          <div>
+          <div className="animate-fade-in">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Senha
             </label>
@@ -103,7 +123,7 @@ export default function LoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 bg-white/50"
                 placeholder="Sua senha"
                 required
               />
@@ -111,7 +131,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg animate-fade-in">
               {error}
             </div>
           )}
@@ -119,28 +139,51 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-pink-500 text-white py-2 px-4 rounded-lg hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-4 rounded-lg hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg transition-all duration-200 hover-scale"
           >
-            {loading ? 'Carregando...' : (isLogin ? 'Entrar' : 'Cadastrar')}
+            {loading ? (
+              <div className="flex items-center justify-center space-x-2">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                <span>Carregando...</span>
+              </div>
+            ) : (
+              isLogin ? 'Entrar' : 'Cadastrar'
+            )}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
+        <div className="mt-8 text-center">
+          <p className="text-gray-600 mb-3">
             {isLogin ? 'Não tem uma conta?' : 'Já tem uma conta?'}
           </p>
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="mt-2 text-pink-500 hover:text-pink-600 font-medium"
+            className="text-pink-500 hover:text-pink-600 font-medium transition-colors story-link"
           >
-            {isLogin ? 'Criar conta' : 'Fazer login'}
+            {isLogin ? 'Criar conta gratuita' : 'Fazer login'}
           </button>
         </div>
 
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <p className="text-sm text-blue-700">
-            <strong>Demo:</strong> Use qualquer email e senha para testar o sistema.
+        <div className="mt-8 p-4 bg-blue-50/50 rounded-lg border border-blue-200 animate-fade-in">
+          <p className="text-sm text-blue-700 text-center">
+            <strong>💡 Demo:</strong> Use qualquer email e senha para testar o sistema completo gratuitamente.
           </p>
+        </div>
+
+        {/* Features Preview */}
+        <div className="mt-6 grid grid-cols-3 gap-2 text-center">
+          <div className="p-2">
+            <div className="text-2xl mb-1">🧮</div>
+            <p className="text-xs text-gray-600">Calculadora</p>
+          </div>
+          <div className="p-2">
+            <div className="text-2xl mb-1">📊</div>
+            <p className="text-xs text-gray-600">Relatórios</p>
+          </div>
+          <div className="p-2">
+            <div className="text-2xl mb-1">💰</div>
+            <p className="text-xs text-gray-600">Lucro Real</p>
+          </div>
         </div>
       </div>
     </div>
