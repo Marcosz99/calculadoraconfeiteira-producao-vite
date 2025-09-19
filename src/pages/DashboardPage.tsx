@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown, MessageCircle, Shield } from 'lucide-react'
+import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown, MessageCircle, Shield, Store, ShoppingBag } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { Receita, IngredienteUsuario, Cliente, Orcamento } from '../types'
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../utils/localStorage'
