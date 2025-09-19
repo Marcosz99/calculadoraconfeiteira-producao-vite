@@ -132,30 +132,28 @@ export default function IngredientesPage() {
   const adicionarIngredientePopular = (ingrediente: IngredienteConfeitaria) => {
     if (!user) return
 
-    // Verificar se é ovo
+    // Verificar se é ovo - abrir modal especial
     if (ingrediente.id === 'ovos') {
       setShowOvoModal(true)
+      setShowIngredientesPopulares(false)
       return
     }
 
-    const novoIngrediente: IngredienteUsuario = {
-      id: Date.now().toString(),
-      usuario_id: user.id,
+    // Preencher o formulário com os dados do ingrediente
+    setFormData({
       nome: ingrediente.nome,
-      preco_atual: ingrediente.preco_medio_nacional,
+      preco_atual: 0, // Deixar vazio para o usuário preencher
       unidade: ingrediente.unidade_padrao,
       categoria: ingrediente.categoria,
-      data_atualizacao: new Date().toISOString()
-    }
-
-    const updatedIngredientes = [...ingredientes, novoIngrediente]
-    setIngredientes(updatedIngredientes)
-
-    const allIngredientes = getFromLocalStorage<IngredienteUsuario[]>(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [])
-    const otherUsersIngredientes = allIngredientes.filter(i => i.usuario_id !== user.id)
-    saveToLocalStorage(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [...otherUsersIngredientes, ...updatedIngredientes])
+      fornecedor: '',
+      estoque_atual: 0,
+      estoque_minimo: 0,
+      modo_receitas: false
+    })
     
+    setEditingIngrediente(null)
     setShowIngredientesPopulares(false)
+    setShowModal(true)
   }
 
   const handleOvoSubmit = () => {
@@ -570,8 +568,8 @@ export default function IngredientesPage() {
                   <div key={ingrediente.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                     <h4 className="font-medium text-gray-900">{ingrediente.nome}</h4>
                     <p className="text-sm text-gray-600">{ingrediente.categoria}</p>
-                    <p className="text-sm font-medium text-green-600 mb-3">
-                      R$ {ingrediente.preco_medio_nacional.toFixed(ingrediente.id === 'ovos' ? 2 : 3)}/{ingrediente.unidade_padrao}
+                    <p className="text-sm text-gray-500 mb-3">
+                      Unidade: {ingrediente.unidade_padrao}
                     </p>
                     <button
                       onClick={() => adicionarIngredientePopular(ingrediente)}
