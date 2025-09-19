@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown, MessageSquare } from 'lucide-react'
+import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown, MessageSquare, BookOpen } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function DashboardPage() {
@@ -174,6 +174,19 @@ export default function DashboardPage() {
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">Comunidade</h3>
                   <p className="text-gray-600">Troque ideias e dicas</p>
+                </div>
+              </div>
+            </Link>
+
+            <Link 
+              to="/como-usar"
+              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-indigo-500"
+            >
+              <div className="flex items-center space-x-4">
+                <BookOpen className="h-10 w-10 text-indigo-500" />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Como Usar</h3>
+                  <p className="text-gray-600">Guia completo das ferramentas</p>
                 </div>
               </div>
             </Link>

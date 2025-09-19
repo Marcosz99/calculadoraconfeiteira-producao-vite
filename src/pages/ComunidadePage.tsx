@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { MessageCircle, ThumbsUp, MessageSquare, Users, Calendar, TrendingUp, Search, Send } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { ArrowLeft, MessageCircle, ThumbsUp, MessageSquare, Users, Calendar, TrendingUp, Search, Send } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 
 interface Comentario {
@@ -194,12 +195,22 @@ export default function ComunidadePage() {
       <div className="container mx-auto px-4 py-6 lg:py-8">
         {/* Header */}
         <div className="mb-6 lg:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-1 lg:mb-2">
-            Comunidade DoceCalc 👥
-          </h1>
-          <p className="text-muted-foreground text-sm lg:text-base">
-            Conecte-se com outros confeiteiros, compartilhe experiências e aprenda juntos!
-          </p>
+          <div className="flex items-center space-x-4 mb-4">
+            <Link 
+              to="/dashboard"
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <ArrowLeft className="h-6 w-6 text-gray-600" />
+            </Link>
+            <div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-1 lg:mb-2">
+                Comunidade DoceCalc 👥
+              </h1>
+              <p className="text-muted-foreground text-sm lg:text-base">
+                Conecte-se com outros confeiteiros, compartilhe experiências e aprenda juntos!
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Stats */}
