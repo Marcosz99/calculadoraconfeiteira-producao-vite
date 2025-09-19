@@ -319,6 +319,32 @@ export default function DashboardPage() {
               </Link>
 
               <Link 
+                to="/meu-catalogo"
+                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-purple-500 block"
+              >
+                <div className="flex items-center space-x-4">
+                  <Store className="h-10 w-10 text-purple-500" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Meu Catálogo</h3>
+                    <p className="text-gray-600">Venda online</p>
+                  </div>
+                </div>
+              </Link>
+
+              <Link 
+                to="/encomendas"
+                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-green-500 block"
+              >
+                <div className="flex items-center space-x-4">
+                  <ShoppingBag className="h-10 w-10 text-green-500" />
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Encomendas</h3>
+                    <p className="text-gray-600">Pedidos recebidos</p>
+                  </div>
+                </div>
+              </Link>
+
+              <Link 
                 to="/backup-emergencial"
                 className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-red-500 block"
               >

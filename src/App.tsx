@@ -13,6 +13,9 @@ import BackupEmergencialPage from './pages/BackupEmergencialPage'
 import LandingPage from './pages/LandingPage'
 import FerramentasPage from './pages/FerramentasPage'
 import LoginPage from './pages/LoginPage'
+import MeuCatalogoPage from './pages/MeuCatalogoPage'
+import EncomendasPage from './pages/EncomendasPage'
+import CatalogoPublicoPage from './pages/CatalogoPublicoPage'
 import './App.css'
 
 function App() {
@@ -34,6 +37,9 @@ function App() {
             <Route path="/upgrade" element={<UpgradePage />} />
             <Route path="/comunidade" element={<ComunidadePage />} />
             <Route path="/backup-emergencial" element={<BackupEmergencialPage />} />
+            <Route path="/meu-catalogo" element={<MeuCatalogoPage />} />
+            <Route path="/encomendas" element={<EncomendasPage />} />
+            <Route path="/catalogo/:userId" element={<CatalogoPublicoPage />} />
           </Routes>
         </div>
       </AuthProvider>

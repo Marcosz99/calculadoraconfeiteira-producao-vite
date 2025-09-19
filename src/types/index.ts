@@ -9,6 +9,9 @@ export interface User {
   data_cadastro: string
   ativo: boolean
   avatar?: string
+  catalogo_ativo: boolean
+  url_catalogo?: string
+  dados_confeitaria: DadosConfeitaria
 }
 
 export interface PerfilConfeitaria {
@@ -157,6 +160,44 @@ export interface ConfiguracaoUsuario {
   custo_hora_trabalho: number
   notificacoes_email: boolean
   notificacoes_whatsapp: boolean
+}
+
+export interface DadosConfeitaria {
+  nomeFantasia: string
+  logo?: string
+  corPrimaria?: string
+  whatsapp?: string
+  instagram?: string
+  endereco?: string
+  descricao?: string
+}
+
+export interface ProdutoCatalogo {
+  id: string
+  receita_id: string
+  nome: string
+  foto?: string
+  preco_publico: number
+  descricao_publica: string
+  categoria: string
+  serve: string
+  prazo_entrega: string
+  ativo: boolean
+  personalizavel: boolean
+  criado_em: string
+}
+
+export interface Encomenda {
+  id: string
+  produto_id: string
+  cliente_nome: string
+  cliente_whatsapp: string
+  data_desejada: string
+  observacoes?: string
+  status: 'nova' | 'confirmada' | 'producao' | 'entregue' | 'cancelada'
+  data_encomenda: string
+  confeitaria_id: string
+  valor_total?: number
 }
 
 export interface RelatorioVendas {

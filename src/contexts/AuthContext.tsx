@@ -69,7 +69,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         plano: 'free',
         data_cadastro: new Date().toISOString(),
-        ativo: true
+        ativo: true,
+        catalogo_ativo: false,
+        dados_confeitaria: {
+          nomeFantasia: nome,
+          whatsapp: '',
+          instagram: '',
+          endereco: '',
+          descricao: ''
+        }
       }
       
       // Criar perfil da confeitaria
@@ -125,7 +133,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email,
           plano: 'free',
           data_cadastro: new Date().toISOString(),
-          ativo: true
+          ativo: true,
+          catalogo_ativo: false,
+          dados_confeitaria: {
+            nomeFantasia: 'Usuário Demo',
+            whatsapp: '',
+            instagram: '',
+            endereco: '',
+            descricao: ''
+          }
         }
         
         const mockPerfil: PerfilConfeitaria = {
