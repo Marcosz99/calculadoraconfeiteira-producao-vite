@@ -231,22 +231,30 @@ export default function BackupEmergencialPage() {
             <div className="bg-white rounded-lg shadow-md p-6">
               <div className="flex items-center space-x-3 mb-4">
                 <Shield className="h-6 w-6 text-green-500" />
-                <h3 className="text-lg font-semibold text-gray-900">Backup no Servidor</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Backup Automático no Servidor</h3>
               </div>
               <p className="text-gray-600 mb-4">
-                Envie uma cópia dos seus dados para nossos servidores seguros como backup emergencial.
+                <strong>Faça backup automático</strong> dos seus dados atuais para nossos servidores seguros. 
+                Não precisa selecionar arquivo - seus dados serão coletados automaticamente!
               </p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-blue-700">
+                  <strong>Como funciona:</strong> Clique no botão abaixo e seus dados atuais (receitas, ingredientes, clientes, orçamentos) 
+                  serão automaticamente enviados e salvos com segurança em nossos servidores.
+                </p>
+              </div>
               <button
                 onClick={enviarBackupServidor}
                 disabled={loading}
                 className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-medium py-3 px-4 rounded-lg transition-colors"
               >
-                {loading ? 'Enviando...' : 'Enviar para Servidor'}
+                {loading ? 'Enviando dados...' : '🚀 Fazer Backup Automático'}
               </button>
               <div className="mt-3 text-sm text-gray-500">
-                <p>✓ Inclui: todos os seus dados</p>
+                <p>✓ Backup automático dos dados atuais</p>
                 <p>✓ Segurança: criptografado e protegido</p>
                 <p>✓ Acesso: apenas você e equipe técnica</p>
+                <p>✓ Não precisa selecionar arquivos</p>
               </div>
             </div>
           </div>

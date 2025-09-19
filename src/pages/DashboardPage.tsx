@@ -318,18 +318,18 @@ export default function DashboardPage() {
                 </div>
               </Link>
 
-              <button 
-                onClick={() => window.open('/backup-emergencial', '_blank')}
-                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-red-500 text-left"
+              <Link 
+                to="/backup-emergencial"
+                className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-red-500 block"
               >
                 <div className="flex items-center space-x-4">
                   <Shield className="h-10 w-10 text-red-500" />
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">Backup Emergencial</h3>
-                    <p className="text-gray-600">Salve seus dados</p>
+                    <p className="text-gray-600">Proteja seus dados</p>
                   </div>
                 </div>
-              </button>
+              </Link>
             </div>
           </div>
           
