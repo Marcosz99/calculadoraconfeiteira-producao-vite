@@ -5,7 +5,7 @@ import { LOCAL_STORAGE_KEYS, getFromLocalStorage, saveToLocalStorage } from '../
 import { supabase } from '@/integrations/supabase/client'
 
 export default function BackupEmergencialPage() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [loading, setLoading] = useState(false)
   const [mensagem, setMensagem] = useState<{tipo: 'sucesso' | 'erro' | 'info', texto: string} | null>(null)
 
@@ -14,9 +14,9 @@ export default function BackupEmergencialPage() {
       const dadosBackup = {
         usuario: {
           id: user?.id,
-          nome: user?.nome,
+          nome: profile?.nome,
           email: user?.email,
-          plano: user?.plano
+          plano: profile?.plano
         },
         receitas: getFromLocalStorage(LOCAL_STORAGE_KEYS.RECEITAS, []),
         ingredientes: getFromLocalStorage(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, []),
@@ -34,7 +34,7 @@ export default function BackupEmergencialPage() {
       
       const link = document.createElement('a')
       link.href = url
-      link.download = `backup-docecalc-${user?.nome?.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.json`
+      link.download = `backup-docecalc-${profile?.nome?.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.json`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
@@ -78,7 +78,7 @@ export default function BackupEmergencialPage() {
       const { error } = await supabase
         .from('backups_usuarios')
         .insert({
-          usuario_email: user.email,
+          usuario_email: user.email || '',
           dados: dadosBackup,
           dispositivo: navigator.userAgent,
           versao: '1.0',

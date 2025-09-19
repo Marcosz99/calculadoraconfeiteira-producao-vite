@@ -6,14 +6,14 @@ import { planos } from '@/data/planos'
 import { supabase } from '@/integrations/supabase/client'
 
 export const UpgradePixPage = () => {
-  const { user, upgradeUser } = useAuth()
+  const { user, profile, upgradeUser } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [paymentData, setPaymentData] = useState<any>(null)
   const [paymentStatus, setPaymentStatus] = useState<'form' | 'pending' | 'paid' | 'expired'>('form')
   const [checkingPayment, setCheckingPayment] = useState(false)
   const [formData, setFormData] = useState({
-    name: user?.nome || '',
+    name: profile?.nome || '',
     cellphone: '',
     email: user?.email || '',
     taxId: ''

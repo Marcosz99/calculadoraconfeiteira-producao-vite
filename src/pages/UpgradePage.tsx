@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { planos } from '../data/planos'
 
 export default function UpgradePage() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState<'pix' | 'card' | null>(null)
 
@@ -76,18 +76,18 @@ export default function UpgradePage() {
         </div>
 
         {/* Plano Atual */}
-        {user && (
+        {profile && (
           <div className="bg-white border border-blue-200 rounded-lg p-6 mb-8">
             <div className="flex items-center space-x-3 mb-4">
               <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                {getPlanoIcon(user.plano)}
+                {getPlanoIcon(profile.plano)}
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Plano Atual: {planos.find(p => p.id === user.plano)?.nome}
+                  Plano Atual: {planos.find(p => p.id === profile.plano)?.nome}
                 </h3>
                 <p className="text-gray-600">
-                  {user.plano === 'free' ? 'Upgrade para desbloquear mais recursos' : 'Obrigado por ser nosso cliente!'}
+                  {profile.plano === 'free' ? 'Upgrade para desbloquear mais recursos' : 'Obrigado por ser nosso cliente!'}
                 </p>
               </div>
             </div>
@@ -96,8 +96,8 @@ export default function UpgradePage() {
 
         {/* Comparativo de Planos */}
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
-          {planos.map(plano => {
-            const isPlanoAtual = user?.plano === plano.id
+        {planos.map(plano => {
+            const isPlanoAtual = profile?.plano === plano.id
             
             return (
               <div 

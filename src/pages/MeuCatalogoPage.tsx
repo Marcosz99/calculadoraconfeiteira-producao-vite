@@ -7,7 +7,7 @@ import { Receita, ProdutoCatalogo, DadosConfeitaria } from '../types'
 import QRCodeGenerator from '../components/QRCodeGenerator'
 
 export default function MeuCatalogoPage() {
-  const { user, updatePerfil } = useAuth()
+  const { user, profile, updatePerfil } = useAuth()
   const [receitas, setReceitas] = useState<Receita[]>([])
   const [produtosCatalogo, setProdutosCatalogo] = useState<ProdutoCatalogo[]>([])
   const [dadosConfeitaria, setDadosConfeitaria] = useState<DadosConfeitaria>({
@@ -29,7 +29,7 @@ export default function MeuCatalogoPage() {
       
       const produtosData = getFromLocalStorage<ProdutoCatalogo[]>(`produtos_catalogo_${user.id}`, [])
       const confeitariaData = getFromLocalStorage<DadosConfeitaria>(`dados_confeitaria_${user.id}`, {
-        nomeFantasia: user.nome || '',
+        nomeFantasia: profile?.nome || '',
         whatsapp: '',
         instagram: '',
         endereco: '',
@@ -39,7 +39,7 @@ export default function MeuCatalogoPage() {
       setReceitas(receitasData)
       setProdutosCatalogo(produtosData)
       setDadosConfeitaria(confeitariaData)
-      setCatalogoAtivo(user.catalogo_ativo || false)
+      setCatalogoAtivo(false)
     }
   }, [user])
 

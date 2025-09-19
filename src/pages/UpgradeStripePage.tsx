@@ -6,7 +6,7 @@ import { planos } from '@/data/planos'
 import { supabase } from '@/integrations/supabase/client'
 
 export const UpgradeStripePage = () => {
-  const { user, upgradeUser } = useAuth()
+  const { user, profile, upgradeUser } = useAuth()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [checkingSubscription, setCheckingSubscription] = useState(false)
@@ -71,7 +71,7 @@ export const UpgradeStripePage = () => {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
           userEmail: user.email,
-          userName: user.nome
+          userName: profile?.nome
         }
       })
       
@@ -147,7 +147,7 @@ export const UpgradeStripePage = () => {
                 </label>
                 <input
                   type="text"
-                  value={user?.nome || ''}
+                  value={profile?.nome || ''}
                   readOnly
                   className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50"
                 />

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown, MessageCircle, Shield, Store, ShoppingBag } from 'lucide-react'
+import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown, MessageCircle, Shield, Store, ShoppingBag, Cloud, BookOpen } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { Receita, IngredienteUsuario, Cliente, Orcamento } from '../types'
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../utils/localStorage'
 import { planos } from '../data/planos'
+import { OnboardingTutorial } from '../components/OnboardingTutorial'
+import { MigrationModal } from '../components/MigrationModal'
 
 export default function DashboardPage() {
-  const { user, perfilConfeitaria, signOut } = useAuth()
+  const { user, profile, perfilConfeitaria, signOut } = useAuth()
   const [stats, setStats] = useState({
     totalReceitas: 0,
     receitasCalculadas: 0,
@@ -19,9 +21,25 @@ export default function DashboardPage() {
   const [proximasEntregas, setProximasEntregas] = useState<any[]>([])
   const [receitasPopulares, setReceitasPopulares] = useState<any[]>([])
   const [alertasEstoque, setAlertasEstoque] = useState<any[]>([])
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [showMigration, setShowMigration] = useState(false)
   
   useEffect(() => {
     if (user) {
+      // Verificar se é primeira vez do usuário
+      const hasSeenOnboarding = localStorage.getItem(`onboarding_${user.id}`)
+      if (!hasSeenOnboarding) {
+        setShowOnboarding(true)
+      }
+
+      // Verificar se precisa mostrar migração
+      const hasLocalData = getFromLocalStorage(LOCAL_STORAGE_KEYS.RECEITAS, []).length > 0 ||
+                          getFromLocalStorage(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, []).length > 0
+      const hasMigrated = localStorage.getItem(`migrated_${user.id}`)
+      
+      if (hasLocalData && !hasMigrated) {
+        setShowMigration(true)
+      }
       const receitas = getFromLocalStorage<Receita[]>(LOCAL_STORAGE_KEYS.RECEITAS, [])
         .filter(r => r.usuario_id === user.id && r.ativo)
       
@@ -67,8 +85,18 @@ export default function DashboardPage() {
       })))
     }
   }, [user])
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false)
+    localStorage.setItem(`onboarding_${user?.id}`, 'completed')
+  }
+
+  const handleMigrationComplete = () => {
+    setShowMigration(false)
+    localStorage.setItem(`migrated_${user?.id}`, 'completed')
+  }
   
-  const planoAtual = planos.find(p => p.id === user?.plano)
+  const planoAtual = planos.find(p => p.id === profile?.plano)
 
   if (!user) {
     return (
@@ -100,9 +128,9 @@ export default function DashboardPage() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <Crown className={`h-5 w-5 ${
-                  user.plano === 'free' ? 'text-gray-400' :
-                  user.plano === 'professional' ? 'text-blue-500' :
-                  user.plano === 'premium' ? 'text-purple-500' :
+                  profile?.plano === 'free' ? 'text-gray-400' :
+                  profile?.plano === 'professional' ? 'text-blue-500' :
+                  profile?.plano === 'premium' ? 'text-purple-500' :
                   'text-yellow-500'
                 }`} />
                 <span className="text-sm font-medium text-gray-700">
@@ -119,6 +147,20 @@ export default function DashboardPage() {
                   <Settings className="h-5 w-5" />
                 </Link>
                 <button
+                  onClick={() => setShowOnboarding(true)}
+                  className="p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                  title="Tutorial"
+                >
+                  <BookOpen className="h-5 w-5" />
+                </button>
+                <button
+                  onClick={() => setShowMigration(true)}
+                  className="p-2 text-gray-400 hover:text-green-600 transition-colors"
+                  title="Migrar dados"
+                >
+                  <Cloud className="h-5 w-5" />
+                </button>
+                <button
                   onClick={signOut}
                   className="p-2 text-gray-400 hover:text-red-500 transition-colors"
                   title="Sair"
@@ -134,7 +176,7 @@ export default function DashboardPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Olá, {user.nome}! 👋
+            Olá, {profile?.nome}! 👋
           </h1>
           <p className="text-gray-600">
             Bem-vinda ao seu painel de controle
@@ -436,5 +478,20 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+
+    {/* Modals */}
+    <OnboardingTutorial
+      isOpen={showOnboarding}
+      onClose={() => setShowOnboarding(false)}
+      onComplete={handleOnboardingComplete}
+    />
+    
+    <MigrationModal
+      isOpen={showMigration}
+      onClose={() => setShowMigration(false)}
+    />
+    </div>
   )
+}
+  
 }

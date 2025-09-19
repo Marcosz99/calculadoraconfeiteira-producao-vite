@@ -22,7 +22,7 @@ interface Post {
 }
 
 export default function ComunidadePage() {
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const [posts, setPosts] = useState<Post[]>([])
   const [filtroCategoria, setFiltroCategoria] = useState<string>('todos')
   const [termoPesquisa, setTermoPesquisa] = useState<string>('')
@@ -123,7 +123,7 @@ export default function ComunidadePage() {
 
     const post: Post = {
       id: Date.now().toString(),
-      autor: user?.nome || 'Usuário',
+      autor: profile?.nome || 'Usuário',
       titulo: novoPost.titulo,
       conteudo: novoPost.conteudo,
       categoria: novoPost.categoria,
@@ -142,7 +142,7 @@ export default function ComunidadePage() {
     const comentarioTexto = novoComentario[postId]?.trim()
     if (!comentarioTexto || !user) return
 
-    const primeiroNome = user.nome.split(' ')[0]
+    const primeiroNome = profile?.nome?.split(' ')[0] || 'Usuário'
     
     const comentario: Comentario = {
       id: Date.now().toString(),
@@ -430,7 +430,7 @@ export default function ComunidadePage() {
                         <div className="flex items-center space-x-2">
                           <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
                             <span className="text-pink-600 font-semibold text-sm">
-                              {user?.nome ? user.nome.split(' ')[0].charAt(0) : 'U'}
+                              {profile?.nome ? profile.nome.split(' ')[0].charAt(0) : 'U'}
                             </span>
                           </div>
                           <div className="flex-1 flex items-center space-x-2">

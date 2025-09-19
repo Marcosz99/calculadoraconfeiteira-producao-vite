@@ -29,6 +29,9 @@ type AuthContextType = {
   resetPassword: (email: string) => Promise<void>
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>
   checkSubscription: () => Promise<void>
+  updatePerfil: (updates: Partial<UserProfile>) => Promise<void>
+  upgradeUser: (plano: 'free' | 'professional') => Promise<void>
+  perfilConfeitaria?: any
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -41,6 +44,9 @@ const AuthContext = createContext<AuthContextType>({
   resetPassword: async () => {},
   updateProfile: async () => {},
   checkSubscription: async () => {},
+  updatePerfil: async () => {},
+  upgradeUser: async () => {},
+  perfilConfeitaria: null,
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -302,6 +308,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  const updatePerfil = updateProfile
+
+  const upgradeUser = async (plano: 'free' | 'professional') => {
+    await updateProfile({ plano })
+  }
+
   const checkSubscription = async () => {
     if (!user) return
 
@@ -330,7 +342,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signIn, 
       resetPassword,
       updateProfile,
-      checkSubscription
+      checkSubscription,
+      updatePerfil,
+      upgradeUser,
+      perfilConfeitaria: profile
     }}>
       {children}
     </AuthContext.Provider>

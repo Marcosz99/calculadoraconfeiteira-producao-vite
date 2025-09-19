@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { supabase } from '@/integrations/supabase/client'
 
 export const UpgradeSuccessPage = () => {
-  const { user, upgradeUser } = useAuth()
+  const { user, profile, upgradeUser } = useAuth()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [verifying, setVerifying] = useState(true)
