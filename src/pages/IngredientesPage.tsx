@@ -20,7 +20,8 @@ export default function IngredientesPage() {
     categoria: 'Outros',
     fornecedor: '',
     estoque_atual: 0,
-    estoque_minimo: 0
+    estoque_minimo: 0,
+    modo_receitas: false
   })
 
   useEffect(() => {
@@ -39,6 +40,7 @@ export default function IngredientesPage() {
   })
 
   const ingredientesEstoqueBaixo = ingredientes.filter(i => 
+    !i.modo_receitas &&
     i.estoque_atual !== undefined && 
     i.estoque_minimo !== undefined && 
     i.estoque_atual <= i.estoque_minimo
@@ -57,8 +59,9 @@ export default function IngredientesPage() {
       unidade: formData.unidade,
       categoria: formData.categoria,
       fornecedor: formData.fornecedor,
-      estoque_atual: formData.estoque_atual,
-      estoque_minimo: formData.estoque_minimo,
+      estoque_atual: formData.modo_receitas ? undefined : formData.estoque_atual,
+      estoque_minimo: formData.modo_receitas ? undefined : formData.estoque_minimo,
+      modo_receitas: formData.modo_receitas,
       data_atualizacao: new Date().toISOString()
     }
 
@@ -89,7 +92,8 @@ export default function IngredientesPage() {
       categoria: 'Outros',
       fornecedor: '',
       estoque_atual: 0,
-      estoque_minimo: 0
+      estoque_minimo: 0,
+      modo_receitas: false
     })
     setEditingIngrediente(null)
     setShowModal(false)
@@ -103,7 +107,8 @@ export default function IngredientesPage() {
       categoria: ingrediente.categoria,
       fornecedor: ingrediente.fornecedor || '',
       estoque_atual: ingrediente.estoque_atual || 0,
-      estoque_minimo: ingrediente.estoque_minimo || 0
+      estoque_minimo: ingrediente.estoque_minimo || 0,
+      modo_receitas: ingrediente.modo_receitas || false
     })
     setEditingIngrediente(ingrediente)
     setShowModal(true)
@@ -287,7 +292,8 @@ export default function IngredientesPage() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredIngredientes.map(ingrediente => {
                   const variacao = getVariacaoPreco(ingrediente)
-                  const estoqueAlerta = ingrediente.estoque_atual !== undefined && 
+                  const estoqueAlerta = !ingrediente.modo_receitas &&
+                                       ingrediente.estoque_atual !== undefined && 
                                        ingrediente.estoque_minimo !== undefined && 
                                        ingrediente.estoque_atual <= ingrediente.estoque_minimo
 
@@ -316,7 +322,9 @@ export default function IngredientesPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {ingrediente.estoque_atual !== undefined ? (
+                        {ingrediente.modo_receitas ? (
+                          <span className="text-sm text-blue-600">Modo receitas</span>
+                        ) : ingrediente.estoque_atual !== undefined ? (
                           <div className={`text-sm ${estoqueAlerta ? 'text-yellow-600 font-medium' : 'text-gray-900'}`}>
                             {ingrediente.estoque_atual} {ingrediente.unidade}
                             {estoqueAlerta && (
@@ -437,34 +445,49 @@ export default function IngredientesPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Estoque Atual
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={formData.estoque_atual}
-                      onChange={(e) => setFormData({...formData, estoque_atual: parseFloat(e.target.value) || 0})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Estoque Mínimo
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={formData.estoque_minimo}
-                      onChange={(e) => setFormData({...formData, estoque_minimo: parseFloat(e.target.value) || 0})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
+
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="modo-receitas"
+                    checked={formData.modo_receitas}
+                    onChange={(e) => setFormData({...formData, modo_receitas: e.target.checked})}
+                    className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <label htmlFor="modo-receitas" className="text-sm font-medium text-gray-700">
+                    Modo para receitas: não contabilizará estoque, apenas ficará liberado para receitas
+                  </label>
                 </div>
+                
+                {!formData.modo_receitas && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Estoque Atual
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={formData.estoque_atual}
+                        onChange={(e) => setFormData({...formData, estoque_atual: parseFloat(e.target.value) || 0})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Estoque Mínimo
+                      </label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={formData.estoque_minimo}
+                        onChange={(e) => setFormData({...formData, estoque_minimo: parseFloat(e.target.value) || 0})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+                )}
                 
                 <div className="flex justify-end space-x-4 mt-6">
                   <button

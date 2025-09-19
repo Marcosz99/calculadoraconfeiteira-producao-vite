@@ -86,6 +86,7 @@ export interface IngredienteUsuario {
   data_atualizacao: string
   estoque_atual?: number
   estoque_minimo?: number
+  modo_receitas?: boolean
 }
 
 export interface ReceitaIngrediente {
