@@ -10,6 +10,7 @@ import RelatoriosPage from './pages/RelatoriosPage'
 import UpgradePage from './pages/UpgradePage'
 import { UpgradePixPage } from './pages/UpgradePixPage'
 import { UpgradeStripePage } from './pages/UpgradeStripePage'
+import { UpgradeSuccessPage } from './pages/UpgradeSuccessPage'
 import ComunidadePage from './pages/ComunidadePage'
 import BackupEmergencialPage from './pages/BackupEmergencialPage'
 import LandingPage from './pages/LandingPage'
@@ -18,6 +19,7 @@ import LoginPage from './pages/LoginPage'
 import MeuCatalogoPage from './pages/MeuCatalogoPage'
 import EncomendasPage from './pages/EncomendasPage'
 import CatalogoPublicoPage from './pages/CatalogoPublicoPage'
+import { ResetPlanButton } from './components/ResetPlanButton'
 import './App.css'
 
 function App() {
@@ -39,12 +41,16 @@ function App() {
             <Route path="/upgrade" element={<UpgradePage />} />
             <Route path="/upgrade/pix" element={<UpgradePixPage />} />
             <Route path="/upgrade/stripe" element={<UpgradeStripePage />} />
+            <Route path="/upgrade-success" element={<UpgradeSuccessPage />} />
             <Route path="/comunidade" element={<ComunidadePage />} />
             <Route path="/backup-emergencial" element={<BackupEmergencialPage />} />
             <Route path="/meu-catalogo" element={<MeuCatalogoPage />} />
             <Route path="/encomendas" element={<EncomendasPage />} />
             <Route path="/catalogo/:userId" element={<CatalogoPublicoPage />} />
           </Routes>
+          
+          {/* Botão para resetar plano (apenas para testes) */}
+          <ResetPlanButton />
         </div>
       </AuthProvider>
     </Router>

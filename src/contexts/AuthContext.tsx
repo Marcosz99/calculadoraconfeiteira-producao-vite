@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { User, PerfilConfeitaria } from '../types'
 import { LOCAL_STORAGE_KEYS, saveToLocalStorage, getFromLocalStorage, initializeDefaultData, clearAllUserData } from '../utils/localStorage'
+import { supabase } from '@/integrations/supabase/client'
 
 type AuthContextType = {
   user: User | null
@@ -11,7 +12,8 @@ type AuthContextType = {
   signUp: (email: string, password: string, nome: string, nomeConfeitaria: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
   updatePerfil: (perfil: Partial<PerfilConfeitaria>) => void
-  upgradeUser: (novoPlano: User['plano']) => void
+  upgradeUser: (novoPlano: 'free' | 'professional') => void
+  checkSubscriptionStatus: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -23,6 +25,7 @@ const AuthContext = createContext<AuthContextType>({
   signIn: async () => {},
   updatePerfil: () => {},
   upgradeUser: () => {},
+  checkSubscriptionStatus: async () => {},
 })
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -186,13 +189,60 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
   
-  const upgradeUser = (novoPlano: User['plano']) => {
+  const upgradeUser = (novoPlano: 'free' | 'professional') => {
     if (user) {
       const updatedUser = { ...user, plano: novoPlano }
       setUser(updatedUser)
       saveToLocalStorage(LOCAL_STORAGE_KEYS.USER, updatedUser)
+      
+      // Verificar subscription status após upgrade
+      if (novoPlano === 'professional') {
+        checkSubscriptionStatus()
+      }
     }
   }
+
+  const checkSubscriptionStatus = async () => {
+    if (!user) return
+    
+    try {
+      // Get the current session
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) return
+      
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      })
+      
+      if (error) {
+        console.error('Error checking subscription:', error)
+        return
+      }
+      
+      // Update user plan based on subscription status
+      if (data.subscribed && user.plano !== 'professional') {
+        const updatedUser = { ...user, plano: 'professional' as const }
+        setUser(updatedUser)
+        saveToLocalStorage(LOCAL_STORAGE_KEYS.USER, updatedUser)
+      } else if (!data.subscribed && user.plano !== 'free') {
+        const updatedUser = { ...user, plano: 'free' as const }
+        setUser(updatedUser)
+        saveToLocalStorage(LOCAL_STORAGE_KEYS.USER, updatedUser)
+      }
+      
+    } catch (error) {
+      console.error('Error checking subscription:', error)
+    }
+  }
+
+  // Check subscription status when user logs in
+  useEffect(() => {
+    if (user && user.plano === 'professional') {
+      checkSubscriptionStatus()
+    }
+  }, [user?.id])
 
   return (
     <AuthContext.Provider value={{ 
@@ -203,7 +253,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signUp, 
       signIn, 
       updatePerfil, 
-      upgradeUser 
+      upgradeUser,
+      checkSubscriptionStatus
     }}>
       {children}
     </AuthContext.Provider>
