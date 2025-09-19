@@ -135,14 +135,14 @@ export const UpgradeSuccessPage = () => {
               <ArrowRight className="w-5 h-5" />
             </Link>
 
-            <div className="text-center">
-              <Link
-                to="/upgrade"
-                className="text-gray-600 hover:text-gray-900 text-sm underline"
-              >
-                Voltar para planos
-              </Link>
-            </div>
+              <div className="text-center">
+                <Link
+                  to="/subscription"
+                  className="text-gray-600 hover:text-gray-900 text-sm underline"
+                >
+                  Gerenciar assinatura
+                </Link>
+              </div>
           </div>
         </div>
 

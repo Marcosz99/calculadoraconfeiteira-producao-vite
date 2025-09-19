@@ -146,6 +146,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         if (session?.user) {
           await fetchProfile(session.user.id)
+          // Verificar assinatura após login
+          if (event === 'SIGNED_IN') {
+            setTimeout(() => {
+              checkSubscription()
+            }, 1000)
+          }
         } else {
           setProfile(null)
         }
@@ -318,7 +324,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return
 
     try {
-      const { data, error } = await supabase.functions.invoke('check-subscription')
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        body: {
+          userEmail: user.email
+        }
+      })
       
       if (error) throw error
 

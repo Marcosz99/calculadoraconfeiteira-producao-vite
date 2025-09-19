@@ -7,6 +7,7 @@ import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../utils/localStorage'
 import { planos } from '../data/planos'
 import { OnboardingTutorial } from '../components/OnboardingTutorial'
 import { MigrationModal } from '../components/MigrationModal'
+import { SubscriptionManager } from '../components/SubscriptionManager'
 
 export default function DashboardPage() {
   const { user, profile, perfilConfeitaria, signOut } = useAuth()
@@ -140,6 +141,13 @@ export default function DashboardPage() {
               
               <div className="flex items-center space-x-2">
                 <Link
+                  to="/subscription"
+                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Assinatura"
+                >
+                  <Crown className="h-5 w-5" />
+                </Link>
+                <Link
                   to="/upgrade"
                   className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
                   title="Configurações"
@@ -262,6 +270,13 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Gerenciamento de Assinatura */}
+        {profile && (
+          <div className="mb-8">
+            <SubscriptionManager />
+          </div>
+        )}
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">

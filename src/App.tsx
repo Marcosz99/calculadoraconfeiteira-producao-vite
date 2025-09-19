@@ -18,6 +18,8 @@ import FerramentasPage from './pages/FerramentasPage'
 import UpgradePage from './pages/UpgradePage'
 import { UpgradePixPage } from './pages/UpgradePixPage'
 import { UpgradeStripePage } from './pages/UpgradeStripePage'
+import { UpgradeSuccessPage } from './pages/UpgradeSuccessPage'
+import SubscriptionDashboardPage from './pages/SubscriptionDashboardPage'
 import MeuCatalogoPage from './pages/MeuCatalogoPage'
 import CatalogoPublicoPage from './pages/CatalogoPublicoPage'
 import EncomendasPage from './pages/EncomendasPage'
@@ -45,6 +47,8 @@ function App() {
             <Route path="/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
             <Route path="/upgrade/pix" element={<ProtectedRoute><UpgradePixPage /></ProtectedRoute>} />
             <Route path="/upgrade/stripe" element={<ProtectedRoute><UpgradeStripePage /></ProtectedRoute>} />
+            <Route path="/upgrade-success" element={<ProtectedRoute><UpgradeSuccessPage /></ProtectedRoute>} />
+            <Route path="/subscription" element={<ProtectedRoute><SubscriptionDashboardPage /></ProtectedRoute>} />
             <Route path="/meu-catalogo" element={<ProtectedRoute><MeuCatalogoPage /></ProtectedRoute>} />
             <Route path="/catalogo/:userId" element={<CatalogoPublicoPage />} />
             <Route path="/encomendas" element={<ProtectedRoute><EncomendasPage /></ProtectedRoute>} />
