@@ -200,160 +200,198 @@ export default function CatalogoPublicoPage() {
         </div>
       </header>
 
-      {/* Produtos */}
-      <main className="max-w-4xl mx-auto px-4 py-8">
-        {produtos.length === 0 ? (
-          <div className="text-center py-12">
-            <ShoppingBag className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Nenhum produto disponível</h2>
-            <p className="text-gray-600">Produtos em breve! Volte mais tarde.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {produtos.map((produto) => (
-              <div key={produto.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                {/* Placeholder para foto */}
-                <div className="h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-                  <span className="text-6xl">🧁</span>
-                </div>
-                
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 text-lg mb-2">{produto.nome}</h3>
-                  
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-3">
-                    {produto.descricao_publica}
-                  </p>
-                  
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                    <div className="flex items-center space-x-1">
-                      <Clock className="h-4 w-4" />
-                      <span>{produto.prazo_entrega}</span>
-                    </div>
-                    <span className="bg-gray-100 px-2 py-1 rounded text-xs">
-                      {produto.serve}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-2xl font-bold text-gray-900">
-                        R$ {produto.preco_publico.toFixed(2)}
-                      </span>
+        {/* Produtos */}
+        <main className="max-w-4xl mx-auto px-4 py-8">
+          {produtos.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="bg-gray-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+                <ShoppingBag className="h-12 w-12 text-gray-400" />
+              </div>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-3">Catálogo em Construção</h2>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                Este catálogo ainda não tem produtos disponíveis. 
+                Volte em breve para ver nossas deliciosas opções!
+              </p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-sm mx-auto">
+                <p className="text-sm text-blue-700">
+                  💡 <strong>Para confeiteiras:</strong> Acesse "Meu Catálogo" para adicionar seus produtos.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Nossos Produtos</h2>
+                <p className="text-gray-600">Escolha e encomende seus doces favoritos</p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {produtos.map((produto) => (
+                  <div key={produto.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover-lift transition-all duration-200 animate-fade-in">
+                    {/* Placeholder para foto do produto */}
+                    <div className="h-48 bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center relative overflow-hidden">
+                      <div className="text-6xl opacity-80">🧁</div>
+                      <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm text-gray-700 px-2 py-1 rounded-full text-xs font-medium">
+                        {produto.serve}
+                      </div>
                     </div>
                     
-                    <button
-                      onClick={() => abrirModalEncomenda(produto)}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                    >
-                      Encomendar
-                    </button>
+                    <div className="p-6">
+                      <h3 className="font-bold text-gray-900 text-xl mb-3">{produto.nome}</h3>
+                      
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
+                        {produto.descricao_publica}
+                      </p>
+                      
+                      <div className="flex items-center justify-between text-sm text-gray-500 mb-6">
+                        <div className="flex items-center space-x-1 bg-gray-100 px-3 py-1 rounded-full">
+                          <Clock className="h-4 w-4" />
+                          <span>{produto.prazo_entrega}</span>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-gray-900">
+                            R$ {produto.preco_publico.toFixed(2)}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <button
+                        onClick={() => abrirModalEncomenda(produto)}
+                        className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-xl hover:shadow-lg hover-scale transition-all duration-200 font-semibold flex items-center justify-center space-x-2"
+                      >
+                        <ShoppingBag className="h-4 w-4" />
+                        <span>Encomendar</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
-      </main>
+            </>
+          )}
+        </main>
 
       {/* Modal de Encomenda */}
       {showModal && produtoSelecionado && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto animate-scale-in">
             <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Fazer Encomenda</h3>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-900">Fazer Encomenda</h3>
                 <button
                   onClick={fecharModal}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   ✕
                 </button>
               </div>
               
-              <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                <h4 className="font-medium text-gray-900">{produtoSelecionado.nome}</h4>
-                <p className="text-sm text-gray-600 mt-1">{produtoSelecionado.descricao_publica}</p>
-                <div className="flex items-center justify-between mt-2">
-                  <span className="text-lg font-bold text-gray-900">
+              {/* Produto Selecionado */}
+              <div className="mb-6 p-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl border border-pink-200">
+                <div className="flex items-center space-x-3 mb-3">
+                  <span className="text-3xl">🧁</span>
+                  <div>
+                    <h4 className="font-semibold text-gray-900">{produtoSelecionado.nome}</h4>
+                    <p className="text-sm text-gray-600">{produtoSelecionado.descricao_publica}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xl font-bold text-gray-900">
                     R$ {produtoSelecionado.preco_publico.toFixed(2)}
                   </span>
-                  <span className="text-sm text-gray-500">
-                    Entrega: {produtoSelecionado.prazo_entrega}
-                  </span>
+                  <div className="text-right text-sm text-gray-600">
+                    <div>Serve: {produtoSelecionado.serve}</div>
+                    <div>Entrega: {produtoSelecionado.prazo_entrega}</div>
+                  </div>
                 </div>
               </div>
               
+              {/* Formulário */}
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Seu nome *
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    👤 Seu nome *
                   </label>
                   <input
                     type="text"
                     value={formulario.nome}
                     onChange={(e) => setFormulario({...formulario, nome: e.target.value})}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                     placeholder="Como devemos te chamar?"
                     required
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    WhatsApp *
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    📱 WhatsApp *
                   </label>
                   <input
                     type="tel"
                     value={formulario.whatsapp}
                     onChange={(e) => setFormulario({...formulario, whatsapp: e.target.value})}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                     placeholder="(11) 99999-9999"
                     required
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Data desejada *
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    📅 Data desejada *
                   </label>
                   <input
                     type="date"
                     value={formulario.dataDesejada}
                     onChange={(e) => setFormulario({...formulario, dataDesejada: e.target.value})}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                     min={new Date().toISOString().split('T')[0]}
                     required
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Observações
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    💬 Observações
                   </label>
                   <textarea
                     value={formulario.observacoes}
                     onChange={(e) => setFormulario({...formulario, observacoes: e.target.value})}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                     rows={3}
-                    placeholder="Personalizações, sabores, decoração..."
+                    placeholder="Personalizações, sabores especiais, decoração..."
                   />
                 </div>
               </div>
               
-              <div className="flex space-x-3 mt-6">
+              {/* Botões */}
+              <div className="grid grid-cols-2 gap-3 mt-8">
                 <button
                   onClick={fecharModal}
-                  className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={enviarEncomenda}
                   disabled={enviando}
-                  className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+                  className="bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 rounded-lg hover:shadow-lg disabled:opacity-50 transition-all duration-200 font-medium"
                 >
-                  {enviando ? 'Enviando...' : 'Enviar Pedido'}
+                  {enviando ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Enviando...</span>
+                    </div>
+                  ) : (
+                    '🚀 Enviar Pedido'
+                  )}
                 </button>
+              </div>
+
+              {/* Informações adicionais */}
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-700">
+                  <strong>✨ Como funciona:</strong> Após enviar, você receberá uma confirmação e poderemos entrar em contato via WhatsApp para finalizar os detalhes da encomenda.
+                </p>
               </div>
             </div>
           </div>

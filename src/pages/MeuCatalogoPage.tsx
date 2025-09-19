@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { Store, Settings, Share2, QrCode, Eye, Plus, Image, Save, ArrowLeft, ExternalLink } from 'lucide-react'
 import { getFromLocalStorage, saveToLocalStorage } from '../utils/localStorage'
 import { Receita, ProdutoCatalogo, DadosConfeitaria } from '../types'
+import QRCodeGenerator from '../components/QRCodeGenerator'
 
 export default function MeuCatalogoPage() {
   const { user, updatePerfil } = useAuth()
@@ -22,7 +23,10 @@ export default function MeuCatalogoPage() {
 
   useEffect(() => {
     if (user) {
-      const receitasData = getFromLocalStorage<Receita[]>(`receitas_${user.id}`, [])
+      // Carrega receitas usando a chave correta do localStorage
+      const receitasData = getFromLocalStorage<Receita[]>('doce_receitas', [])
+        .filter(r => r.usuario_id === user.id && r.ativo)
+      
       const produtosData = getFromLocalStorage<ProdutoCatalogo[]>(`produtos_catalogo_${user.id}`, [])
       const confeitariaData = getFromLocalStorage<DadosConfeitaria>(`dados_confeitaria_${user.id}`, {
         nomeFantasia: user.nome || '',
@@ -32,7 +36,7 @@ export default function MeuCatalogoPage() {
         descricao: ''
       })
       
-      setReceitas(receitasData.filter(r => r.ativo))
+      setReceitas(receitasData)
       setProdutosCatalogo(produtosData)
       setDadosConfeitaria(confeitariaData)
       setCatalogoAtivo(user.catalogo_ativo || false)
@@ -134,6 +138,14 @@ export default function MeuCatalogoPage() {
               >
                 <Share2 className="h-4 w-4" />
                 <span>Copiar Link</span>
+              </button>
+              
+              <button
+                onClick={() => setShowQRCode(true)}
+                className="flex items-center space-x-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-200 transition-colors"
+              >
+                <QrCode className="h-4 w-4" />
+                <span>QR Code</span>
               </button>
               
               <Link
@@ -252,76 +264,128 @@ export default function MeuCatalogoPage() {
               </h3>
               
               {receitas.length === 0 ? (
-                <div className="text-center py-8">
-                  <Image className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">Você ainda não tem receitas criadas.</p>
-                  <Link to="/receitas" className="text-blue-600 hover:text-blue-800 font-medium">
-                    Criar primeira receita
+                <div className="text-center py-12">
+                  <Image className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 mb-4">Você ainda não tem receitas criadas.</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Crie algumas receitas primeiro para poder adicioná-las ao seu catálogo.
+                  </p>
+                  <Link 
+                    to="/receitas" 
+                    className="inline-flex items-center space-x-2 bg-pink-500 text-white px-6 py-3 rounded-lg hover:bg-pink-600 transition-colors"
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>Criar primeira receita</span>
                   </Link>
                 </div>
               ) : (
                 <div className="space-y-6">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <p className="text-sm text-blue-700">
+                      <strong>💡 Como funciona:</strong> Selecione as receitas que deseja mostrar no seu catálogo público. 
+                      Você pode personalizar preços e descrições para cada produto.
+                    </p>
+                  </div>
+
                   {receitas.map((receita) => {
                     const produtoNoCatalogo = produtosCatalogo.find(p => p.receita_id === receita.id)
                     
                     return (
-                      <div key={receita.id} className="border border-gray-200 rounded-lg p-4">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center space-x-3">
-                            <input
-                              type="checkbox"
-                              checked={!!produtoNoCatalogo}
-                              onChange={() => handleToggleReceita(receita)}
-                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            />
-                            <div>
-                              <h4 className="font-medium text-gray-900">{receita.nome}</h4>
-                              <p className="text-sm text-gray-600">{receita.descricao}</p>
+                      <div 
+                        key={receita.id} 
+                        className={`border-2 rounded-xl p-6 transition-all duration-200 ${
+                          produtoNoCatalogo 
+                            ? 'border-green-200 bg-green-50/50 shadow-md' 
+                            : 'border-gray-200 bg-white hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="flex items-center space-x-4">
+                            <div className="relative">
+                              <input
+                                type="checkbox"
+                                checked={!!produtoNoCatalogo}
+                                onChange={() => handleToggleReceita(receita)}
+                                className="h-5 w-5 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                              />
+                              {produtoNoCatalogo && (
+                                <div className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full animate-bounce-in"></div>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900 text-lg">{receita.nome}</h4>
+                              <p className="text-gray-600 mt-1">{receita.descricao}</p>
+                              <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                                <span className="bg-gray-100 px-2 py-1 rounded">
+                                  Serve: {receita.rendimento}
+                                </span>
+                                {receita.preco_sugerido && (
+                                  <span className="bg-green-100 text-green-700 px-2 py-1 rounded">
+                                    Preço calculado: R$ {receita.preco_sugerido.toFixed(2)}
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
-                          <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                            {receita.rendimento}
-                          </span>
+                          
+                          {produtoNoCatalogo && (
+                            <div className="text-green-600 font-medium text-sm bg-green-100 px-3 py-1 rounded-full">
+                              ✓ No catálogo
+                            </div>
+                          )}
                         </div>
                         
                         {produtoNoCatalogo && (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 pt-4 border-t border-gray-100">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Preço Público</label>
-                              <input
-                                type="number"
-                                value={produtoNoCatalogo.preco_publico}
-                                onChange={(e) => handleUpdateProduto(produtoNoCatalogo.id, 'preco_publico', parseFloat(e.target.value) || 0)}
-                                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="0.00"
-                                step="0.01"
-                              />
-                            </div>
-                            
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Prazo de Entrega</label>
-                              <select
-                                value={produtoNoCatalogo.prazo_entrega}
-                                onChange={(e) => handleUpdateProduto(produtoNoCatalogo.id, 'prazo_entrega', e.target.value)}
-                                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              >
-                                <option value="24 horas">24 horas</option>
-                                <option value="48 horas">48 horas</option>
-                                <option value="3 dias">3 dias</option>
-                                <option value="1 semana">1 semana</option>
-                                <option value="Sob consulta">Sob consulta</option>
-                              </select>
-                            </div>
-                            
-                            <div className="md:col-span-2">
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Descrição Pública</label>
-                              <textarea
-                                value={produtoNoCatalogo.descricao_publica}
-                                onChange={(e) => handleUpdateProduto(produtoNoCatalogo.id, 'descricao_publica', e.target.value)}
-                                className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                rows={2}
-                                placeholder="Descrição que aparecerá no catálogo público"
-                              />
+                          <div className="mt-6 pt-6 border-t border-green-200 animate-fade-in">
+                            <h5 className="font-medium text-gray-900 mb-4">Configurações do Produto</h5>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  💰 Preço Público
+                                </label>
+                                <div className="relative">
+                                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">R$</span>
+                                  <input
+                                    type="number"
+                                    value={produtoNoCatalogo.preco_publico}
+                                    onChange={(e) => handleUpdateProduto(produtoNoCatalogo.id, 'preco_publico', parseFloat(e.target.value) || 0)}
+                                    className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    placeholder="0.00"
+                                    step="0.01"
+                                    min="0"
+                                  />
+                                </div>
+                              </div>
+                              
+                              <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  ⏰ Prazo de Entrega
+                                </label>
+                                <select
+                                  value={produtoNoCatalogo.prazo_entrega}
+                                  onChange={(e) => handleUpdateProduto(produtoNoCatalogo.id, 'prazo_entrega', e.target.value)}
+                                  className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                >
+                                  <option value="24 horas">24 horas</option>
+                                  <option value="48 horas">48 horas</option>
+                                  <option value="3 dias">3 dias</option>
+                                  <option value="1 semana">1 semana</option>
+                                  <option value="Sob consulta">Sob consulta</option>
+                                </select>
+                              </div>
+                              
+                              <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  📝 Descrição Pública
+                                </label>
+                                <textarea
+                                  value={produtoNoCatalogo.descricao_publica}
+                                  onChange={(e) => handleUpdateProduto(produtoNoCatalogo.id, 'descricao_publica', e.target.value)}
+                                  className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                  rows={3}
+                                  placeholder="Descrição que aparecerá no catálogo público para os clientes..."
+                                />
+                              </div>
                             </div>
                           </div>
                         )}
@@ -345,6 +409,16 @@ export default function MeuCatalogoPage() {
             <span>{loading ? 'Salvando...' : 'Salvar Catálogo'}</span>
           </button>
         </div>
+
+        {/* QR Code Modal */}
+        {user && (
+          <QRCodeGenerator
+            url={`${window.location.origin}/catalogo/${user.id}`}
+            title={dadosConfeitaria.nomeFantasia || user.nome}
+            isOpen={showQRCode}
+            onClose={() => setShowQRCode(false)}
+          />
+        )}
       </div>
     </div>
   )
