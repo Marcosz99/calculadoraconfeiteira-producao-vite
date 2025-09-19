@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { MessageCircle, MapPin, Instagram, Clock, ShoppingBag, ArrowLeft } from 'lucide-react'
+import { MessageCircle, MapPin, Instagram, Clock, ShoppingBag, ArrowLeft, Store } from 'lucide-react'
 import { getFromLocalStorage, saveToLocalStorage } from '../utils/localStorage'
 import { ProdutoCatalogo, DadosConfeitaria, User } from '../types'
 
@@ -136,15 +136,30 @@ export default function CatalogoPublicoPage() {
 
   if (!dadosConfeitaria) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Catálogo não encontrado</h1>
-          <p className="text-gray-600 mb-4">Este catálogo não existe ou não está disponível.</p>
+      <div className="min-h-screen bg-gradient-soft flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <div className="bg-white rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <Store className="h-12 w-12 text-gray-400" />
+          </div>
+          
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Catálogo não Encontrado</h1>
+          <p className="text-gray-600 mb-6">
+            Este catálogo não existe ou ainda não foi configurado.
+          </p>
+          
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold text-blue-900 mb-2">💡 Para Confeiteiras:</h3>
+            <p className="text-sm text-blue-700">
+              Para criar seu catálogo público, acesse <strong>"Meu Catálogo"</strong> no dashboard, 
+              ative o catálogo e selecione suas receitas.
+            </p>
+          </div>
+          
           <button
             onClick={() => navigate('/')}
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+            className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-200"
           >
-            Voltar ao início
+            Voltar ao Início
           </button>
         </div>
       </div>

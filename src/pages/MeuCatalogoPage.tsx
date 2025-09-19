@@ -227,32 +227,49 @@ export default function MeuCatalogoPage() {
               </div>
             </div>
 
-            {/* Status do Catálogo */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Status do Catálogo</h3>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={catalogoAtivo}
-                    onChange={(e) => setCatalogoAtivo(e.target.checked)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Ativo</span>
-                </div>
-              </div>
-              
-              <div className="text-center">
-                <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                  catalogoAtivo ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {catalogoAtivo ? '✅ Catálogo Ativo' : '⚫ Catálogo Inativo'}
-                </div>
-                <p className="text-sm text-gray-600 mt-2">
-                  {produtosNoCatalogo.length} produto(s) no catálogo
-                </p>
+          {/* Status do Catálogo */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Status do Catálogo</h3>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={catalogoAtivo}
+                  onChange={(e) => setCatalogoAtivo(e.target.checked)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <span className="ml-2 text-sm text-gray-700">Ativo</span>
               </div>
             </div>
+            
+            <div className="text-center">
+              <div className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-3 ${
+                catalogoAtivo ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+              }`}>
+                {catalogoAtivo ? '✅ Catálogo Público Ativo' : '❌ Catálogo Inativo'}
+              </div>
+              <p className="text-sm text-gray-600 mb-2">
+                {produtosNoCatalogo.length} produto(s) selecionado(s)
+              </p>
+              
+              {!catalogoAtivo && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
+                  <p className="text-sm text-yellow-700">
+                    ⚠️ <strong>Atenção:</strong> Seu catálogo está inativo. 
+                    Marque como "Ativo" e salve para torná-lo público.
+                  </p>
+                </div>
+              )}
+              
+              {catalogoAtivo && produtosNoCatalogo.length === 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-sm text-blue-700">
+                    💡 Selecione algumas receitas abaixo para aparecerem no seu catálogo público.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
           </div>
 
           {/* Seleção de Produtos */}
@@ -399,15 +416,27 @@ export default function MeuCatalogoPage() {
         </div>
 
         {/* Botões de Ação */}
-        <div className="mt-8 flex items-center justify-center space-x-4">
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4">
           <button
             onClick={salvarCatalogo}
             disabled={loading}
-            className="flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+            className={`w-full sm:w-auto flex items-center justify-center space-x-2 px-8 py-4 rounded-lg font-semibold transition-all duration-200 ${
+              catalogoAtivo && produtosNoCatalogo.length > 0
+                ? 'bg-gradient-to-r from-green-500 to-blue-600 text-white hover:shadow-lg hover-scale'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+            }`}
           >
             <Save className="h-5 w-5" />
             <span>{loading ? 'Salvando...' : 'Salvar Catálogo'}</span>
           </button>
+          
+          {catalogoAtivo && produtosNoCatalogo.length > 0 && (
+            <div className="text-center">
+              <p className="text-sm text-green-600 font-medium">
+                🎉 Seu catálogo está pronto para receber encomendas!
+              </p>
+            </div>
+          )}
         </div>
 
         {/* QR Code Modal */}
