@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, Plus, Search, FileText, Calendar, DollarSign, User, Edit, Trash2, Eye, Send, Check, X, Clock } from 'lucide-react'
+import { ArrowLeft, Plus, Search, FileText, Calendar, DollarSign, User, Edit, Trash2, Eye, Send, Check, X, Clock, QrCode, MessageCircle } from 'lucide-react'
+import QRCode from 'qrcode'
 import { useAuth } from '../contexts/AuthContext'
 import { Orcamento, OrcamentoItem, Cliente, Receita } from '../types'
 import { LOCAL_STORAGE_KEYS, saveToLocalStorage, getFromLocalStorage } from '../utils/localStorage'
@@ -14,11 +15,16 @@ export default function OrcamentosPage() {
   const [statusFiltro, setStatusFiltro] = useState('todos')
   const [showModal, setShowModal] = useState(false)
   const [editingOrcamento, setEditingOrcamento] = useState<Orcamento | null>(null)
+  const [showQRModal, setShowQRModal] = useState(false)
+  const [qrCodeImage, setQrCodeImage] = useState<string | null>(null)
+  const [currentOrcamento, setCurrentOrcamento] = useState<Orcamento | null>(null)
   const [formData, setFormData] = useState({
     cliente_id: '',
+    cliente_nome_avulso: '',
     descricao: '',
     observacoes: '',
-    data_validade: ''
+    data_validade: '',
+    incluir_qr_code: true
   })
   const [itensOrcamento, setItensOrcamento] = useState<OrcamentoItem[]>([])
 
@@ -36,8 +42,9 @@ export default function OrcamentosPage() {
 
   const filteredOrcamentos = orcamentos.filter(orcamento => {
     const cliente = clientes.find(c => c.id === orcamento.cliente_id)
+    const nomeCliente = cliente?.nome || orcamento.cliente_nome_avulso || 'Cliente não informado'
     const matchesSearch = orcamento.numero_orcamento.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         cliente?.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         nomeCliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          orcamento.descricao?.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = statusFiltro === 'todos' || orcamento.status === statusFiltro
     
@@ -81,7 +88,8 @@ export default function OrcamentosPage() {
     const orcamentoData: Orcamento = {
       id: editingOrcamento?.id || Date.now().toString(),
       usuario_id: user.id,
-      cliente_id: formData.cliente_id,
+      cliente_id: formData.cliente_id || '',
+      cliente_nome_avulso: formData.cliente_nome_avulso,
       numero_orcamento: numeroOrcamento,
       data_criacao: editingOrcamento?.data_criacao || new Date().toISOString(),
       data_validade: formData.data_validade,
@@ -89,6 +97,7 @@ export default function OrcamentosPage() {
       valor_total: valorTotal,
       descricao: formData.descricao,
       observacoes: formData.observacoes,
+      incluir_qr_code: formData.incluir_qr_code,
       itens: itensOrcamento
     }
 
@@ -114,9 +123,11 @@ export default function OrcamentosPage() {
   const resetForm = () => {
     setFormData({
       cliente_id: '',
+      cliente_nome_avulso: '',
       descricao: '',
       observacoes: '',
-      data_validade: ''
+      data_validade: '',
+      incluir_qr_code: true
     })
     setItensOrcamento([])
     setEditingOrcamento(null)
@@ -125,10 +136,12 @@ export default function OrcamentosPage() {
 
   const editOrcamento = (orcamento: Orcamento) => {
     setFormData({
-      cliente_id: orcamento.cliente_id,
+      cliente_id: orcamento.cliente_id || '',
+      cliente_nome_avulso: orcamento.cliente_nome_avulso || '',
       descricao: orcamento.descricao || '',
       observacoes: orcamento.observacoes || '',
-      data_validade: orcamento.data_validade.split('T')[0]
+      data_validade: orcamento.data_validade.split('T')[0],
+      incluir_qr_code: orcamento.incluir_qr_code !== false
     })
     setItensOrcamento(orcamento.itens)
     setEditingOrcamento(orcamento)
@@ -200,6 +213,82 @@ export default function OrcamentosPage() {
 
   const getReceitaById = (id: string) => {
     return receitas.find(r => r.id === id)
+  }
+
+  // Função para gerar QR Code do WhatsApp
+  const generateWhatsAppQRCode = async (orcamento: Orcamento) => {
+    try {
+      const cliente = getClienteById(orcamento.cliente_id)
+      const nomeCliente = cliente?.nome || orcamento.cliente_nome_avulso || 'Cliente não informado'
+      
+      let message = `🧁 *ORÇAMENTO DOCECALC*\n\n`
+      message += `📄 *Número:* ${orcamento.numero_orcamento}\n`
+      message += `👤 *Cliente:* ${nomeCliente}\n`
+      message += `📅 *Válido até:* ${new Date(orcamento.data_validade).toLocaleDateString('pt-BR')}\n\n`
+      
+      if (orcamento.descricao) {
+        message += `📝 *Descrição:* ${orcamento.descricao}\n\n`
+      }
+      
+      message += `📋 *ITENS:*\n`
+      orcamento.itens.forEach((item, index) => {
+        const receita = getReceitaById(item.receita_id)
+        message += `${index + 1}. ${receita?.nome} (${item.quantidade}x) - R$ ${item.valor_total.toFixed(2)}\n`
+      })
+      
+      message += `\n💰 *VALOR TOTAL: R$ ${orcamento.valor_total.toFixed(2)}*\n\n`
+      
+      if (orcamento.observacoes) {
+        message += `📝 *Observações:* ${orcamento.observacoes}\n\n`
+      }
+      
+      message += `✨ _Orçamento gerado pelo DoceCalc_`
+      
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
+      
+      if (orcamento.incluir_qr_code) {
+        const qrCodeDataUrl = await QRCode.toDataURL(whatsappUrl, {
+          width: 300,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF'
+          }
+        })
+        return qrCodeDataUrl
+      }
+      
+      return whatsappUrl
+    } catch (error) {
+      console.error('Erro ao gerar QR Code:', error)
+      return null
+    }
+  }
+
+  // Função para compartilhar diretamente no WhatsApp
+  const shareToWhatsApp = async (orcamento: Orcamento) => {
+    const whatsappUrl = await generateWhatsAppQRCode(orcamento)
+    if (whatsappUrl && typeof whatsappUrl === 'string') {
+      window.open(whatsappUrl, '_blank')
+    }
+  }
+
+  // Função para mostrar QR Code
+  const showQRCode = async (orcamento: Orcamento) => {
+    try {
+      const qrCode = await generateWhatsAppQRCode(orcamento)
+      if (qrCode && typeof qrCode === 'string' && qrCode.startsWith('data:')) {
+        setQrCodeImage(qrCode)
+        setCurrentOrcamento(orcamento)
+        setShowQRModal(true)
+      } else {
+        // Se não tem QR code, abre diretamente o WhatsApp
+        shareToWhatsApp(orcamento)
+      }
+    } catch (error) {
+      console.error('Erro ao gerar QR Code:', error)
+      shareToWhatsApp(orcamento)
+    }
   }
 
   // Estatísticas
@@ -373,7 +462,9 @@ export default function OrcamentosPage() {
                         </h3>
                         <div className="flex items-center space-x-2">
                           <User className="h-4 w-4 text-gray-400" />
-                          <span className="text-gray-600">{cliente?.nome}</span>
+                          <span className="text-gray-600">
+                            {cliente?.nome || orcamento.cliente_nome_avulso || 'Cliente não informado'}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -387,6 +478,13 @@ export default function OrcamentosPage() {
                       </span>
                       
                       <div className="flex items-center space-x-1">
+                        <button
+                          onClick={() => showQRCode(orcamento)}
+                          className="text-green-600 hover:text-green-800 p-1"
+                          title="Compartilhar no WhatsApp"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                        </button>
                         {orcamento.status === 'rascunho' && (
                           <button
                             onClick={() => changeStatus(orcamento.id, 'enviado')}
@@ -497,15 +595,14 @@ export default function OrcamentosPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Cliente *
+                      Cliente
                     </label>
                     <select
                       value={formData.cliente_id}
                       onChange={(e) => setFormData({...formData, cliente_id: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                      required
                     >
-                      <option value="">Selecione um cliente</option>
+                      <option value="">Orçamento Avulso (sem cliente)</option>
                       {clientes.map(cliente => (
                         <option key={cliente.id} value={cliente.id}>
                           {cliente.nome}
@@ -513,8 +610,23 @@ export default function OrcamentosPage() {
                       ))}
                     </select>
                   </div>
+
+                  {!formData.cliente_id && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Nome do Cliente (Opcional)
+                      </label>
+                      <input
+                        type="text"
+                        value={formData.cliente_nome_avulso}
+                        onChange={(e) => setFormData({...formData, cliente_nome_avulso: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="Ex: Maria Silva"
+                      />
+                    </div>
+                  )}
                   
-                  <div>
+                  <div className={!formData.cliente_id ? 'md:col-start-1' : ''}>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Válido até *
                     </label>
@@ -654,6 +766,27 @@ export default function OrcamentosPage() {
                     placeholder="Informações adicionais, condições de pagamento, etc."
                   />
                 </div>
+
+                {/* Opção QR Code */}
+                <div className="flex items-center space-x-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <QrCode className="h-6 w-6 text-green-600" />
+                  <div className="flex-1">
+                    <label className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={formData.incluir_qr_code}
+                        onChange={(e) => setFormData({...formData, incluir_qr_code: e.target.checked})}
+                        className="mr-3 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                      />
+                      <span className="text-sm font-medium text-gray-700">
+                        Incluir QR Code para WhatsApp
+                      </span>
+                    </label>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Facilita o compartilhamento do orçamento via WhatsApp
+                    </p>
+                  </div>
+                </div>
                 
                 <div className="flex justify-end space-x-4 mt-6">
                   <button
@@ -672,6 +805,45 @@ export default function OrcamentosPage() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Modal QR Code */}
+        {showQRModal && qrCodeImage && currentOrcamento && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-8 max-w-md w-full m-4">
+              <div className="text-center">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Compartilhar no WhatsApp
+                </h3>
+                <p className="text-sm text-gray-600 mb-6">
+                  Escaneie o QR Code com seu celular para compartilhar o orçamento{' '}
+                  <strong>{currentOrcamento.numero_orcamento}</strong> no WhatsApp
+                </p>
+                <div className="flex justify-center mb-6">
+                  <img 
+                    src={qrCodeImage} 
+                    alt="QR Code WhatsApp" 
+                    className="border border-gray-200 rounded-lg"
+                  />
+                </div>
+                <div className="flex justify-center space-x-4">
+                  <button
+                    onClick={() => shareToWhatsApp(currentOrcamento)}
+                    className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    <span>Abrir WhatsApp</span>
+                  </button>
+                  <button
+                    onClick={() => setShowQRModal(false)}
+                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    Fechar
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}

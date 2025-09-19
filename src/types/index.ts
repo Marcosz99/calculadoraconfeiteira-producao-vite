@@ -115,6 +115,7 @@ export interface Orcamento {
   id: string
   usuario_id: string
   cliente_id: string
+  cliente_nome_avulso?: string
   numero_orcamento: string
   data_criacao: string
   data_validade: string
@@ -122,6 +123,7 @@ export interface Orcamento {
   valor_total: number
   descricao?: string
   observacoes?: string
+  incluir_qr_code?: boolean
   itens: OrcamentoItem[]
 }
 
