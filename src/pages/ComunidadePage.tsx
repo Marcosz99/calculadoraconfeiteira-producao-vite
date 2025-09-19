@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { MessageCircle, ThumbsUp, MessageSquare, Users, Calendar, TrendingUp } from 'lucide-react'
+import { MessageCircle, ThumbsUp, MessageSquare, Users, Calendar, TrendingUp, Search, Send } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
+
+interface Comentario {
+  id: string
+  autor: string
+  conteudo: string
+  data: string
+}
 
 interface Post {
   id: string
@@ -9,7 +16,7 @@ interface Post {
   conteudo: string
   categoria: 'dica' | 'pergunta' | 'receita' | 'negocio'
   curtidas: number
-  comentarios: number
+  comentarios: Comentario[]
   data: string
   jaInteragiu: boolean
 }
@@ -18,12 +25,15 @@ export default function ComunidadePage() {
   const { user } = useAuth()
   const [posts, setPosts] = useState<Post[]>([])
   const [filtroCategoria, setFiltroCategoria] = useState<string>('todos')
+  const [termoPesquisa, setTermoPesquisa] = useState<string>('')
   const [novoPost, setNovoPost] = useState({
     titulo: '',
     conteudo: '',
     categoria: 'dica' as const
   })
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
+  const [comentariosVisiveis, setComentariosVisiveis] = useState<{[key: string]: boolean}>({})
+  const [novoComentario, setNovoComentario] = useState<{[key: string]: string}>({})
 
   // Dados mock para demonstração
   useEffect(() => {
@@ -35,7 +45,20 @@ export default function ComunidadePage() {
         conteudo: 'Pessoal, descobri uma técnica incrível para precificar brigadeiros gourmet! Sempre multiplico o custo dos ingredientes por 3.5 e adiciono R$ 0,50 por unidade de mão de obra. Tem funcionado super bem!',
         categoria: 'dica',
         curtidas: 15,
-        comentarios: 8,
+        comentarios: [
+          {
+            id: '1-1',
+            autor: 'Pedro Santos',
+            conteudo: 'Ótima dica! Vou testar na minha confeitaria.',
+            data: '2025-09-18'
+          },
+          {
+            id: '1-2',
+            autor: 'Ana Costa',
+            conteudo: 'Funcionou comigo também! Obrigada por compartilhar.',
+            data: '2025-09-18'
+          }
+        ],
         data: '2025-09-18',
         jaInteragiu: false
       },
@@ -46,7 +69,14 @@ export default function ComunidadePage() {
         conteudo: 'Gente, preciso de ajuda! Minha massa de bolo fica linda no forno, mas depois murcha. Já tentei várias receitas e sempre acontece isso. Alguém tem alguma dica?',
         categoria: 'pergunta',
         curtidas: 3,
-        comentarios: 12,
+        comentarios: [
+          {
+            id: '2-1',
+            autor: 'João',
+            conteudo: 'Pode ser excesso de fermento ou abertura do forno antes da hora. Deixa assar uns 40min sem abrir!',
+            data: '2025-09-17'
+          }
+        ],
         data: '2025-09-17',
         jaInteragiu: false
       },
@@ -57,7 +87,7 @@ export default function ComunidadePage() {
         conteudo: 'Compartilhando com vocês minha receita secreta de brownie! 200g chocolate meio amargo, 100g manteiga, 2 ovos, 100g açúcar cristal, 50g farinha. Assa 180°C por 25min. Sucesso garantido!',
         categoria: 'receita',
         curtidas: 28,
-        comentarios: 15,
+        comentarios: [],
         data: '2025-09-16',
         jaInteragiu: true
       },
@@ -68,7 +98,7 @@ export default function ComunidadePage() {
         conteudo: 'Pessoal, quero compartilhar minha estratégia que triplicou minhas vendas em 6 meses: focar em nichos específicos (casamentos), criar pacotes, usar redes sociais estrategicamente e sempre entregar mais que o esperado!',
         categoria: 'negocio',
         curtidas: 42,
-        comentarios: 23,
+        comentarios: [],
         data: '2025-09-15',
         jaInteragiu: false
       }
@@ -98,7 +128,7 @@ export default function ComunidadePage() {
       conteudo: novoPost.conteudo,
       categoria: novoPost.categoria,
       curtidas: 0,
-      comentarios: 0,
+      comentarios: [],
       data: new Date().toISOString().split('T')[0],
       jaInteragiu: false
     }
@@ -108,9 +138,49 @@ export default function ComunidadePage() {
     setMostrarFormulario(false)
   }
 
-  const postsFiltrados = filtroCategoria === 'todos' 
-    ? posts 
-    : posts.filter(post => post.categoria === filtroCategoria)
+  const adicionarComentario = (postId: string) => {
+    const comentarioTexto = novoComentario[postId]?.trim()
+    if (!comentarioTexto || !user) return
+
+    const primeiroNome = user.nome.split(' ')[0]
+    
+    const comentario: Comentario = {
+      id: Date.now().toString(),
+      autor: primeiroNome,
+      conteudo: comentarioTexto,
+      data: new Date().toISOString().split('T')[0]
+    }
+
+    setPosts(posts.map(post => 
+      post.id === postId 
+        ? { ...post, comentarios: [...post.comentarios, comentario] }
+        : post
+    ))
+
+    setNovoComentario({ ...novoComentario, [postId]: '' })
+  }
+
+  const toggleComentarios = (postId: string) => {
+    setComentariosVisiveis({
+      ...comentariosVisiveis,
+      [postId]: !comentariosVisiveis[postId]
+    })
+  }
+
+  // Filtrar posts por categoria e termo de pesquisa
+  let postsFiltrados = posts
+  
+  if (filtroCategoria !== 'todos') {
+    postsFiltrados = postsFiltrados.filter(post => post.categoria === filtroCategoria)
+  }
+  
+  if (termoPesquisa.trim()) {
+    postsFiltrados = postsFiltrados.filter(post => 
+      post.titulo.toLowerCase().includes(termoPesquisa.toLowerCase()) ||
+      post.conteudo.toLowerCase().includes(termoPesquisa.toLowerCase()) ||
+      post.autor.toLowerCase().includes(termoPesquisa.toLowerCase())
+    )
+  }
 
   const categoriasInfo = {
     dica: { nome: 'Dicas', cor: 'bg-blue-100 text-blue-800', icon: TrendingUp },
@@ -162,6 +232,20 @@ export default function ComunidadePage() {
                 <p className="text-gray-600">Interações hoje</p>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Barra de Pesquisa */}
+        <div className="mb-8">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+            <input
+              type="text"
+              placeholder="Pesquisar posts, autores ou conteúdo..."
+              value={termoPesquisa}
+              onChange={(e) => setTermoPesquisa(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+            />
           </div>
         </div>
 
@@ -299,7 +383,7 @@ export default function ComunidadePage() {
                     <h3 className="text-lg font-semibold text-gray-900 mb-3">{post.titulo}</h3>
                     <p className="text-gray-700 mb-4">{post.conteudo}</p>
                     
-                    <div className="flex items-center space-x-6 text-gray-500">
+                    <div className="flex items-center space-x-6 text-gray-500 border-t pt-4">
                       <button
                         onClick={() => curtirPost(post.id)}
                         className={`flex items-center space-x-2 hover:text-pink-500 transition-colors ${
@@ -310,11 +394,71 @@ export default function ComunidadePage() {
                         <span>{post.curtidas}</span>
                       </button>
                       
-                      <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => toggleComentarios(post.id)}
+                        className="flex items-center space-x-2 hover:text-pink-500 transition-colors"
+                      >
                         <MessageSquare className="h-4 w-4" />
-                        <span>{post.comentarios}</span>
-                      </div>
+                        <span>{post.comentarios.length} respostas</span>
+                      </button>
                     </div>
+
+                    {/* Comentários */}
+                    {comentariosVisiveis[post.id] && (
+                      <div className="mt-4 border-t pt-4">
+                        {/* Lista de comentários */}
+                        {post.comentarios.length > 0 && (
+                          <div className="space-y-3 mb-4">
+                            {post.comentarios.map((comentario) => (
+                              <div key={comentario.id} className="bg-gray-50 rounded-lg p-3">
+                                <div className="flex items-center space-x-2 mb-2">
+                                  <div className="w-6 h-6 bg-pink-100 rounded-full flex items-center justify-center">
+                                    <span className="text-pink-600 font-semibold text-xs">
+                                      {comentario.autor.charAt(0)}
+                                    </span>
+                                  </div>
+                                  <span className="font-medium text-gray-900 text-sm">{comentario.autor}</span>
+                                  <span className="text-gray-500 text-xs">{comentario.data}</span>
+                                </div>
+                                <p className="text-gray-700 text-sm">{comentario.conteudo}</p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Formulário para novo comentário */}
+                        <div className="flex items-center space-x-2">
+                          <div className="w-8 h-8 bg-pink-100 rounded-full flex items-center justify-center">
+                            <span className="text-pink-600 font-semibold text-sm">
+                              {user?.nome ? user.nome.split(' ')[0].charAt(0) : 'U'}
+                            </span>
+                          </div>
+                          <div className="flex-1 flex items-center space-x-2">
+                            <input
+                              type="text"
+                              placeholder="Escreva uma resposta..."
+                              value={novoComentario[post.id] || ''}
+                              onChange={(e) => setNovoComentario({
+                                ...novoComentario,
+                                [post.id]: e.target.value
+                              })}
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 text-sm"
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  adicionarComentario(post.id)
+                                }
+                              }}
+                            />
+                            <button
+                              onClick={() => adicionarComentario(post.id)}
+                              className="bg-pink-500 hover:bg-pink-600 text-white px-3 py-2 rounded-md transition-colors"
+                            >
+                              <Send className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )
               })}
