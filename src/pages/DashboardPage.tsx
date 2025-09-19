@@ -112,7 +112,8 @@ export default function DashboardPage() {
   }
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
+      <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
@@ -466,7 +467,6 @@ export default function DashboardPage() {
                   Use os relatórios para identificar seus produtos mais rentáveis e clientes mais valiosos.
                 </p>
               </div>
-              
               <div className="bg-purple-50 p-4 rounded-lg">
                 <h4 className="font-medium text-purple-900 mb-2">🎯 Organize-se Melhor</h4>
                 <p className="text-sm text-purple-700">
@@ -477,21 +477,18 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
-    </div>
 
-    {/* Modals */}
-    <OnboardingTutorial
-      isOpen={showOnboarding}
-      onClose={() => setShowOnboarding(false)}
-      onComplete={handleOnboardingComplete}
-    />
-    
-    <MigrationModal
-      isOpen={showMigration}
-      onClose={() => setShowMigration(false)}
-    />
+      {/* Modals */}
+      <OnboardingTutorial
+        isOpen={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+        onComplete={handleOnboardingComplete}
+      />
+      
+      <MigrationModal
+        isOpen={showMigration}
+        onClose={() => setShowMigration(false)}
+      />
     </div>
   )
-}
-  
 }
