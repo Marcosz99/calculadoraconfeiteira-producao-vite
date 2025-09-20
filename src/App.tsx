@@ -26,6 +26,7 @@ import CatalogoPublicoPage from './pages/CatalogoPublicoPage'
 import EncomendasPage from './pages/EncomendasPage'
 import ComunidadePage from './pages/ComunidadePage'
 import BackupEmergencialPage from './pages/BackupEmergencialPage'
+import CreditTestPage from './pages/CreditTestPage'
 import { ResetPlanButton } from './components/ResetPlanButton'
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
             <Route path="/encomendas" element={<ProtectedRoute><EncomendasPage /></ProtectedRoute>} />
             <Route path="/comunidade" element={<ProtectedRoute><ComunidadePage /></ProtectedRoute>} />
             <Route path="/backup-emergencial" element={<ProtectedRoute><BackupEmergencialPage /></ProtectedRoute>} />
+            <Route path="/credit-test" element={<ProtectedRoute><CreditTestPage /></ProtectedRoute>} />
           </Routes>
           
           <ResetPlanButton />
