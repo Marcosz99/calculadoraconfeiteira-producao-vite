@@ -28,6 +28,7 @@ import ComunidadePage from './pages/ComunidadePage'
 import BackupEmergencialPage from './pages/BackupEmergencialPage'
 import CreditTestPage from './pages/CreditTestPage'
 import AiAssistantPage from './pages/AiAssistantPage'
+import MarketplacePage from './pages/MarketplacePage'
 import { ResetPlanButton } from './components/ResetPlanButton'
 
 function App() {
@@ -60,6 +61,7 @@ function App() {
             <Route path="/backup-emergencial" element={<ProtectedRoute><BackupEmergencialPage /></ProtectedRoute>} />
             <Route path="/credit-test" element={<ProtectedRoute><CreditTestPage /></ProtectedRoute>} />
             <Route path="/ai-assistant" element={<ProtectedRoute><AiAssistantPage /></ProtectedRoute>} />
+            <Route path="/marketplace" element={<ProtectedRoute><MarketplacePage /></ProtectedRoute>} />
           </Routes>
           
           <ResetPlanButton />
