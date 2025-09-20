@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown, MessageSquare, BookOpen, TestTube, Bot, ShoppingBag } from 'lucide-react'
+import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown, MessageSquare, BookOpen, TestTube, Bot, ShoppingBag, Brain, Palette } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import CreditsDisplay from '../components/CreditsDisplay'
 
@@ -217,6 +217,32 @@ export default function DashboardPage() {
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900">Marketplace</h3>
                   <p className="text-gray-600">E-books e recursos premium</p>
+                </div>
+              </div>
+            </Link>
+
+            <Link 
+              to="/advanced-calculator"
+              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-blue-500"
+            >
+              <div className="flex items-center space-x-4">
+                <Brain className="h-10 w-10 text-blue-500" />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Calculadora IA</h3>
+                  <p className="text-gray-600">Análise avançada por foto</p>
+                </div>
+              </div>
+            </Link>
+
+            <Link 
+              to="/custom-catalog"
+              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-pink-500"
+            >
+              <div className="flex items-center space-x-4">
+                <Palette className="h-10 w-10 text-pink-500" />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Catálogo</h3>
+                  <p className="text-gray-600">Catálogo personalizado</p>
                 </div>
               </div>
             </Link>

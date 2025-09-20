@@ -29,6 +29,8 @@ import BackupEmergencialPage from './pages/BackupEmergencialPage'
 import CreditTestPage from './pages/CreditTestPage'
 import AiAssistantPage from './pages/AiAssistantPage'
 import MarketplacePage from './pages/MarketplacePage'
+import AdvancedCalculatorPage from './pages/AdvancedCalculatorPage'
+import CustomCatalogPage from './pages/CustomCatalogPage'
 import { ResetPlanButton } from './components/ResetPlanButton'
 
 function App() {
@@ -62,6 +64,8 @@ function App() {
             <Route path="/credit-test" element={<ProtectedRoute><CreditTestPage /></ProtectedRoute>} />
             <Route path="/ai-assistant" element={<ProtectedRoute><AiAssistantPage /></ProtectedRoute>} />
             <Route path="/marketplace" element={<ProtectedRoute><MarketplacePage /></ProtectedRoute>} />
+            <Route path="/advanced-calculator" element={<ProtectedRoute><AdvancedCalculatorPage /></ProtectedRoute>} />
+            <Route path="/custom-catalog" element={<ProtectedRoute><CustomCatalogPage /></ProtectedRoute>} />
           </Routes>
           
           <ResetPlanButton />
