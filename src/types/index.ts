@@ -1,11 +1,19 @@
 // Tipos de dados centrais do DoceCalc
 
+export interface UserPlan {
+  planType: 'gratuito' | 'profissional' | 'premium'
+  creditsIA: number
+  creditsUsedThisMonth: number
+  resetDate: string // Data do próximo reset mensal
+}
+
 export interface User {
   id: string
   nome: string
   email: string
   telefone?: string
   plano: 'free' | 'professional' | 'premium' | 'master'
+  plan: UserPlan // Novo campo para o sistema de créditos IA
   data_cadastro: string
   ativo: boolean
   avatar?: string
