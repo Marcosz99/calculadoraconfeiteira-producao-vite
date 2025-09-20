@@ -1,14 +1,15 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react'
 import { Crown, Zap, ArrowUp } from 'lucide-react'
 import { useCredits } from '../hooks/useCredits'
+import UpgradePlanModal from './UpgradePlanModal'
 
 interface CreditsDisplayProps {
   className?: string
 }
 
 export default function CreditsDisplay({ className = '' }: CreditsDisplayProps) {
-  const { plan, remainingCredits, loading } = useCredits()
+  const { plan, remainingCredits, loading, upgradePlanType } = useCredits()
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   
   if (loading) {
     return (
@@ -58,48 +59,68 @@ export default function CreditsDisplay({ className = '' }: CreditsDisplayProps) 
 
   const showUpgradeButton = remainingCredits <= 2 && plan.planType !== 'premium'
 
-  return (
-    <div className={`flex items-center space-x-3 ${className}`}>
-      {/* Badge do Plano */}
-      <div className="flex items-center space-x-1 px-2 py-1 bg-gray-100 rounded-full">
-        {getPlanIcon()}
-        <span className="text-xs font-medium text-gray-700">{getPlanText()}</span>
-      </div>
+  const handleUpgrade = (newPlanType: typeof plan.planType) => {
+    upgradePlanType(newPlanType)
+    setShowUpgradeModal(false)
+  }
 
-      {/* Contador de Créditos */}
-      <div className="flex flex-col items-end">
-        <div className="flex items-center space-x-2">
-          <Zap className="h-4 w-4 text-gray-400" />
-          <span className={`text-sm font-medium ${getTextColor()}`}>
-            {plan.planType === 'premium' ? 'Ilimitado' : `${remainingCredits}/${totalCredits}`}
+  const handleUpgradeClick = () => {
+    setShowUpgradeModal(true)
+  }
+
+  return (
+    <>
+      <div className={`flex items-center space-x-3 ${className}`}>
+        {/* Badge do Plano */}
+        <div className="flex items-center space-x-1 px-2 py-1 bg-gray-100 rounded-full">
+          {getPlanIcon()}
+          <span className="text-xs font-medium text-gray-700">{getPlanText()}</span>
+        </div>
+
+        {/* Contador de Créditos */}
+        <div className="flex flex-col items-end">
+          <div className="flex items-center space-x-2">
+            <Zap className="h-4 w-4 text-gray-400" />
+            <span className={`text-sm font-medium ${getTextColor()}`}>
+              {plan.planType === 'premium' ? 'Ilimitado' : `${remainingCredits}/${totalCredits}`}
+            </span>
+          </div>
+          
+          {/* Barra de Progresso */}
+          {plan.planType !== 'premium' && (
+            <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden mt-1">
+              <div 
+                className={`h-full transition-all duration-300 ${getBarColor()}`}
+                style={{ width: `${Math.max(0, remainingPercentage)}%` }}
+              />
+            </div>
+          )}
+          
+          <span className="text-xs text-gray-500 mt-0.5">
+            {plan.planType === 'premium' ? 'Consultas IA' : 'consultas restantes'}
           </span>
         </div>
-        
-        {/* Barra de Progresso */}
-        {plan.planType !== 'premium' && (
-          <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden mt-1">
-            <div 
-              className={`h-full transition-all duration-300 ${getBarColor()}`}
-              style={{ width: `${Math.max(0, remainingPercentage)}%` }}
-            />
-          </div>
+
+        {/* Botão de Upgrade */}
+        {showUpgradeButton && (
+          <button
+            onClick={handleUpgradeClick}
+            className="flex items-center space-x-1 px-3 py-1.5 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-medium rounded-full hover:from-pink-600 hover:to-purple-700 transition-all duration-200 shadow-sm hover:shadow-md"
+          >
+            <ArrowUp className="h-3 w-3" />
+            <span>Upgrade</span>
+          </button>
         )}
-        
-        <span className="text-xs text-gray-500 mt-0.5">
-          {plan.planType === 'premium' ? 'Consultas IA' : 'consultas restantes'}
-        </span>
       </div>
 
-      {/* Botão de Upgrade */}
-      {showUpgradeButton && (
-        <Link
-          to="/upgrade"
-          className="flex items-center space-x-1 px-3 py-1.5 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-medium rounded-full hover:from-pink-600 hover:to-purple-700 transition-all duration-200 shadow-sm hover:shadow-md"
-        >
-          <ArrowUp className="h-3 w-3" />
-          <span>Upgrade</span>
-        </Link>
-      )}
-    </div>
+      {/* Modal de Upgrade */}
+      <UpgradePlanModal
+        isOpen={showUpgradeModal}
+        onClose={() => setShowUpgradeModal(false)}
+        onUpgrade={handleUpgrade}
+        currentPlan={plan.planType}
+        trigger={remainingCredits === 0 ? 'no_credits' : 'low_credits'}
+      />
+    </>
   )
 }
