@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown, MessageSquare, BookOpen } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
+import CreditsDisplay from '../components/CreditsDisplay'
 
 export default function DashboardPage() {
   const { user, profile, signOut } = useAuth()
@@ -34,6 +35,9 @@ export default function DashboardPage() {
             </div>
             
             <div className="flex items-center space-x-4">
+              {/* Sistema de Créditos IA */}
+              <CreditsDisplay />
+              
               <div className="flex items-center space-x-2">
                 <Crown className={`h-5 w-5 ${
                   profile?.plano === 'free' ? 'text-gray-400' :
