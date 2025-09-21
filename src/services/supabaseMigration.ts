@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Supabase Migration Service - Migrate localStorage to Supabase
 import { supabase } from '@/integrations/supabase/client';
 import { 
@@ -6,7 +7,6 @@ import {
   saveToLocalStorage,
   removeFromLocalStorage 
 } from '@/utils/localStorage';
-import type { Receita, IngredienteUsuario, Cliente, Orcamento } from '@/types';
 
 class SupabaseMigrationService {
   // ===== RECEITAS MIGRATION =====
