@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import ResetPasswordPage from './pages/ResetPasswordPage'
+import { useDataMigration } from './hooks/useDataMigration'
 import './App.css'
 
 // Páginas
@@ -35,12 +36,13 @@ import FinanceiroPage from './pages/FinanceiroPage'
 import PerfilPage from './pages/PerfilPage'
 import { ResetPlanButton } from './components/ResetPlanButton'
 
-function App() {
+function AppContent() {
+  // Initialize data migration on app start
+  useDataMigration();
+  
   return (
-    <Router>
-      <AuthProvider>
-        <div className="w-full min-h-screen bg-background text-foreground">
-          <Routes>
+    <div className="w-full min-h-screen bg-background text-foreground">
+      <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
@@ -70,10 +72,18 @@ function App() {
             <Route path="/custom-catalog" element={<ProtectedRoute><CustomCatalogPage /></ProtectedRoute>} />
             <Route path="/financeiro" element={<ProtectedRoute><FinanceiroPage /></ProtectedRoute>} />
             <Route path="/perfil" element={<ProtectedRoute><PerfilPage /></ProtectedRoute>} />
-          </Routes>
-          
-          <ResetPlanButton />
-        </div>
+      </Routes>
+      
+      <ResetPlanButton />
+    </div>
+  )
+}
+
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <AppContent />
       </AuthProvider>
     </Router>
   )
