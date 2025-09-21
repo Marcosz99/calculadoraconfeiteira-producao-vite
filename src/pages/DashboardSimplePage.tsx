@@ -51,8 +51,32 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {/* Quick Stats - Simplified */}
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+            <div className="flex items-center">
+              <div className="p-2 rounded-lg bg-pink-100">
+                <FileText className="h-5 w-5 text-pink-600" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-600">Receitas</p>
+                <p className="text-lg font-semibold text-gray-900">15</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
+            <div className="flex items-center">
+              <div className="p-2 rounded-lg bg-purple-100">
+                <Package className="h-5 w-5 text-purple-600" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-600">Ingredientes</p>
+                <p className="text-lg font-semibold text-gray-900">32</p>
+              </div>
+            </div>
+          </div>
+          
           <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
             <div className="flex items-center">
               <div className="p-2 rounded-lg bg-green-100">
@@ -64,47 +88,11 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
-          
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-blue-100">
-                <Package className="h-5 w-5 text-blue-600" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-600">Pedidos</p>
-                <p className="text-lg font-semibold text-gray-900">8</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-purple-100">
-                <Users className="h-5 w-5 text-purple-600" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-600">Clientes</p>
-                <p className="text-lg font-semibold text-gray-900">42</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100">
-            <div className="flex items-center">
-              <div className="p-2 rounded-lg bg-orange-100">
-                <Star className="h-5 w-5 text-orange-600" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-gray-600">Avaliação</p>
-                <p className="text-lg font-semibold text-gray-900">4.9⭐</p>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Main Actions */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Ações Principais</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Principais Funcionalidades</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Link 
               to="/calculadora"
@@ -137,8 +125,8 @@ export default function DashboardPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Receitas</h3>
               <p className="text-gray-600 text-sm mb-3">Gerencie e organize suas receitas</p>
               <div className="flex items-center text-sm text-green-600">
-                <Target className="h-4 w-4 mr-1" />
-                <span>15 receitas</span>
+                <Bot className="h-4 w-4 mr-1" />
+                <span>Com IA</span>
               </div>
             </Link>
 
@@ -155,16 +143,70 @@ export default function DashboardPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Ingredientes</h3>
               <p className="text-gray-600 text-sm mb-3">Controle de estoque e preços</p>
               <div className="flex items-center text-sm text-purple-600">
-                <Clock className="h-4 w-4 mr-1" />
-                <span>Atualizado hoje</span>
+                <Target className="h-4 w-4 mr-1" />
+                <span>32 itens</span>
+              </div>
+            </Link>
+
+            <Link 
+              to="/comunidade"
+              className="group bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-teal-200 transition-all duration-200"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 rounded-lg bg-teal-100 group-hover:bg-teal-500 transition-colors">
+                  <Users className="h-6 w-6 text-teal-600 group-hover:text-white" />
+                </div>
+                <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-teal-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Comunidade</h3>
+              <p className="text-gray-600 text-sm mb-3">Troque receitas e experiências</p>
+              <div className="flex items-center text-sm text-teal-600">
+                <Users className="h-4 w-4 mr-1" />
+                <span>Conectar</span>
+              </div>
+            </Link>
+
+            <Link 
+              to="/relatorios"
+              className="group bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-orange-200 transition-all duration-200"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 rounded-lg bg-orange-100 group-hover:bg-orange-500 transition-colors">
+                  <BarChart3 className="h-6 w-6 text-orange-600 group-hover:text-white" />
+                </div>
+                <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-orange-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Relatórios</h3>
+              <p className="text-gray-600 text-sm mb-3">Analytics e insights do negócio</p>
+              <div className="flex items-center text-sm text-orange-600">
+                <Brain className="h-4 w-4 mr-1" />
+                <span>Com IA</span>
+              </div>
+            </Link>
+
+            <Link 
+              to="/financeiro"
+              className="group bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-emerald-200 transition-all duration-200"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="p-3 rounded-lg bg-emerald-100 group-hover:bg-emerald-500 transition-colors">
+                  <DollarSign className="h-6 w-6 text-emerald-600 group-hover:text-white" />
+                </div>
+                <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-emerald-500" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Financeiro</h3>
+              <p className="text-gray-600 text-sm mb-3">Controle financeiro completo</p>
+              <div className="flex items-center text-sm text-emerald-600">
+                <Bot className="h-4 w-4 mr-1" />
+                <span>OCR + IA</span>
               </div>
             </Link>
           </div>
         </div>
 
-        {/* Secondary Actions */}
+        {/* More Features */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Mais Ferramentas</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Mais Funcionalidades</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <Link 
               to="/clientes"
@@ -192,31 +234,6 @@ export default function DashboardPage() {
               </div>
             </Link>
             
-            <Link 
-              to="/relatorios"
-              className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md hover:border-orange-200 transition-all group"
-            >
-              <div className="text-center">
-                <div className="p-3 rounded-lg bg-orange-100 group-hover:bg-orange-500 transition-colors inline-block mb-3">
-                  <BarChart3 className="h-6 w-6 text-orange-600 group-hover:text-white" />
-                </div>
-                <h3 className="font-medium text-gray-900 mb-1">Relatórios</h3>
-                <p className="text-xs text-gray-600">Analytics</p>
-              </div>
-            </Link>
-
-            <Link 
-              to="/comunidade"
-              className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md hover:border-teal-200 transition-all group"
-            >
-              <div className="text-center">
-                <div className="p-3 rounded-lg bg-teal-100 group-hover:bg-teal-500 transition-colors inline-block mb-3">
-                  <MessageSquare className="h-6 w-6 text-teal-600 group-hover:text-white" />
-                </div>
-                <h3 className="font-medium text-gray-900 mb-1">Comunidade</h3>
-                <p className="text-xs text-gray-600">Troque receitas</p>
-              </div>
-            </Link>
 
             <Link 
               to="/ai-assistant"
@@ -257,18 +274,6 @@ export default function DashboardPage() {
               </div>
             </Link>
 
-            <Link 
-              to="/financeiro"
-              className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md hover:border-emerald-200 transition-all group"
-            >
-              <div className="text-center">
-                <div className="p-3 rounded-lg bg-emerald-100 group-hover:bg-emerald-500 transition-colors inline-block mb-3">
-                  <DollarSign className="h-6 w-6 text-emerald-600 group-hover:text-white" />
-                </div>
-                <h3 className="font-medium text-gray-900 mb-1">Financeiro</h3>
-                <p className="text-xs text-gray-600">Controle</p>
-              </div>
-            </Link>
           </div>
         </div>
 
