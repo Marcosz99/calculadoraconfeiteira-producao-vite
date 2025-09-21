@@ -126,15 +126,17 @@ export default function CustomCatalogPage() {
     const produtoExistente = produtos.find(p => p.receita_id === receitaId)
     
     if (produtoExistente) {
-      // Remover produto
-      const produtosAtualizados = produtos.filter(p => p.receita_id !== receitaId)
+      // Alternar status ativo/inativo (preservar dados)
+      const produtosAtualizados = produtos.map(p => 
+        p.receita_id === receitaId ? { ...p, ativo: !p.ativo } : p
+      )
       setProdutos(produtosAtualizados)
       
       const allProdutos = getFromLocalStorage<ProdutoCatalogo[]>('catalogo_produtos', [])
       const otherUsersProdutos = allProdutos.filter(p => p.usuario_id !== user.id)
       saveToLocalStorage('catalogo_produtos', [...otherUsersProdutos, ...produtosAtualizados])
     } else {
-      // Adicionar produto
+      // Criar novo produto
       const novoProduto: ProdutoCatalogo = {
         id: Date.now().toString(),
         usuario_id: user.id,
@@ -499,27 +501,44 @@ export default function CustomCatalogPage() {
               <div className="divide-y divide-gray-200">
                 {receitas.map(receita => {
                   const produto = produtos.find(p => p.receita_id === receita.id)
-                  const isAtivo = !!produto
+                  const isAtivo = produto?.ativo || false
+                  const temProduto = !!produto
                   
                   return (
                     <div key={receita.id} className="p-6">
                       <div className="flex items-start justify-between">
                         <div className="flex items-start space-x-4">
                           <div className="flex-shrink-0">
-                            <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
-                              <ShoppingBag className="h-8 w-8 text-gray-400" />
+                            <div className={`w-16 h-16 rounded-lg flex items-center justify-center ${
+                              isAtivo ? 'bg-green-100' : 'bg-gray-100'
+                            }`}>
+                              <ShoppingBag className={`h-8 w-8 ${
+                                isAtivo ? 'text-green-500' : 'text-gray-400'
+                              }`} />
                             </div>
                           </div>
                           
                           <div className="flex-1">
-                            <h4 className="text-lg font-medium text-gray-900">
-                              {receita.nome}
-                            </h4>
+                            <div className="flex items-center space-x-2">
+                              <h4 className="text-lg font-medium text-gray-900">
+                                {receita.nome}
+                              </h4>
+                              {isAtivo && (
+                                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                                  Ativo
+                                </span>
+                              )}
+                              {temProduto && !isAtivo && (
+                                <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full">
+                                  Inativo
+                                </span>
+                              )}
+                            </div>
                             <p className="text-sm text-gray-500">
                               {receita.categoria} • {receita.rendimento}
                             </p>
                             
-                            {isAtivo && produto && (
+                            {temProduto && produto && (
                               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -569,6 +588,7 @@ export default function CustomCatalogPage() {
                           <button
                             onClick={() => toggleProduto(receita.id)}
                             className="focus:outline-none"
+                            title={isAtivo ? 'Desativar do catálogo' : 'Ativar no catálogo'}
                           >
                             {isAtivo ? (
                               <ToggleRight className="h-8 w-8 text-green-500" />
