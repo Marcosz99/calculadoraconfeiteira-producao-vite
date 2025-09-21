@@ -230,27 +230,29 @@ export default function AiAssistantPage() {
                       )}
                     </div>
 
-                    {/* Mensagem */}
-                    <div className={`rounded-lg p-3 ${
-                      message.sender === 'user'
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-white border border-gray-200 text-gray-900'
-                    }`}>
+                     {/* Mensagem */}
+                     <div className={`rounded-lg p-4 max-w-full ${
+                       message.sender === 'user'
+                         ? 'bg-blue-500 text-white'
+                         : 'bg-white border border-gray-200 text-gray-900 shadow-sm'
+                     }`}>
                       {message.isLoading ? (
-                        <div className="flex items-center space-x-2">
-                          <Loader className="h-4 w-4 animate-spin" />
-                          <span className="text-sm">DoceBot está pensando...</span>
-                        </div>
+                           <div className="flex items-center space-x-2 text-gray-500">
+                             <Loader className="h-4 w-4 animate-spin text-pink-500" />
+                             <span className="text-sm">DoceBot está pensando...</span>
+                           </div>
                       ) : (
                         <>
-                          <div className="whitespace-pre-wrap text-sm">
+                          <div className="whitespace-pre-line text-sm leading-relaxed">
                             {message.content}
                           </div>
                           
-                          {/* Timestamp */}
-                          <div className={`flex items-center justify-between mt-2 text-xs ${
-                            message.sender === 'user' ? 'text-blue-100' : 'text-gray-500'
-                          }`}>
+                           {/* Timestamp e Confiança */}
+                           <div className={`flex items-center justify-between mt-3 pt-2 border-t text-xs ${
+                             message.sender === 'user' 
+                               ? 'text-blue-100 border-blue-400' 
+                               : 'text-gray-400 border-gray-100'
+                           }`}>
                             <div className="flex items-center space-x-1">
                               <Clock className="h-3 w-3" />
                               <span>{formatTimestamp(message.timestamp)}</span>
@@ -260,23 +262,23 @@ export default function AiAssistantPage() {
                             )}
                           </div>
 
-                          {/* Perguntas Relacionadas */}
-                          {message.relatedQuestions && message.relatedQuestions.length > 0 && (
-                            <div className="mt-3 pt-3 border-t border-gray-100">
-                              <p className="text-xs text-gray-500 mb-2">Perguntas relacionadas:</p>
-                              <div className="space-y-1">
-                                {message.relatedQuestions.slice(0, 3).map((question, index) => (
-                                  <button
-                                    key={index}
-                                    onClick={() => handleQuickQuestion(question)}
-                                    className="block w-full text-left text-xs text-gray-600 hover:text-pink-600 transition-colors"
-                                  >
-                                    • {question}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
+                           {/* Perguntas Relacionadas */}
+                           {message.relatedQuestions && message.relatedQuestions.length > 0 && (
+                             <div className="mt-4 pt-3 border-t border-gray-100">
+                               <p className="text-xs font-medium text-gray-600 mb-2">💡 Perguntas relacionadas:</p>
+                               <div className="space-y-1">
+                                 {message.relatedQuestions.slice(0, 2).map((question, index) => (
+                                   <button
+                                     key={index}
+                                     onClick={() => handleQuickQuestion(question)}
+                                     className="block w-full text-left text-xs text-gray-600 hover:text-pink-600 hover:bg-pink-50 p-2 rounded transition-colors"
+                                   >
+                                     • {question}
+                                   </button>
+                                 ))}
+                               </div>
+                             </div>
+                           )}
                         </>
                       )}
                     </div>
