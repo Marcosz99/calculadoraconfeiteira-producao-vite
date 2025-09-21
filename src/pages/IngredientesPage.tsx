@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowLeft, Plus, Search, Package, AlertTriangle, TrendingUp, Edit, Trash2, DollarSign, Star } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { IngredienteUsuario } from '../types'
-import { LOCAL_STORAGE_KEYS, saveToLocalStorage, getFromLocalStorage } from '../utils/localStorage'
+import { supabase } from '@/integrations/supabase/client'
 import { INGREDIENTES_CONFEITARIA, INGREDIENTES_MAIS_USADOS, CATEGORIAS_INGREDIENTES, IngredienteConfeitaria } from '../data/ingredientes-confeitaria'
 import CurrencyInput from '../components/ui/CurrencyInput'
 
@@ -31,10 +31,27 @@ export default function IngredientesPage() {
 
   useEffect(() => {
     if (user) {
-      const savedIngredientes = getFromLocalStorage<IngredienteUsuario[]>(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [])
-      setIngredientes(savedIngredientes.filter(i => i.usuario_id === user.id))
+      loadIngredientesFromSupabase()
     }
   }, [user])
+
+  const loadIngredientesFromSupabase = async () => {
+    if (!user) return
+    
+    try {
+      const { data, error } = await supabase
+        .from('ingredientes_usuario')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('nome', { ascending: true })
+      
+      if (error) throw error
+      
+      setIngredientes(data || [])
+    } catch (error) {
+      console.error('Erro ao carregar ingredientes:', error)
+    }
+  }
 
   const categorias = CATEGORIAS_INGREDIENTES
 
@@ -51,42 +68,57 @@ export default function IngredientesPage() {
     i.estoque_atual <= i.estoque_minimo
   )
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user) return
 
-    const ingredienteData: IngredienteUsuario = {
-      id: editingIngrediente?.id || Date.now().toString(),
-      usuario_id: user.id,
-      nome: formData.nome,
-      preco_atual: formData.preco_atual,
-      preco_anterior: editingIngrediente?.preco_atual,
-      unidade: formData.unidade,
-      categoria: formData.categoria,
-      fornecedor: formData.fornecedor,
-      estoque_atual: formData.modo_receitas ? undefined : formData.estoque_atual,
-      estoque_minimo: formData.modo_receitas ? undefined : formData.estoque_minimo,
-      modo_receitas: formData.modo_receitas,
-      data_atualizacao: new Date().toISOString()
+    try {
+      const ingredienteData = {
+        user_id: user.id,
+        nome: formData.nome,
+        preco_atual: formData.preco_atual,
+        preco_anterior: editingIngrediente?.preco_atual || null,
+        unidade: formData.unidade,
+        categoria: formData.categoria,
+        fornecedor: formData.fornecedor || null,
+        estoque_atual: formData.modo_receitas ? null : formData.estoque_atual,
+        estoque_minimo: formData.modo_receitas ? null : formData.estoque_minimo,
+        modo_receitas: formData.modo_receitas,
+        observacoes: null
+      }
+
+      if (editingIngrediente) {
+        // Atualizar ingrediente existente
+        const { data, error } = await supabase
+          .from('ingredientes_usuario')
+          .update(ingredienteData)
+          .eq('id', editingIngrediente.id)
+          .eq('user_id', user.id)
+          .select()
+          .single()
+
+        if (error) throw error
+
+        setIngredientes(prev => prev.map(i => i.id === editingIngrediente.id ? data : i))
+      } else {
+        // Criar novo ingrediente
+        const { data, error } = await supabase
+          .from('ingredientes_usuario')
+          .insert(ingredienteData)
+          .select()
+          .single()
+
+        if (error) throw error
+
+        setIngredientes(prev => [data, ...prev])
+      }
+
+      resetForm()
+      alert(editingIngrediente ? '✅ Ingrediente atualizado!' : '✅ Ingrediente criado!')
+    } catch (error) {
+      console.error('Erro ao salvar ingrediente:', error)
+      alert('❌ Erro ao salvar ingrediente. Tente novamente.')
     }
-
-    let updatedIngredientes
-    if (editingIngrediente) {
-      updatedIngredientes = ingredientes.map(i => 
-        i.id === editingIngrediente.id ? ingredienteData : i
-      )
-    } else {
-      updatedIngredientes = [...ingredientes, ingredienteData]
-    }
-
-    setIngredientes(updatedIngredientes)
-
-    // Salvar todos os ingredientes
-    const allIngredientes = getFromLocalStorage<IngredienteUsuario[]>(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [])
-    const otherUsersIngredientes = allIngredientes.filter(i => i.usuario_id !== user.id)
-    saveToLocalStorage(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [...otherUsersIngredientes, ...updatedIngredientes])
-
-    resetForm()
   }
 
   const resetForm = () => {
@@ -119,14 +151,23 @@ export default function IngredientesPage() {
     setShowModal(true)
   }
 
-  const deleteIngrediente = (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir este ingrediente?')) {
-      const updatedIngredientes = ingredientes.filter(i => i.id !== id)
-      setIngredientes(updatedIngredientes)
-      
-      const allIngredientes = getFromLocalStorage<IngredienteUsuario[]>(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [])
-      const updatedAllIngredientes = allIngredientes.filter(i => i.id !== id)
-      saveToLocalStorage(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, updatedAllIngredientes)
+  const deleteIngrediente = async (id: string) => {
+    if (!window.confirm('Tem certeza que deseja excluir este ingrediente?')) return
+
+    try {
+      const { error } = await supabase
+        .from('ingredientes_usuario')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user?.id)
+
+      if (error) throw error
+
+      setIngredientes(prev => prev.filter(i => i.id !== id))
+      alert('✅ Ingrediente excluído com sucesso!')
+    } catch (error) {
+      console.error('Erro ao excluir ingrediente:', error)
+      alert('❌ Erro ao excluir ingrediente. Tente novamente.')
     }
   }
 
@@ -157,31 +198,39 @@ export default function IngredientesPage() {
     setShowModal(true)
   }
 
-  const handleOvoSubmit = () => {
+  const handleOvoSubmit = async () => {
     if (!user || ovoData.valorPago <= 0 || ovoData.quantidade <= 0) return
 
     const precoUnitario = ovoData.valorPago / ovoData.quantidade
 
-    const novoIngrediente: IngredienteUsuario = {
-      id: Date.now().toString(),
-      usuario_id: user.id,
-      nome: 'Ovos',
-      preco_atual: precoUnitario,
-      unidade: 'unidade',
-      categoria: 'Ovos',
-      data_atualizacao: new Date().toISOString()
+    try {
+      const novoIngrediente = {
+        user_id: user.id,
+        nome: 'Ovos',
+        preco_atual: precoUnitario,
+        unidade: 'unidade',
+        categoria: 'Ovos',
+        observacoes: null
+      }
+
+      const { data, error } = await supabase
+        .from('ingredientes_usuario')
+        .insert(novoIngrediente)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      setIngredientes(prev => [data, ...prev])
+      
+      setShowOvoModal(false)
+      setShowIngredientesPopulares(false)
+      setOvoData({ valorPago: 0, quantidade: 0 })
+      alert('✅ Ingrediente ovo adicionado com sucesso!')
+    } catch (error) {
+      console.error('Erro ao adicionar ingrediente ovo:', error)
+      alert('❌ Erro ao adicionar ingrediente. Tente novamente.')
     }
-
-    const updatedIngredientes = [...ingredientes, novoIngrediente]
-    setIngredientes(updatedIngredientes)
-
-    const allIngredientes = getFromLocalStorage<IngredienteUsuario[]>(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [])
-    const otherUsersIngredientes = allIngredientes.filter(i => i.usuario_id !== user.id)
-    saveToLocalStorage(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [...otherUsersIngredientes, ...updatedIngredientes])
-    
-    setShowOvoModal(false)
-    setShowIngredientesPopulares(false)
-    setOvoData({ valorPago: 0, quantidade: 0 })
   }
 
   const ingredientesPopularesFiltrados = INGREDIENTES_CONFEITARIA
