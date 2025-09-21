@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { IngredienteUsuario } from '../types'
 import { LOCAL_STORAGE_KEYS, saveToLocalStorage, getFromLocalStorage } from '../utils/localStorage'
 import { INGREDIENTES_CONFEITARIA, INGREDIENTES_MAIS_USADOS, CATEGORIAS_INGREDIENTES, IngredienteConfeitaria } from '../data/ingredientes-confeitaria'
+import CurrencyInput from '../components/ui/CurrencyInput'
 
 export default function IngredientesPage() {
   const { user } = useAuth()
@@ -412,15 +413,14 @@ export default function IngredientesPage() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Preço Atual (R$)
+                      Preço Atual
                     </label>
-                    <input
-                      type="number"
-                      step="0.01"
+                    <CurrencyInput
                       value={formData.preco_atual}
-                      onChange={(e) => setFormData({...formData, preco_atual: parseFloat(e.target.value) || 0})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      required
+                      onChange={(value) => setFormData({...formData, preco_atual: value || 0})}
+                      className="border-gray-300"
+                      placeholder="R$ 0,00"
+                      allowEmpty={false}
                     />
                   </div>
                   
@@ -601,15 +601,14 @@ export default function IngredientesPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Quanto você pagou? (R$)
+                    Quanto você pagou?
                   </label>
-                  <input
-                    type="number"
-                    step="0.01"
+                  <CurrencyInput
                     value={ovoData.valorPago}
-                    onChange={(e) => setOvoData({...ovoData, valorPago: parseFloat(e.target.value) || 0})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Ex: 30.00"
+                    onChange={(value) => setOvoData({...ovoData, valorPago: value || 0})}
+                    className="border-gray-300"
+                    placeholder="R$ 0,00"
+                    allowEmpty={false}
                   />
                 </div>
                 

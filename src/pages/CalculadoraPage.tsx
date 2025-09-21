@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { IngredienteUsuario, Receita, CalculoPreco } from '../types'
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage, saveToLocalStorage } from '../utils/localStorage'
 import { parseNumericInput, formatForInput } from '../utils/numberUtils'
+import CurrencyInput from '../components/ui/CurrencyInput'
 
 interface Ingrediente {
   id: string
@@ -320,15 +321,13 @@ export default function CalculadoraPage() {
                       
                       <div className="sm:col-span-2">
                         <label className="block text-sm font-medium text-foreground mb-2">
-                          Preço por unidade (R$)
+                          Preço por unidade
                         </label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          value={formatForInput(ingrediente.precoUnitario)}
-                          onChange={(e) => atualizarIngrediente(ingrediente.id, 'precoUnitario', parseNumericInput(e.target.value))}
-                          className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
-                          placeholder="Digite o preço por unidade"
+                        <CurrencyInput
+                          value={ingrediente.precoUnitario}
+                          onChange={(value) => atualizarIngrediente(ingrediente.id, 'precoUnitario', value)}
+                          className="border-input bg-background text-foreground"
+                          placeholder="R$ 0,00"
                         />
                       </div>
                     </div>
@@ -361,15 +360,13 @@ export default function CalculadoraPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">
-                      Custo/Hora (R$)
+                      Custo/Hora
                     </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={formatForInput(custoHora)}
-                      onChange={(e) => setCustoHora(parseNumericInput(e.target.value))}
-                      placeholder="Digite o custo por hora"
-                      className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                    <CurrencyInput
+                      value={custoHora}
+                      onChange={setCustoHora}
+                      className="border-input bg-background text-foreground"
+                      placeholder="R$ 0,00"
                     />
                   </div>
                 </div>
@@ -387,15 +384,13 @@ export default function CalculadoraPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Custo Fixo (R$)
+                    Custo Fixo
                   </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formatForInput(custoFixo)}
-                    onChange={(e) => setCustoFixo(parseNumericInput(e.target.value))}
-                    placeholder="Digite o custo fixo"
-                    className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
+                  <CurrencyInput
+                    value={custoFixo}
+                    onChange={setCustoFixo}
+                    className="border-input bg-background text-foreground"
+                    placeholder="R$ 0,00"
                   />
                 </div>
               </div>
