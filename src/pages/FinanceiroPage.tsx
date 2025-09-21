@@ -11,6 +11,7 @@ import { TransacaoFinanceira, GastoFixo, GastoPlanejado, ResumoFinanceiro, Orcam
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage, saveToLocalStorage } from '../utils/localStorage'
 import AdvancedCharts from '../components/AdvancedCharts'
 import { supabase } from '@/integrations/supabase/client'
+import { FinancialActionButtons } from '../components/FinancialActionButtons'
 
 export default function FinanceiroPage() {
   const { user } = useAuth()
@@ -26,11 +27,25 @@ export default function FinanceiroPage() {
   
   // Estados para modais
   const [showUploadModal, setShowUploadModal] = useState(false)
+  const [showManualModal, setShowManualModal] = useState(false)
   const [showGastoFixoModal, setShowGastoFixoModal] = useState(false)
   const [showGastoPlanejadoModal, setShowGastoPlanejadoModal] = useState(false)
   const [uploadType, setUploadType] = useState<'receita' | 'despesa' | null>(null)
   const [processandoOCR, setProcessandoOCR] = useState(false)
   const [dadosExtraidos, setDadosExtraidos] = useState<Partial<TransacaoFinanceira> | null>(null)
+  
+  // Estados para formulário manual
+  const [novaTransacao, setNovaTransacao] = useState<Partial<TransacaoFinanceira>>({
+    tipo: 'receita',
+    valor: 0,
+    data: new Date().toISOString().substring(0, 10),
+    categoria: '',
+    descricao: '',
+    metodo_pagamento: 'pix',
+    fornecedor_cliente: '',
+    extraido_por_ocr: false,
+    verificado: true
+  })
   
   // Estados para formulários
   const [novoGastoFixo, setNovoGastoFixo] = useState<Partial<GastoFixo>>({
@@ -389,6 +404,35 @@ export default function FinanceiroPage() {
     }
   }
 
+  // Salvar transação manual
+  const salvarTransacaoManual = () => {
+    if (!user || !novaTransacao.valor || !novaTransacao.categoria || !novaTransacao.descricao) return
+
+    const transacao: TransacaoFinanceira = {
+      ...novaTransacao as TransacaoFinanceira,
+      id: Date.now().toString(),
+      criado_em: new Date().toISOString()
+    }
+
+    const novasTransacoes = [transacao, ...transacoes]
+    setTransacoes(novasTransacoes)
+    saveToLocalStorage('transacoes_financeiras', novasTransacoes)
+    
+    // Reset form
+    setNovaTransacao({
+      tipo: 'receita',
+      valor: 0,
+      data: new Date().toISOString().substring(0, 10),
+      categoria: '',
+      descricao: '',
+      metodo_pagamento: 'pix',
+      fornecedor_cliente: '',
+      extraido_por_ocr: false,
+      verificado: true
+    })
+    setShowManualModal(false)
+  }
+
   // Salvar gasto fixo
   const salvarGastoFixo = () => {
     if (!user || !novoGastoFixo.nome || !novoGastoFixo.valor || !novoGastoFixo.categoria) return
@@ -487,28 +531,24 @@ export default function FinanceiroPage() {
               </Link>
               <h1 className="text-2xl font-bold text-gray-900">💰 Financeiro</h1>
             </div>
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => {
-                  setUploadType('receita')
-                  setShowUploadModal(true)
-                }}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center"
-              >
-                <TrendingUp className="h-4 w-4 mr-2" />
-                + Receita
-              </button>
-              <button
-                onClick={() => {
-                  setUploadType('despesa')
-                  setShowUploadModal(true)
-                }}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center"
-              >
-                <TrendingDown className="h-4 w-4 mr-2" />
-                + Despesa
-              </button>
-            </div>
+            <FinancialActionButtons
+              onUploadReceita={() => {
+                setUploadType('receita')
+                setShowUploadModal(true)
+              }}
+              onUploadDespesa={() => {
+                setUploadType('despesa')
+                setShowUploadModal(true)
+              }}
+              onManualReceita={() => {
+                setNovaTransacao(prev => ({ ...prev, tipo: 'receita' }))
+                setShowManualModal(true)
+              }}
+              onManualDespesa={() => {
+                setNovaTransacao(prev => ({ ...prev, tipo: 'despesa' }))
+                setShowManualModal(true)
+              }}
+            />
           </div>
         </div>
       </div>
@@ -1054,31 +1094,151 @@ export default function FinanceiroPage() {
               {uploadType === 'receita' ? '💰 Adicionar Receita' : '💸 Adicionar Despesa'}
             </h3>
 
-            {!dadosExtraidos ? (
+            {dadosExtraidos ? (
+              <div>
+                <div className="bg-green-50 p-4 rounded-lg mb-4">
+                  <h4 className="font-medium text-green-800 mb-2">✅ Dados extraídos da nota fiscal:</h4>
+                  <div className="space-y-2 text-sm">
+                    <div><strong>Valor:</strong> {formatarMoeda(dadosExtraidos.valor || 0)}</div>
+                    <div><strong>Data:</strong> {dadosExtraidos.data ? formatarData(dadosExtraidos.data) : 'Não identificada'}</div>
+                    <div><strong>Empresa:</strong> {dadosExtraidos.fornecedor_cliente || 'Não identificada'}</div>
+                    <div><strong>Categoria:</strong> {dadosExtraidos.categoria || 'Outros'}</div>
+                    <div><strong>Descrição:</strong> {dadosExtraidos.descricao || 'Sem descrição'}</div>
+                    <div><strong>Pagamento:</strong> {dadosExtraidos.metodo_pagamento || 'Não identificado'}</div>
+                  </div>
+                </div>
+
+                {/* Formulário para editar dados extraídos */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Valor</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={dadosExtraidos.valor || 0}
+                      onChange={(e) => setDadosExtraidos(prev => prev ? { ...prev, valor: parseFloat(e.target.value) } : null)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Data</label>
+                    <input
+                      type="date"
+                      value={dadosExtraidos.data || ''}
+                      onChange={(e) => setDadosExtraidos(prev => prev ? { ...prev, data: e.target.value } : null)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                    <select
+                      value={dadosExtraidos.categoria || ''}
+                      onChange={(e) => setDadosExtraidos(prev => prev ? { ...prev, categoria: e.target.value } : null)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Selecione uma categoria</option>
+                      {uploadType === 'receita' ? (
+                        <>
+                          <option value="Vendas Bolos">Vendas Bolos</option>
+                          <option value="Vendas Docinhos">Vendas Docinhos</option>
+                          <option value="Vendas Tortas">Vendas Tortas</option>
+                          <option value="Encomendas">Encomendas</option>
+                          <option value="Outros">Outros</option>
+                        </>
+                      ) : (
+                        <>
+                          <option value="Ingredientes">Ingredientes</option>
+                          <option value="Embalagens">Embalagens</option>
+                          <option value="Equipamentos">Equipamentos</option>
+                          <option value="Marketing">Marketing</option>
+                          <option value="Contas">Contas</option>
+                          <option value="Outros">Outros</option>
+                        </>
+                      )}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                    <input
+                      type="text"
+                      value={dadosExtraidos.descricao || ''}
+                      onChange={(e) => setDadosExtraidos(prev => prev ? { ...prev, descricao: e.target.value } : null)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="Descreva a transação"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Empresa/Cliente</label>
+                    <input
+                      type="text"
+                      value={dadosExtraidos.fornecedor_cliente || ''}
+                      onChange={(e) => setDadosExtraidos(prev => prev ? { ...prev, fornecedor_cliente: e.target.value } : null)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="Nome da empresa ou cliente"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Método de Pagamento</label>
+                    <select
+                      value={dadosExtraidos.metodo_pagamento || 'pix'}
+                      onChange={(e) => setDadosExtraidos(prev => prev ? { ...prev, metodo_pagamento: e.target.value as any } : null)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="pix">PIX</option>
+                      <option value="dinheiro">Dinheiro</option>
+                      <option value="cartao_credito">Cartão de Crédito</option>
+                      <option value="cartao_debito">Cartão de Débito</option>
+                      <option value="transferencia">Transferência</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button
+                    onClick={() => {
+                      setShowUploadModal(false)
+                      setUploadType(null)
+                      setDadosExtraidos(null)
+                    }}
+                    className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={confirmarTransacao}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    ✅ Confirmar Transação
+                  </button>
+                </div>
+              </div>
+            ) : (
               <div>
                 <p className="text-gray-600 text-sm mb-4">
-                  {uploadType === 'receita' 
-                    ? 'Faça upload de um comprovante de venda ou nota fiscal'
-                    : 'Faça upload de uma nota fiscal ou comprovante de compra'
-                  }
+                  Faça upload da foto da nota fiscal, comprovante ou extrato para extrair os dados automaticamente com IA.
                 </p>
 
-                <div 
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-orange-400 transition-colors"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">
-                    {processandoOCR ? 'Processando comprovante...' : 'Clique para selecionar arquivo'}
-                  </p>
-                  {processandoOCR && (
-                    <div className="mt-4">
-                      <div className="bg-orange-100 text-orange-800 px-3 py-2 rounded-lg text-sm">
-                        🤖 IA extraindo dados automaticamente...
-                      </div>
-                    </div>
-                  )}
-                </div>
+                {processandoOCR ? (
+                  <div className="text-center py-8">
+                    <Loader className="h-8 w-8 animate-spin mx-auto text-blue-600 mb-4" />
+                    <p className="text-gray-600">🤖 IA processando documento...</p>
+                    <p className="text-sm text-gray-500 mt-2">Analisando dados da imagem</p>
+                  </div>
+                ) : (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors"
+                  >
+                    <Upload className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                    <p className="text-gray-600 font-medium">Clique para fazer upload</p>
+                    <p className="text-sm text-gray-500 mt-1">PNG, JPG até 10MB</p>
+                  </div>
+                )}
 
                 <input
                   ref={fileInputRef}
@@ -1101,17 +1261,7 @@ export default function FinanceiroPage() {
                   </button>
                 </div>
               </div>
-            ) : (
-              <div>
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                  <div className="flex items-center mb-2">
-                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                    <span className="text-green-800 font-medium">Dados Extraídos com IA</span>
-                  </div>
-                  <p className="text-green-700 text-sm">
-                    Nossa IA processou o comprovante e extraiu os seguintes dados:
-                  </p>
-                </div>
+            )}
 
                 <div className="space-y-4">
                   <div>
@@ -1192,7 +1342,137 @@ export default function FinanceiroPage() {
         </div>
       )}
 
-      {/* Modal de Novo Gasto Fixo */}
+      {/* Modal de Transação Manual */}
+      {showManualModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-lg font-semibold mb-4">
+              {novaTransacao.tipo === 'receita' ? '💰 Nova Receita' : '💸 Nova Despesa'}
+            </h3>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Valor *</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={novaTransacao.valor || 0}
+                  onChange={(e) => setNovaTransacao(prev => ({ ...prev, valor: parseFloat(e.target.value) }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="0,00"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Data *</label>
+                <input
+                  type="date"
+                  value={novaTransacao.data || ''}
+                  onChange={(e) => setNovaTransacao(prev => ({ ...prev, data: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Categoria *</label>
+                <select
+                  value={novaTransacao.categoria || ''}
+                  onChange={(e) => setNovaTransacao(prev => ({ ...prev, categoria: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Selecione uma categoria</option>
+                  {novaTransacao.tipo === 'receita' ? (
+                    <>
+                      <option value="Vendas Bolos">Vendas Bolos</option>
+                      <option value="Vendas Docinhos">Vendas Docinhos</option>
+                      <option value="Vendas Tortas">Vendas Tortas</option>
+                      <option value="Encomendas">Encomendas</option>
+                      <option value="Outros">Outros</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="Ingredientes">Ingredientes</option>
+                      <option value="Embalagens">Embalagens</option>
+                      <option value="Equipamentos">Equipamentos</option>
+                      <option value="Marketing">Marketing</option>
+                      <option value="Contas">Contas</option>
+                      <option value="Outros">Outros</option>
+                    </>
+                  )}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Descrição *</label>
+                <input
+                  type="text"
+                  value={novaTransacao.descricao || ''}
+                  onChange={(e) => setNovaTransacao(prev => ({ ...prev, descricao: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="Descreva a transação"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {novaTransacao.tipo === 'receita' ? 'Cliente' : 'Fornecedor'}
+                </label>
+                <input
+                  type="text"
+                  value={novaTransacao.fornecedor_cliente || ''}
+                  onChange={(e) => setNovaTransacao(prev => ({ ...prev, fornecedor_cliente: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder={novaTransacao.tipo === 'receita' ? 'Nome do cliente' : 'Nome do fornecedor'}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Método de Pagamento</label>
+                <select
+                  value={novaTransacao.metodo_pagamento || 'pix'}
+                  onChange={(e) => setNovaTransacao(prev => ({ ...prev, metodo_pagamento: e.target.value as any }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="pix">PIX</option>
+                  <option value="dinheiro">Dinheiro</option>
+                  <option value="cartao_credito">Cartão de Crédito</option>
+                  <option value="cartao_debito">Cartão de Débito</option>
+                  <option value="transferencia">Transferência</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowManualModal(false)
+                  setNovaTransacao({
+                    tipo: 'receita',
+                    valor: 0,
+                    data: new Date().toISOString().substring(0, 10),
+                    categoria: '',
+                    descricao: '',
+                    metodo_pagamento: 'pix',
+                    fornecedor_cliente: '',
+                    extraido_por_ocr: false,
+                    verificado: true
+                  })
+                }}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={salvarTransacaoManual}
+                disabled={!novaTransacao.valor || !novaTransacao.categoria || !novaTransacao.descricao}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                💾 Salvar Transação
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       {showGastoFixoModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
