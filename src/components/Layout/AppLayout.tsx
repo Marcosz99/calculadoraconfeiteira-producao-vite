@@ -20,7 +20,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
     { name: 'Receitas', href: '/receitas', icon: FileText },
     { name: 'Ingredientes', href: '/ingredientes', icon: Package },
     { name: 'Comunidade', href: '/comunidade', icon: Users },
-    { name: 'Relatórios', href: '/relatorios', icon: BarChart3 },
     { name: 'Financeiro', href: '/financeiro', icon: DollarSign },
   ]
 
@@ -198,7 +197,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               </div>
               
               <div className="grid grid-cols-2 gap-4">
-                {[...moreItems, { name: 'Relatórios', href: '/relatorios', icon: BarChart3 }, { name: 'Financeiro', href: '/financeiro', icon: DollarSign }].map((item) => (
+                {moreItems.map((item) => (
                   <Link
                     key={item.name}
                     to={item.href}

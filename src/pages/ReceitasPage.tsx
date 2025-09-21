@@ -360,7 +360,7 @@ export default function ReceitasPage() {
               }`}
             >
               <Camera className="h-5 w-5" />
-              <span>Digitalizar</span>
+              <span>Digitalizar com IA</span>
             </button>
             
             <LimitBadge type="receitas" />

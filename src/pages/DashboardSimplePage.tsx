@@ -166,23 +166,6 @@ export default function DashboardPage() {
               </div>
             </Link>
 
-            <Link 
-              to="/relatorios"
-              className="group bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-orange-200 transition-all duration-200"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 rounded-lg bg-orange-100 group-hover:bg-orange-500 transition-colors">
-                  <BarChart3 className="h-6 w-6 text-orange-600 group-hover:text-white" />
-                </div>
-                <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-orange-500" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Relatórios</h3>
-              <p className="text-gray-600 text-sm mb-3">Analytics e insights do negócio</p>
-              <div className="flex items-center text-sm text-orange-600">
-                <Brain className="h-4 w-4 mr-1" />
-                <span>Com IA</span>
-              </div>
-            </Link>
 
             <Link 
               to="/financeiro"
