@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Search, Filter, Clock, Users, Star, Edit, Trash2, Eye, X } from 'lucide-react'
+import { ArrowLeft, Plus, Search, Filter, Clock, Users, Star, Edit, Trash2, Eye, X, Camera } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { Receita, Categoria, ReceitaIngrediente, IngredienteUsuario } from '../types'
 import { LOCAL_STORAGE_KEYS, saveToLocalStorage, getFromLocalStorage } from '../utils/localStorage'
@@ -9,6 +9,8 @@ import { UpgradeModal } from '../components/UpgradeModal'
 import { LimitBadge } from '../components/LimitBadge'
 import IntelligentIngredientSearch from '../components/ui/IntelligentIngredientSearch'
 import { IngredienteConfeitaria, INGREDIENTES_CONFEITARIA } from '../data/ingredientes-confeitaria'
+import RecipeOCR from '../components/RecipeOCR'
+import { RecipeData } from '../services/geminiService'
 
 export default function ReceitasPage() {
   const { user } = useAuth()
@@ -32,6 +34,7 @@ export default function ReceitasPage() {
     foto_principal: ''
   })
   const [ingredientesReceita, setIngredientesReceita] = useState<ReceitaIngrediente[]>([])
+  const [showOCRModal, setShowOCRModal] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -93,6 +96,38 @@ export default function ReceitasPage() {
     setIngredientesReceita([])
     setEditingReceita(null)
     setShowModal(false)
+  }
+
+  // Handle OCR processed recipe
+  const handleOCRRecipe = (ocrData: RecipeData) => {
+    if (!user) return
+
+    // Convert OCR ingredients to ReceitaIngrediente format
+    const convertedIngredients: ReceitaIngrediente[] = ocrData.ingredientes.map((ing, index) => ({
+      id: Date.now().toString() + index,
+      receita_id: '',
+      ingrediente_id: '', // Will be filled when saved
+      quantidade: ing.quantidade || 0,
+      unidade: ing.unidade || 'g',
+      observacoes: '',
+      ordem: index
+    }))
+
+    // Set form data with OCR results
+    setFormData({
+      nome: ocrData.nome || 'Receita Digitalizada',
+      categoria: 'Bolos',
+      categoria_id: '',
+      modo_preparo: ocrData.modo_preparo || [''],
+      tempo_preparo_mins: ocrData.tempo_estimado || 60,
+      rendimento: ocrData.rendimento || '',
+      foto_principal: ''
+    })
+    
+    setIngredientesReceita(convertedIngredients)
+    setEditingReceita(null)
+    setShowModal(true)
+    setShowOCRModal(false)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -250,6 +285,24 @@ export default function ReceitasPage() {
             >
               <Plus className="h-5 w-5" />
               <span>Nova Receita</span>
+            </button>
+
+            <button
+              onClick={() => {
+                if (canAddReceita()) {
+                  setShowOCRModal(true)
+                } else {
+                  setShowUpgradeModal(true)
+                }
+              }}
+              className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-colors ${
+                canAddReceita() 
+                  ? 'bg-blue-500 text-white hover:bg-blue-600' 
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
+            >
+              <Camera className="h-5 w-5" />
+              <span>Digitalizar</span>
             </button>
             
             <LimitBadge type="receitas" />
@@ -651,6 +704,13 @@ export default function ReceitasPage() {
             navigate('/upgrade/stripe')
           }
         }}
+      />
+
+      {/* OCR Modal */}
+      <RecipeOCR
+        isOpen={showOCRModal}
+        onClose={() => setShowOCRModal(false)}
+        onRecipeExtracted={handleOCRRecipe}
       />
     </div>
   )
