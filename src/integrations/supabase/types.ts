@@ -131,6 +131,50 @@ export type Database = {
         }
         Relationships: []
       }
+      compras_ebooks: {
+        Row: {
+          created_at: string
+          dados_pagamento: Json | null
+          ebook_id: string
+          id: string
+          metodo_pagamento: string
+          preco_pago: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dados_pagamento?: Json | null
+          ebook_id: string
+          id?: string
+          metodo_pagamento: string
+          preco_pago: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dados_pagamento?: Json | null
+          ebook_id?: string
+          id?: string
+          metodo_pagamento?: string
+          preco_pago?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compras_ebooks_ebook_id_fkey"
+            columns: ["ebook_id"]
+            isOneToOne: false
+            referencedRelation: "ebooks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       configuracoes_usuario: {
         Row: {
           created_at: string
@@ -166,6 +210,117 @@ export type Database = {
           notificacoes_email?: boolean | null
           notificacoes_whatsapp?: boolean | null
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      creditos_ia: {
+        Row: {
+          created_at: string
+          creditos_totais: number
+          creditos_usados: number
+          data_reset: string
+          id: string
+          plano: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          creditos_totais?: number
+          creditos_usados?: number
+          data_reset?: string
+          id?: string
+          plano?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          creditos_totais?: number
+          creditos_usados?: number
+          data_reset?: string
+          id?: string
+          plano?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ebooks: {
+        Row: {
+          arquivo_url: string | null
+          ativo: boolean | null
+          autor: string
+          capa_url: string | null
+          categoria: string | null
+          created_at: string
+          descricao: string | null
+          id: string
+          preco: number
+          tags: string[] | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          arquivo_url?: string | null
+          ativo?: boolean | null
+          autor: string
+          capa_url?: string | null
+          categoria?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          preco?: number
+          tags?: string[] | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          arquivo_url?: string | null
+          ativo?: boolean | null
+          autor?: string
+          capa_url?: string | null
+          categoria?: string | null
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          preco?: number
+          tags?: string[] | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      historico_ia: {
+        Row: {
+          created_at: string
+          creditos_usados: number | null
+          id: string
+          metadados: Json | null
+          prompt_usuario: string
+          resposta_ia: string
+          tipo_operacao: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          creditos_usados?: number | null
+          id?: string
+          metadados?: Json | null
+          prompt_usuario: string
+          resposta_ia: string
+          tipo_operacao: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          creditos_usados?: number | null
+          id?: string
+          metadados?: Json | null
+          prompt_usuario?: string
+          resposta_ia?: string
+          tipo_operacao?: string
           user_id?: string
         }
         Relationships: []
@@ -503,53 +658,15 @@ export type Database = {
           },
         ]
       }
-      user_credits: {
-        Row: {
-          id: string
-          user_id: string
-          plan_type: string
-          credits_ia: number
-          credits_used_this_month: number
-          reset_date: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          plan_type?: string
-          credits_ia?: number
-          credits_used_this_month?: number
-          reset_date: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          plan_type?: string
-          credits_ia?: number
-          credits_used_this_month?: number
-          reset_date?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_credits_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      reset_monthly_credits: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
