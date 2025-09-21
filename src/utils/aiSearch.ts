@@ -1,4 +1,4 @@
-import { getFullKnowledgeBase, KnowledgeItem } from '../data/knowledge-base'
+import { getFullKnowledgeBase, KnowledgeItem } from '../data/clean-knowledge'
 
 export interface SearchResult {
   answer: KnowledgeItem | null

@@ -83,14 +83,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Main content */}
       <div className="flex flex-col w-0 flex-1 overflow-hidden">
         {/* Header */}
-        <div className="relative z-10 flex-shrink-0 flex h-16 bg-white shadow-sm border-b border-gray-200">
-          <button
-            className="px-4 border-r border-gray-200 text-gray-400 focus:outline-none focus:ring-2 focus:ring-inset lg:hidden"
-            style={{ '--tw-ring-color': 'var(--primary)' } as React.CSSProperties}
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            <Menu className="h-6 w-6" />
-          </button>
+        <div className="relative z-10 flex-shrink-0 flex h-16 bg-white shadow-sm border-gray-200 lg:border-b">{/* Removed mobile hamburger menu */}
           
           <button
             className="hidden lg:flex items-center justify-center w-12 h-12 border-r border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-inset transition-colors"
@@ -101,7 +94,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <Menu className="h-5 w-5" />
           </button>
 
-          <div className="flex-1 px-4 flex justify-between">
+          <div className="flex-1 px-4 lg:px-4 flex justify-between">{/* Consistent padding */}
             <div className="flex-1 flex">
               <div className="flex items-center">
                 <h1 className="text-lg font-semibold text-gray-900">

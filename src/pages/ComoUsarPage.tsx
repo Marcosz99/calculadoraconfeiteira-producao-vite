@@ -245,11 +245,16 @@ export default function ComoUsarPage() {
             <h2 className="text-2xl font-bold">Bem-vinda ao DoceCalc!</h2>
           </div>
           <p className="text-lg mb-4">
-            Este guia vai te ensinar a usar cada ferramenta do jeito certo. Mesmo que você nunca tenha usado um sistema assim, vai conseguir dominar tudo!
+            Este guia completo vai te ensinar a dominar cada ferramenta e transformar sua confeitaria num negócio mais lucrativo e organizado.
           </p>
-          <div className="bg-white/20 rounded-lg p-4">
-            <h3 className="font-semibold mb-2">🎯 Dica Importante:</h3>
-            <p>Comece pela <strong>Calculadora</strong> e <strong>Ingredientes</strong>. Elas são a base de tudo! Depois use as outras ferramentas conforme sua necessidade.</p>
+          <div className="bg-white/20 rounded-lg p-4 mb-4">
+            <h3 className="font-semibold mb-2">🎯 Por onde começar:</h3>
+            <p><strong>1º:</strong> Ingredientes (cadastre tudo com preços atuais)</p>
+            <p><strong>2º:</strong> Calculadora (crie suas receitas principais)</p>
+            <p><strong>3º:</strong> Use as outras conforme precisa</p>
+          </div>
+          <div className="bg-white/10 rounded-lg p-3">
+            <p className="text-sm"><strong>💡 Dica de ouro:</strong> Leia cada seção com atenção. Uma hora investida aqui vai te economizar semanas de dúvidas!</p>
           </div>
         </div>
 
@@ -347,35 +352,84 @@ export default function ComoUsarPage() {
         </div>
 
         {/* Footer com dicas extras */}
-        <div className="mt-12 bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">🚀 Dicas para Começar Bem</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">Primeira semana:</h3>
-              <ul className="space-y-1 text-gray-700 text-sm">
-                <li>• Cadastre todos seus ingredientes com preços atuais</li>
-                <li>• Crie 3-5 receitas principais</li>
-                <li>• Faça seu primeiro orçamento</li>
-                <li>• Cadastre seus clientes frequentes</li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-gray-900 mb-2">Depois de um mês:</h3>
-              <ul className="space-y-1 text-gray-700 text-sm">
-                <li>• Use os relatórios para análises</li>
-                <li>• Participe da comunidade</li>
-                <li>• Atualize preços mensalmente</li>
-                <li>• Configure seu catálogo online</li>
-              </ul>
+        <div className="mt-12 space-y-8">
+          <div className="bg-white rounded-lg shadow-md p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">🚀 Plano de Ação: Seus Primeiros Passos</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-blue-50 p-6 rounded-lg">
+                <h3 className="font-bold text-blue-900 mb-3">🗓️ Primeiro Dia</h3>
+                <ul className="space-y-2 text-blue-800 text-sm">
+                  <li>✅ Cadastre 10 ingredientes básicos</li>
+                  <li>✅ Crie sua primeira receita</li>
+                  <li>✅ Teste a calculadora de custos</li>
+                  <li>✅ Adicione 2-3 clientes</li>
+                </ul>
+              </div>
+              <div className="bg-green-50 p-6 rounded-lg">
+                <h3 className="font-bold text-green-900 mb-3">📅 Primeira Semana</h3>
+                <ul className="space-y-2 text-green-800 text-sm">
+                  <li>✅ Complete 20+ ingredientes</li>
+                  <li>✅ Crie 5 receitas principais</li>
+                  <li>✅ Faça 3 orçamentos de teste</li>
+                  <li>✅ Configure seu perfil completo</li>
+                </ul>
+              </div>
+              <div className="bg-purple-50 p-6 rounded-lg">
+                <h3 className="font-bold text-purple-900 mb-3">🎯 Primeiro Mês</h3>
+                <ul className="space-y-2 text-purple-800 text-sm">
+                  <li>✅ Use todos os relatórios</li>
+                  <li>✅ Participe da comunidade</li>
+                  <li>✅ Domine todas as ferramentas</li>
+                  <li>✅ Considere plano Professional</li>
+                </ul>
+              </div>
             </div>
           </div>
-          
-          <div className="mt-6 p-4 bg-green-50 rounded-lg">
-            <h4 className="font-semibold text-green-800 mb-2">💚 Precisa de ajuda?</h4>
-            <p className="text-green-700 text-sm">
-              Se tiver dúvidas, acesse a <Link to="/comunidade" className="underline hover:no-underline">Comunidade</Link> e pergunte! 
-              Outros confeiteiros e nossa equipe estão sempre prontos para ajudar.
-            </p>
+
+          <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg text-white p-8">
+            <h2 className="text-2xl font-bold mb-4">⚠️ Erros Comuns que Custam Caro</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="font-semibold mb-3">❌ NÃO faça:</h3>
+                <ul className="space-y-2 text-sm">
+                  <li>• Precificar "no olho" sem calcular</li>
+                  <li>• Esquecer de incluir sua mão de obra</li>
+                  <li>• Usar preços desatualizados</li>
+                  <li>• Margem de lucro menor que 30%</li>
+                  <li>• Não anotar gastos extras (gás, luz)</li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-3">✅ SEMPRE faça:</h3>
+                <ul className="space-y-2 text-sm">
+                  <li>• Use a calculadora para tudo</li>
+                  <li>• Atualize preços mensalmente</li>
+                  <li>• Inclua 100% dos custos</li>
+                  <li>• Mantenha margem mínima de 40%</li>
+                  <li>• Registre todos os gastos</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">💬 Precisa de Ajuda?</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">🤝 Na Comunidade:</h3>
+                <p className="text-gray-700 text-sm mb-3">Milhares de confeiteiras dispostas a ajudar! Faça perguntas, tire dúvidas e compartilhe experiências.</p>
+                <Link to="/comunidade" className="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-md text-sm hover:bg-blue-200 transition-colors">
+                  Ir para Comunidade
+                </Link>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900 mb-2">🎓 Dicas Diárias:</h3>
+                <p className="text-gray-700 text-sm mb-3">Use o sistema todo dia por 10 minutos. Em 1 mês você será expert e seu negócio estará organizado!</p>
+                <Link to="/dashboard" className="inline-block bg-pink-100 text-pink-700 px-4 py-2 rounded-md text-sm hover:bg-pink-200 transition-colors">
+                  Começar Agora
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>

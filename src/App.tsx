@@ -27,14 +27,14 @@ import CatalogoPublicoPage from './pages/CatalogoPublicoPage'
 import EncomendasPage from './pages/EncomendasPage'
 import ComunidadePage from './pages/ComunidadePage'
 import BackupEmergencialPage from './pages/BackupEmergencialPage'
-import CreditTestPage from './pages/CreditTestPage'
+{/* Removed CreditTestPage for production */}
 import AiAssistantPage from './pages/AiAssistantPage'
 import MarketplacePage from './pages/MarketplacePage'
 import AdvancedCalculatorPage from './pages/AdvancedCalculatorPage'
 import CustomCatalogPage from './pages/CustomCatalogPage'
 import FinanceiroPage from './pages/FinanceiroPage'
 import PerfilPage from './pages/PerfilPage'
-import { ResetPlanButton } from './components/ResetPlanButton'
+{/* Removed ResetPlanButton for production */}
 
 function AppContent() {
   // Data migration is now disabled as system is fully cloud-based
@@ -65,7 +65,7 @@ function AppContent() {
             <Route path="/encomendas" element={<ProtectedRoute><EncomendasPage /></ProtectedRoute>} />
             <Route path="/comunidade" element={<ProtectedRoute><ComunidadePage /></ProtectedRoute>} />
             <Route path="/backup-emergencial" element={<ProtectedRoute><BackupEmergencialPage /></ProtectedRoute>} />
-            <Route path="/credit-test" element={<ProtectedRoute><CreditTestPage /></ProtectedRoute>} />
+            {/* Removed credit test route for production */}
             <Route path="/ai-assistant" element={<ProtectedRoute><AiAssistantPage /></ProtectedRoute>} />
             <Route path="/marketplace" element={<ProtectedRoute><MarketplacePage /></ProtectedRoute>} />
             <Route path="/advanced-calculator" element={<ProtectedRoute><AdvancedCalculatorPage /></ProtectedRoute>} />
@@ -74,7 +74,7 @@ function AppContent() {
             <Route path="/perfil" element={<ProtectedRoute><PerfilPage /></ProtectedRoute>} />
       </Routes>
       
-      <ResetPlanButton />
+      {/* Removed ResetPlanButton for production */}
     </div>
   )
 }

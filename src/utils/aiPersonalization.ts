@@ -1,6 +1,6 @@
 // Sistema de personalização para DoceBot Pro
 
-import { KnowledgeItem } from '../data/knowledge-base'
+import { KnowledgeItem } from '../data/clean-knowledge'
 import { SearchResult } from './aiSearch'
 
 export interface UserContext {
