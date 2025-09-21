@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown, MessageSquare, BookOpen, TestTube, Bot, ShoppingBag, Brain, Palette } from 'lucide-react'
+import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Settings, LogOut, Crown, MessageSquare, BookOpen, TestTube, Bot, ShoppingBag, Brain, Palette, User } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import CreditsDisplay from '../components/CreditsDisplay'
 
@@ -56,6 +56,13 @@ export default function DashboardPage() {
                   title="Comunidade"
                 >
                   <MessageSquare className="h-5 w-5" />
+                </Link>
+                <Link
+                  to="/perfil"
+                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Perfil"
+                >
+                  <User className="h-5 w-5" />
                 </Link>
                 <Link
                   to="/upgrade"
