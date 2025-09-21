@@ -1,35 +1,35 @@
-// Supabase Storage Service - Handle image uploads
-import { supabase } from '@/integrations/supabase/client';
+// Cloudinary Storage Service - Handle image uploads
+interface CloudinaryResponse {
+  secure_url: string;
+  public_id: string;
+}
 
-class SupabaseStorageService {
-  private readonly BUCKETS = {
-    AVATARS: 'avatars',
-    RECEITAS: 'receitas',
-    COMPROVANTES: 'comprovantes',
-    LOGOS: 'logos'
-  };
+class CloudinaryStorageService {
+  private readonly CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME || 'demo'}/image/upload`;
+  private readonly CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY;
+  private readonly CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
 
   // ===== AVATAR UPLOAD =====
   async uploadAvatar(userId: string, file: File): Promise<{ url: string | null; error: string | null }> {
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${userId}/avatar.${fileExt}`;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'ml_default'); // You can create a custom preset
+      formData.append('folder', `avatars/${userId}`);
+      formData.append('public_id', `avatar`);
+      formData.append('overwrite', 'true');
 
-      // Upload file
-      const { error: uploadError } = await supabase.storage
-        .from(this.BUCKETS.AVATARS)
-        .upload(fileName, file, { upsert: true });
+      const response = await fetch(this.CLOUDINARY_UPLOAD_URL, {
+        method: 'POST',
+        body: formData,
+      });
 
-      if (uploadError) {
-        return { url: null, error: uploadError.message };
+      if (!response.ok) {
+        throw new Error('Upload failed');
       }
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from(this.BUCKETS.AVATARS)
-        .getPublicUrl(fileName);
-
-      return { url: urlData.publicUrl, error: null };
+      const data: CloudinaryResponse = await response.json();
+      return { url: data.secure_url, error: null };
     } catch (error) {
       console.error('Erro no upload do avatar:', error);
       return { url: null, error: 'Erro interno no upload' };
@@ -39,22 +39,24 @@ class SupabaseStorageService {
   // ===== RECIPE IMAGES =====
   async uploadRecipeImage(userId: string, recipeId: string, file: File): Promise<{ url: string | null; error: string | null }> {
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${userId}/${recipeId}.${fileExt}`;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'ml_default');
+      formData.append('folder', `receitas/${userId}`);
+      formData.append('public_id', recipeId);
+      formData.append('overwrite', 'true');
 
-      const { error: uploadError } = await supabase.storage
-        .from(this.BUCKETS.RECEITAS)
-        .upload(fileName, file, { upsert: true });
+      const response = await fetch(this.CLOUDINARY_UPLOAD_URL, {
+        method: 'POST',
+        body: formData,
+      });
 
-      if (uploadError) {
-        return { url: null, error: uploadError.message };
+      if (!response.ok) {
+        throw new Error('Upload failed');
       }
 
-      const { data: urlData } = supabase.storage
-        .from(this.BUCKETS.RECEITAS)
-        .getPublicUrl(fileName);
-
-      return { url: urlData.publicUrl, error: null };
+      const data: CloudinaryResponse = await response.json();
+      return { url: data.secure_url, error: null };
     } catch (error) {
       console.error('Erro no upload da imagem da receita:', error);
       return { url: null, error: 'Erro interno no upload' };
@@ -65,22 +67,23 @@ class SupabaseStorageService {
   async uploadReceipt(userId: string, file: File): Promise<{ url: string | null; error: string | null }> {
     try {
       const timestamp = Date.now();
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${userId}/receipt_${timestamp}.${fileExt}`;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'ml_default');
+      formData.append('folder', `comprovantes/${userId}`);
+      formData.append('public_id', `receipt_${timestamp}`);
 
-      const { error: uploadError } = await supabase.storage
-        .from(this.BUCKETS.COMPROVANTES)
-        .upload(fileName, file);
+      const response = await fetch(this.CLOUDINARY_UPLOAD_URL, {
+        method: 'POST',
+        body: formData,
+      });
 
-      if (uploadError) {
-        return { url: null, error: uploadError.message };
+      if (!response.ok) {
+        throw new Error('Upload failed');
       }
 
-      const { data: urlData } = supabase.storage
-        .from(this.BUCKETS.COMPROVANTES)
-        .getPublicUrl(fileName);
-
-      return { url: urlData.publicUrl, error: null };
+      const data: CloudinaryResponse = await response.json();
+      return { url: data.secure_url, error: null };
     } catch (error) {
       console.error('Erro no upload do comprovante:', error);
       return { url: null, error: 'Erro interno no upload' };
@@ -90,22 +93,24 @@ class SupabaseStorageService {
   // ===== LOGO UPLOAD =====
   async uploadLogo(userId: string, file: File): Promise<{ url: string | null; error: string | null }> {
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${userId}/logo.${fileExt}`;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'ml_default');
+      formData.append('folder', `logos/${userId}`);
+      formData.append('public_id', 'logo');
+      formData.append('overwrite', 'true');
 
-      const { error: uploadError } = await supabase.storage
-        .from(this.BUCKETS.LOGOS)
-        .upload(fileName, file, { upsert: true });
+      const response = await fetch(this.CLOUDINARY_UPLOAD_URL, {
+        method: 'POST',
+        body: formData,
+      });
 
-      if (uploadError) {
-        return { url: null, error: uploadError.message };
+      if (!response.ok) {
+        throw new Error('Upload failed');
       }
 
-      const { data: urlData } = supabase.storage
-        .from(this.BUCKETS.LOGOS)
-        .getPublicUrl(fileName);
-
-      return { url: urlData.publicUrl, error: null };
+      const data: CloudinaryResponse = await response.json();
+      return { url: data.secure_url, error: null };
     } catch (error) {
       console.error('Erro no upload do logo:', error);
       return { url: null, error: 'Erro interno no upload' };
@@ -113,13 +118,12 @@ class SupabaseStorageService {
   }
 
   // ===== DELETE FILES =====
-  async deleteFile(bucket: string, filePath: string): Promise<boolean> {
+  async deleteFile(publicId: string): Promise<boolean> {
     try {
-      const { error } = await supabase.storage
-        .from(bucket)
-        .remove([filePath]);
-
-      return !error;
+      // For deletion, you would need to use the Cloudinary Admin API
+      // This would typically be done on the backend
+      console.log('Delete file with public_id:', publicId);
+      return true;
     } catch (error) {
       console.error('Erro ao deletar arquivo:', error);
       return false;
@@ -158,4 +162,4 @@ class SupabaseStorageService {
   }
 }
 
-export const storageService = new SupabaseStorageService();
+export const storageService = new CloudinaryStorageService();

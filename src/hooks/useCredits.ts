@@ -65,7 +65,7 @@ export function useCredits(): UseCreditsReturn {
       setState(prev => ({ ...prev, loading: true, error: null }))
       
       const { data, error } = await supabase
-        .from('user_credits')
+        .from('creditos_ia')
         .select('*')
         .eq('user_id', user.id)
         .single()
@@ -83,10 +83,10 @@ export function useCredits(): UseCreditsReturn {
       } else {
         // Converter dados do Supabase para UserPlan
         plan = {
-          planType: data.plan_type as UserPlan['planType'],
-          creditsIA: data.credits_ia,
-          creditsUsedThisMonth: data.credits_used_this_month,
-          resetDate: data.reset_date,
+          planType: data.plano as UserPlan['planType'],
+          creditsIA: data.creditos_totais,
+          creditsUsedThisMonth: data.creditos_usados,
+          resetDate: data.data_reset,
         }
 
         // Verificar se precisa resetar créditos
@@ -114,13 +114,13 @@ export function useCredits(): UseCreditsReturn {
     if (!user) return
 
     const { error } = await supabase
-      .from('user_credits')
+      .from('creditos_ia')
       .insert({
         user_id: user.id,
-        plan_type: plan.planType,
-        credits_ia: plan.creditsIA,
-        credits_used_this_month: plan.creditsUsedThisMonth,
-        reset_date: plan.resetDate,
+        plano: plan.planType,
+        creditos_totais: plan.creditsIA,
+        creditos_usados: plan.creditsUsedThisMonth,
+        data_reset: plan.resetDate,
       })
 
     if (error) throw error
@@ -147,11 +147,11 @@ export function useCredits(): UseCreditsReturn {
     }
 
     await supabase
-      .from('user_credits')
+      .from('creditos_ia')
       .update({
-        credits_ia: resetPlan.creditsIA,
-        credits_used_this_month: 0,
-        reset_date: resetPlan.resetDate,
+        creditos_totais: resetPlan.creditsIA,
+        creditos_usados: 0,
+        data_reset: resetPlan.resetDate,
       })
       .eq('user_id', user.id)
 
@@ -176,9 +176,9 @@ export function useCredits(): UseCreditsReturn {
       const newUsedCredits = state.plan.creditsUsedThisMonth + 1
       
       const { error } = await supabase
-        .from('user_credits')
+        .from('creditos_ia')
         .update({
-          credits_used_this_month: newUsedCredits,
+          creditos_usados: newUsedCredits,
         })
         .eq('user_id', user.id)
 
@@ -227,10 +227,10 @@ export function useCredits(): UseCreditsReturn {
       }
 
       const { error } = await supabase
-        .from('user_credits')
+        .from('creditos_ia')
         .update({
-          plan_type: newPlanType,
-          credits_ia: upgradedPlan.creditsIA,
+          plano: newPlanType,
+          creditos_totais: upgradedPlan.creditsIA,
         })
         .eq('user_id', user.id)
 
