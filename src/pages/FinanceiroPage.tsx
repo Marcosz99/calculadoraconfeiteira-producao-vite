@@ -213,8 +213,6 @@ export default function FinanceiroPage() {
               return sum + g.valor
           }
         }
-      } else if (g.periodicidade === 'mensal') {
-        return sum + g.valor
       }
       
       return sum
