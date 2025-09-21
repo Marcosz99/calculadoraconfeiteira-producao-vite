@@ -7,6 +7,8 @@ import { LOCAL_STORAGE_KEYS, saveToLocalStorage, getFromLocalStorage } from '../
 import { useSubscriptionLimits } from '../hooks/useSubscriptionLimits'
 import { UpgradeModal } from '../components/UpgradeModal'
 import { LimitBadge } from '../components/LimitBadge'
+import IntelligentIngredientSearch from '../components/ui/IntelligentIngredientSearch'
+import { IngredienteConfeitaria } from '../data/ingredientes-confeitaria'
 
 export default function ReceitasPage() {
   const { user } = useAuth()
@@ -23,6 +25,7 @@ export default function ReceitasPage() {
   const [formData, setFormData] = useState({
     nome: '',
     categoria: 'Bolos',
+    categoria_id: '',
     modo_preparo: [''],
     tempo_preparo_mins: 60,
     rendimento: '',
@@ -44,7 +47,7 @@ export default function ReceitasPage() {
 
   const filteredReceitas = receitas.filter(receita => {
     const matchesSearch = receita.nome.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategoria = categoriaFiltro === 'todas' || receita.categoria === categoriaFiltro
+    const matchesCategoria = categoriaFiltro === 'todas' || receita.categoria_id === categoriaFiltro
     
     return matchesSearch && matchesCategoria && receita.ativo
   })
@@ -98,7 +101,7 @@ export default function ReceitasPage() {
     const receitaData: Receita = {
       id: editingReceita?.id || Date.now().toString(),
       usuario_id: user.id,
-      categoria: formData.categoria,
+      categoria_id: formData.categoria_id || (formData.categoria === 'Bolos' ? 'cat_bolos' : 'cat_' + formData.categoria.toLowerCase()),
       nome: formData.nome.trim(),
       descricao: '',
       modo_preparo: formData.modo_preparo.filter(step => step.trim()),
@@ -135,7 +138,7 @@ export default function ReceitasPage() {
   const editReceita = (receita: Receita) => {
     setFormData({
       nome: receita.nome,
-      categoria: receita.categoria || 'Bolos',
+      categoria: receita.categoria_id ? categorias.find(c => c.id === receita.categoria_id)?.nome || 'Bolos' : 'Bolos',
       modo_preparo: receita.modo_preparo.length > 0 ? receita.modo_preparo : [''],
       tempo_preparo_mins: receita.tempo_preparo_mins,
       rendimento: receita.rendimento,
@@ -144,6 +147,20 @@ export default function ReceitasPage() {
     setIngredientesReceita(receita.ingredientes)
     setEditingReceita(receita)
     setShowModal(true)
+  }
+
+  // Adicionar ingrediente do sistema inteligente
+  const adicionarIngredienteInteligente = (ingrediente: IngredienteConfeitaria) => {
+    const novoIngrediente: ReceitaIngrediente = {
+      id: Date.now().toString(),
+      receita_id: '',
+      ingrediente_id: ingrediente.id,
+      quantidade: 0,
+      unidade: ingrediente.unidade_padrao,
+      observacoes: '',
+      ordem: ingredientesReceita.length
+    }
+    setIngredientesReceita([...ingredientesReceita, novoIngrediente])
   }
 
   const adicionarIngrediente = () => {
@@ -264,16 +281,6 @@ export default function ReceitasPage() {
               ))}
             </select>
             
-            <select
-              value={dificuldadeFiltro}
-              onChange={(e) => setDificuldadeFiltro(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-            >
-              <option value="todas">Todas as dificuldades</option>
-              <option value="iniciante">Iniciante</option>
-              <option value="intermediario">Intermediário</option>
-              <option value="avancado">Avançado</option>
-            </select>
             
             <div className="flex items-center space-x-2 text-gray-600">
               <Filter className="h-5 w-5" />
@@ -486,89 +493,82 @@ export default function ReceitasPage() {
                   </div>
                 </div>
 
-                {/* Ingredientes */}
+                {/* Sistema Inteligente de Busca de Ingredientes */}
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <label className="block text-sm font-medium text-gray-700">
-                      Ingredientes
-                    </label>
-                    <button
-                      type="button"
-                      onClick={adicionarIngrediente}
-                      className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
-                    >
-                      <Plus className="h-4 w-4" />
-                      <span>Adicionar</span>
-                    </button>
-                  </div>
+                  <label className="block text-sm font-medium text-gray-700 mb-4">
+                    Ingredientes *
+                  </label>
                   
-                  <div className="space-y-4">
-                    {ingredientesReceita.map((ingrediente, index) => (
-                      <div key={index} className="border border-gray-200 p-4 rounded-lg">
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                          <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Ingrediente
-                            </label>
-                            <select
-                              value={ingrediente.ingrediente_id}
-                              onChange={(e) => atualizarIngrediente(index, 'ingrediente_id', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-                            >
-                              <option value="">Selecione um ingrediente</option>
-                              {ingredientes.map(ing => (
-                                <option key={ing.id} value={ing.id}>
-                                  {ing.nome}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Quantidade
-                            </label>
-                            <input
-                              type="number"
-                              step="0.01"
-                              value={ingrediente.quantidade}
-                              onChange={(e) => atualizarIngrediente(index, 'quantidade', parseFloat(e.target.value) || 0)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-                            />
-                          </div>
-                          
-                          <div className="flex items-center space-x-2">
-                            <div className="flex-1">
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Unidade
-                              </label>
-                              <select
-                                value={ingrediente.unidade}
-                                onChange={(e) => atualizarIngrediente(index, 'unidade', e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-                              >
-                                <option value="g">g</option>
-                                <option value="kg">kg</option>
-                                <option value="ml">ml</option>
-                                <option value="l">l</option>
-                                <option value="xícara">xícara</option>
-                                <option value="colher de sopa">colher de sopa</option>
-                                <option value="colher de chá">colher de chá</option>
-                                <option value="unidade">unidade</option>
-                              </select>
+                  {/* Busca Inteligente */}
+                  <IntelligentIngredientSearch
+                    onAddIngredient={adicionarIngredienteInteligente}
+                    selectedIngredients={ingredientesReceita}
+                    className="mb-6"
+                  />
+                  
+                  {/* Lista de Ingredientes Adicionados */}
+                  {ingredientesReceita.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">
+                        Ingredientes da Receita ({ingredientesReceita.length})
+                      </h4>
+                      {ingredientesReceita.map((ingrediente, index) => {
+                        // Buscar o nome do ingrediente da base de dados
+                        const ingredienteInfo = ingredientes.find(ing => ing.id === ingrediente.ingrediente_id) ||
+                                               INGREDIENTES_CONFEITARIA.find(ing => ing.id === ingrediente.ingrediente_id)
+                        
+                        return (
+                          <div key={index} className="border border-gray-200 p-3 rounded-lg bg-gray-50">
+                            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 items-center">
+                              <div className="sm:col-span-2">
+                                <p className="font-medium text-gray-900 text-sm">
+                                  {ingredienteInfo?.nome || 'Ingrediente desconhecido'}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {ingredienteInfo?.categoria || 'Categoria não definida'}
+                                </p>
+                              </div>
+                              
+                              <div>
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={ingrediente.quantidade}
+                                  onChange={(e) => atualizarIngrediente(index, 'quantidade', parseFloat(e.target.value) || 0)}
+                                  className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                  placeholder="Quantidade"
+                                />
+                              </div>
+                              
+                              <div className="flex items-center space-x-2">
+                                <select
+                                  value={ingrediente.unidade}
+                                  onChange={(e) => atualizarIngrediente(index, 'unidade', e.target.value)}
+                                  className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                >
+                                  <option value="g">g</option>
+                                  <option value="kg">kg</option>
+                                  <option value="ml">ml</option>
+                                  <option value="l">l</option>
+                                  <option value="xícara">xícara</option>
+                                  <option value="colher de sopa">colher de sopa</option>
+                                  <option value="colher de chá">colher de chá</option>
+                                  <option value="unidade">unidade</option>
+                                </select>
+                                <button
+                                  type="button"
+                                  onClick={() => removerIngrediente(index)}
+                                  className="text-red-500 hover:text-red-700 p-1"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </div>
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => removerIngrediente(index)}
-                              className="text-red-500 hover:text-red-700 p-2"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
                           </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 {/* Modo de Preparo */}
