@@ -1,0 +1,442 @@
+# 📱 PROMPT UX/UI GERAL - DoceCalc Reorganização Completa
+
+## 🎯 **OBJETIVO PRINCIPAL**
+Reorganizar TODA a aplicação DoceCalc seguindo o padrão de UX do dashboard refinado, priorizando facilidade de uso, organização lógica e interface intuitiva para confeiteiras.
+
+## 🏗️ **ARQUITETURA GERAL DA APLICAÇÃO**
+
+### **ESTRUTURA DE NAVEGAÇÃO**
+
+#### **Desktop (1024px+):**
+- **Header fixo:** Logo + Saudação personalizada + Menu hambúrguer + Perfil
+- **Sidebar retrátil:** Funcionalidades principais sempre visíveis
+- **Área principal:** Conteúdo da página atual
+- **Quick actions floating:** Botões rápidos sempre acessíveis
+
+#### **Mobile (até 768px):**
+- **Header simplificado:** Logo + Nome usuário + Menu hambúrguer  
+- **Bottom navigation fixo:** 4 abas principais + modal "Mais"
+- **Conteúdo full-screen:** Aproveita toda tela
+- **Modais bottom-sheet:** Deslizam de baixo para cima
+
+### **SISTEMA DE CORES UNIFICADO**
+```css
+/* Cores principais */
+--primary: #ec4899 (rosa vibrante)
+--primary-light: #f9a8d4 (rosa claro)
+--secondary: #fbbf24 (laranja - upgrades)
+--success: #10b981 (verde)
+--warning: #f59e0b (laranja)
+--error: #ef4444 (vermelho)
+
+/* Neutros */
+--gray-50: #f9fafb
+--gray-100: #f3f4f6
+--gray-200: #e5e7eb
+--gray-800: #1f2937
+--gray-900: #111827
+```
+
+---
+
+## 🧮 **CALCULADORA - REORGANIZAÇÃO**
+
+### **PROBLEMAS ATUAIS:**
+- Interface confusa com muitos campos
+- Falta de fluxo lógico claro
+- Campos monetários sem formatação
+- Resultado pouco destacado
+
+### **NOVA ESTRUTURA:**
+```
+STEP 1: Seleção de Receita
+- "Calcular receita existente" ou "Nova receita rápida"
+- Se existente: dropdown com busca
+- Se nova: só nome + categoria
+
+STEP 2: Ingredientes (Interface Nova)
+- Busca inteligente com autocomplete
+- Cards visuais dos ingredientes
+- Quantidade + unidade em modal rápido
+- Lista dos ingredientes adicionados (editável)
+
+STEP 3: Configurações
+- Mão de obra (R$/hora + tempo estimado)
+- Custos fixos (energia, gás, embalagem)
+- Margem desejada (slider visual)
+
+STEP 4: Resultado
+- Preço final GRANDE e destacado
+- Breakdown visual dos custos
+- 3 cenários (pessimista/realista/otimista)
+- Botões de ação: Salvar / Compartilhar / Novo Cálculo
+```
+
+### **MELHORIAS UX:**
+- Stepper visual mostrando progresso
+- Cada step em card separado
+- Botões "Anterior/Próximo" sempre visíveis
+- Preview do resultado em sidebar (desktop)
+- Campos monetários com formatação R$ correta
+
+---
+
+## 📝 **RECEITAS - SIMPLIFICAÇÃO TOTAL**
+
+### **PROBLEMAS ATUAIS:**
+- Formulário complexo demais (10+ campos)
+- Campos obrigatórios desnecessários
+- Navegação confusa entre receitas
+
+### **NOVA ESTRUTURA:**
+```
+PÁGINA PRINCIPAL:
+- Header: "Minhas Receitas" + busca + filtros simples
+- Grid responsivo de cards de receitas
+- FAB (Floating Action Button): "Nova Receita"
+- Categorias em tabs: Todas / Bolos / Doces / Salgados
+
+CARD DE RECEITA:
+- Foto grande (placeholder se não tiver)
+- Nome da receita
+- Categoria + tempo de preparo
+- Ações rápidas: Ver / Editar / Calcular Preço / Compartilhar
+
+FORMULÁRIO NOVA RECEITA (Simplificado):
+STEP 1: Básico
+- Nome da receita
+- Categoria (dropdown)
+- Foto (upload simples)
+
+STEP 2: Ingredientes
+- Sistema de busca igual à calculadora
+- Ingredientes obrigatórios marcados
+
+STEP 3: Preparo
+- Tempo estimado (slider)
+- Modo de preparo (textarea simples)
+- Rendimento (texto livre)
+
+RESULTADO: Preview da receita + botão Salvar
+```
+
+---
+
+## 🥄 **INGREDIENTES - ORGANIZAÇÃO INTELIGENTE**
+
+### **NOVA ESTRUTURA:**
+```
+LAYOUT PRINCIPAL:
+- Tabs: "Meus Ingredientes" / "Buscar Novos" / "Favoritos"
+- Barra de busca sempre presente
+- Filtros por categoria (Açúcares, Farinhas, etc.)
+
+MEUS INGREDIENTES:
+- Lista/grid com foto + nome + preço atual
+- Indicadores visuais: estoque baixo, sem preço, etc.
+- Ações rápidas: Editar preço / Ver receitas que usam / Favoritar
+
+BUSCAR NOVOS:
+- Base de dados dos 100+ ingredientes
+- Categorias em cards visuais
+- Busca instantânea
+- Botão "Adicionar aos Meus" em cada item
+
+CADASTRO/EDIÇÃO:
+- Modal simples e rápido
+- Campos essenciais: Nome, Preço, Unidade, Categoria
+- Upload de foto opcional
+- Estimativa de estoque (opcional)
+```
+
+---
+
+## 👥 **COMUNIDADE - FEED MODERNO**
+
+### **NOVA ESTRUTURA:**
+```
+LAYOUT FEED:
+- Header: Logo comunidade + busca + filtros
+- Tabs: "Feed" / "Minhas Receitas" / "Salvos" / "Criar Post"
+
+FEED PRINCIPAL:
+- Cards estilo Instagram
+- Foto da receita + nome do autor
+- Preview da receita (ingredientes + tempo)
+- Ações: Curtir / Comentar / Salvar / Compartilhar
+
+CRIAR POST (Compartilhar Receita):
+- Só receitas PRÓPRIAS aparecem
+- Preview de como ficará no feed
+- Opção de adicionar descrição
+- Configurações de privacidade
+
+INTERAÇÕES:
+- Modal para ver receita completa
+- Botão "Adicionar às Minhas Receitas"
+- Sistema de comentários simples
+- Perfil público do autor
+```
+
+---
+
+## 📊 **RELATÓRIOS - VISUAL E FUNCIONAL**
+
+### **NOVA ESTRUTURA:**
+```
+DASHBOARD PRINCIPAL:
+- Cards de KPIs: Receita Total / Pedidos / Ticket Médio / Margem
+- Filtros de período funcionais (7d, 30d, 90d, 1ano)
+- Gráficos com Recharts:
+  - Evolução de vendas (linha)
+  - Top receitas (barras)
+  - Custos por categoria (pizza)
+
+RELATÓRIOS ESPECÍFICOS:
+- Rentabilidade por Receita
+- Análise de Ingredientes
+- Performance por Período
+- Projeções e Metas
+
+EXPORTAÇÃO:
+- PDF profissional
+- Excel para análises
+- Compartilhamento via link
+
+UPGRADE PARA PRO:
+- Usuários gratuitos veem dados limitados
+- Modal de upgrade em relatórios avançados
+- Preview do que terão com upgrade
+```
+
+---
+
+## 🤖 **DOCEBOT IA - CONTEXTUALIZADA**
+
+### **NOVA ESTRUTURA:**
+```
+PÁGINA PRINCIPAL:
+- 3 especialistas visuais em cards:
+  - DoceBot Calculadora (precificação)
+  - DoceBot Chef (técnicas culinárias)  
+  - DoceBot Consultora (negócios)
+
+INTERFACE DE CHAT:
+- Histórico de conversas por especialista
+- Sugestões contextuais baseadas na página atual
+- Contador de créditos sempre visível
+- Respostas com formatação rica
+
+INTEGRAÇÃO CONTEXTUAL:
+- Botão IA em cada página relevante
+- Chat abre com contexto automático
+- Exemplo na Calculadora: "Analise minha precificação"
+- Exemplo nas Receitas: "Como melhorar esta massa?"
+```
+
+---
+
+## 👥 **CLIENTES - CRM SIMPLIFICADO**
+
+### **NOVA ESTRUTURA:**
+```
+DASHBOARD CLIENTES:
+- Cards de estatísticas: Total / Novos este mês / VIPs
+- Lista com busca e filtros
+- Segmentação visual: Novo / Ativo / Inativo / VIP
+
+CADASTRO INTELIGENTE:
+- 3 opções em destaque:
+  - Manual (formulário simples)
+  - QR Code (cliente se cadastra)
+  - Import Inteligente (IA processa texto)
+
+PERFIL DO CLIENTE:
+- Dados essenciais em cards
+- Histórico de pedidos
+- Preferências e observações
+- Ações rápidas: Ligar / WhatsApp / Email / Novo Pedido
+```
+
+---
+
+## 📋 **ORÇAMENTOS - PROCESSO SIMPLES**
+
+### **NOVA ESTRUTURA:**
+```
+PIPELINE VISUAL:
+- Kanban: Rascunho / Enviado / Aprovado / Em Produção / Entregue
+- Drag & drop entre colunas
+- Cards com info essencial
+
+NOVO ORÇAMENTO:
+STEP 1: Cliente (busca ou cadastro rápido)
+STEP 2: Produtos (seleção de receitas + quantidades)
+STEP 3: Configurações (prazo, desconto, observações)
+STEP 4: Preview + Envio (WhatsApp, email, PDF)
+
+TEMPLATES:
+- Orçamentos salvos como templates
+- Personalização automática por cliente
+- Versionamento simples
+```
+
+---
+
+## 📖 **CATÁLOGO - DUAS ABAS CLARAS**
+
+### **NOVA ESTRUTURA:**
+```
+ABA 1: PERSONALIZAÇÃO
+- Configurador visual em tempo real
+- Upload de logo
+- Seletor de cores (fixas + color picker)
+- Escolha de fontes (6 opções)
+- Preview instantâneo
+
+ABA 2: PRODUTOS
+- Lista de receitas com toggle ON/OFF
+- Campos específicos para cada produto:
+  - Foto para catálogo
+  - Descrição pública
+  - Preço de venda
+  - Disponibilidade
+- Preview do catálogo em tempo real
+- Geração de QR Code + Link compartilhável
+
+CATÁLOGO PÚBLICO:
+- Página responsiva com design personalizado
+- Grid de produtos
+- Botão WhatsApp para pedidos
+- Header com dados da confeitaria
+```
+
+---
+
+## 🛒 **MARKETPLACE - LOJA ATRATIVA**
+
+### **NOVA ESTRUTURA:**
+```
+HOMEPAGE:
+- Banner com ebook em destaque
+- Categorias em cards visuais
+- "Mais Vendidos" e "Lançamentos"
+- Busca + filtros funcionais
+
+PÁGINA DO EBOOK:
+- Galeria de imagens
+- Descrição rica com preview de receitas
+- Preço destacado
+- Reviews (mockadas inicialmente)
+- Seção "Você também pode gostar"
+- Botão de compra prominence
+
+CHECKOUT:
+- Carrinho lateral fixo
+- Formulário de pagamento simples
+- Opções PIX + Cartão bem visíveis
+- Resumo do pedido claro
+
+MEUS EBOOKS:
+- Biblioteca pessoal
+- Downloads + acesso às receitas no app
+- Status de aproveitamento das receitas
+```
+
+---
+
+## 📱 **NAVEGAÇÃO MOBILE UNIFICADA**
+
+### **BOTTOM NAVIGATION (4 abas fixas):**
+```
+🏠 Início - Dashboard principal
+🧮 Calcular - Calculadora direta
+📝 Receitas - Lista de receitas
+👥 Comunidade - Feed social
+```
+
+### **MODAL "MAIS" (5ª aba):**
+```
+Grid 2x3 organizado:
+- 👤 Clientes
+- 📋 Orçamentos  
+- 📖 Catálogo
+- 🛒 Marketplace
+- 🤖 DoceBot IA
+- 📊 Relatórios
+```
+
+### **HEADER MOBILE:**
+- Logo pequeno + nome do usuário
+- Ícone de notificações
+- Menu hambúrguer (configurações, perfil, sair)
+
+---
+
+## 🎨 **PRINCÍPIOS DE DESIGN UNIFICADOS**
+
+### **CARDS E COMPONENTES:**
+- Sempre com sombra sutil e bordas arredondadas
+- Padding consistente (p-4 ou p-6)
+- Hierarchy visual clara com tipografia
+- Estados hover e loading padronizados
+
+### **BOTÕES:**
+- Primário: bg-pink-500 hover:bg-pink-600
+- Secundário: border com texto colorido
+- Ghost: apenas texto com hover sutil
+- FAB: circular, sombra, sempre acessível
+
+### **FORMULÁRIOS:**
+- Labels claras e diretas
+- Campos espaçosos e touch-friendly
+- Validação em tempo real
+- Mensagens de erro amigáveis
+
+### **LOADING E ESTADOS:**
+- Skeletons para listas longas
+- Spinners para ações rápidas
+- Empty states amigáveis e com CTA
+- Mensagens de sucesso positivas
+
+---
+
+## ✅ **CHECKLIST DE IMPLEMENTAÇÃO**
+
+### **FASE 1: Base (Semana 1):**
+- [ ] Sistema de cores e componentes base
+- [ ] Header e navegação responsiva
+- [ ] Bottom navigation mobile
+- [ ] Campos monetários corrigidos
+
+### **FASE 2: Páginas Principais (Semana 2):**
+- [ ] Dashboard refinado
+- [ ] Calculadora reorganizada  
+- [ ] Receitas simplificadas
+- [ ] Ingredientes organizados
+
+### **FASE 3: Funcionalidades Avançadas (Semana 3):**
+- [ ] Comunidade moderna
+- [ ] Relatórios funcionais
+- [ ] DoceBot contextualizada
+- [ ] CRM de clientes
+
+### **FASE 4: Finalização (Semana 4):**
+- [ ] Orçamentos pipeline
+- [ ] Catálogo funcional
+- [ ] Marketplace atrativo
+- [ ] Polish e ajustes finais
+
+---
+
+## 🎯 **RESULTADO ESPERADO**
+
+Uma aplicação completamente reorganizada, intuitiva e profissional, onde cada confeiteira consegue:
+
+1. **Entrar e entender imediatamente** o que fazer
+2. **Navegar sem confusão** entre funcionalidades
+3. **Completar tarefas rapidamente** sem friction
+4. **Sentir-se confiante** usando todas as features
+5. **Perceber o valor** de cada funcionalidade
+
+**FOCO:** Experiência de usuário superior aos concorrentes, interface moderna e fluxos otimizados para o dia-a-dia real das confeiteiras.
