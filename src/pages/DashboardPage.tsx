@@ -366,7 +366,7 @@ export default function DashboardPage() {
               </Link>
               
               <Link 
-                to="/relatorios"
+                to="/financeiro"
                 className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow border-l-4 border-orange-500"
               >
                 <div className="flex items-center space-x-4">

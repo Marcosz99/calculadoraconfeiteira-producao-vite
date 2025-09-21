@@ -55,7 +55,7 @@ const steps: OnboardingStep[] = [
     description: "Visualize relatórios detalhados sobre suas vendas, produtos mais vendidos e performance do seu negócio.",
     icon: FileText,
     actionText: "Ver Relatórios",
-    actionLink: "/relatorios"
+    actionLink: "/financeiro"
   }
 ]
 
