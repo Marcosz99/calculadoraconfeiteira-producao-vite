@@ -10,7 +10,8 @@ export const LOCAL_STORAGE_KEYS = {
   ORCAMENTOS: 'doce_orcamentos',
   PEDIDOS: 'doce_pedidos',
   CONFIGURACOES: 'doce_configuracoes',
-  STATS_DASHBOARD: 'doce_stats_dashboard'
+  STATS_DASHBOARD: 'doce_stats_dashboard',
+  DOCUMENTOS_FISCAIS: 'doce_documentos_fiscais'
 }
 
 export function saveToLocalStorage<T>(key: string, data: T): void {
@@ -20,6 +21,9 @@ export function saveToLocalStorage<T>(key: string, data: T): void {
     console.error('Erro ao salvar no localStorage:', error)
   }
 }
+
+// Alias para compatibilidade
+export const setToLocalStorage = saveToLocalStorage;
 
 export function getFromLocalStorage<T>(key: string, defaultValue: T): T {
   try {

@@ -14,6 +14,7 @@ import IngredientesPage from './pages/IngredientesPage'
 import ClientesPage from './pages/ClientesPage'
 import OrcamentosPage from './pages/OrcamentosPage'
 import RelatoriosPage from './pages/RelatoriosPage'
+import RelatoriosAvancadosPage from './pages/RelatoriosAvancadosPage'
 import FerramentasPage from './pages/FerramentasPage'
 import UpgradePage from './pages/UpgradePage'
 import { UpgradePixPage } from './pages/UpgradePixPage'
@@ -50,6 +51,7 @@ function App() {
             <Route path="/clientes" element={<ProtectedRoute><ClientesPage /></ProtectedRoute>} />
             <Route path="/orcamentos" element={<ProtectedRoute><OrcamentosPage /></ProtectedRoute>} />
             <Route path="/relatorios" element={<ProtectedRoute requiresPro={true}><RelatoriosPage /></ProtectedRoute>} />
+            <Route path="/relatorios-avancados" element={<ProtectedRoute requiresPro={true}><RelatoriosAvancadosPage /></ProtectedRoute>} />
             <Route path="/ferramentas" element={<ProtectedRoute><FerramentasPage /></ProtectedRoute>} />
             <Route path="/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
             <Route path="/upgrade/pix" element={<ProtectedRoute><UpgradePixPage /></ProtectedRoute>} />

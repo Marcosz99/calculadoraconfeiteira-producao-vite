@@ -11,6 +11,23 @@ const getGeminiClient = () => {
   return new GoogleGenerativeAI(apiKey);
 };
 
+// Interface para dados extraídos de documentos fiscais
+export interface DocumentFiscalData {
+  tipo: 'nota_fiscal' | 'extrato' | 'comprovante' | 'outro';
+  valor_total: number;
+  data: string;
+  empresa_emitente?: string;
+  cnpj_emitente?: string;
+  numero_documento?: string;
+  itens?: Array<{
+    descricao: string;
+    quantidade?: number;
+    valor_unitario?: number;
+    valor_total: number;
+  }>;
+  observacoes?: string;
+}
+
 export interface RecipeData {
   nome: string;
   ingredientes: Array<{
@@ -238,5 +255,165 @@ export async function validateIngredients(ingredientes: RecipeData['ingredientes
   } catch (error) {
     console.error('Erro ao validar ingredientes:', error);
     return ingredientes;
+  }
+}
+
+// Processar documentos fiscais usando OCR
+export async function processDocumentFiscal(imageFile: File): Promise<DocumentFiscalData> {
+  try {
+    const genAI = getGeminiClient();
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    // Convert file to base64
+    const base64Data = await fileToBase64(imageFile);
+    
+    const prompt = `
+    Você é especialista em análise de documentos fiscais brasileiros.
+    Analise esta imagem de nota fiscal, extrato bancário ou comprovante e extraia TODOS os dados relevantes.
+    
+    Identifique o tipo de documento e extraia:
+    - Tipo do documento (nota_fiscal, extrato, comprovante, outro)
+    - Valor total principal
+    - Data do documento ou transação
+    - Nome da empresa/estabelecimento
+    - CNPJ (se disponível)
+    - Número do documento
+    - Lista de itens/produtos com valores (se aplicável)
+    - Observações importantes
+    
+    Retorne JSON exatamente neste formato:
+    {
+      "tipo": "nota_fiscal" | "extrato" | "comprovante" | "outro",
+      "valor_total": número decimal,
+      "data": "YYYY-MM-DD" ou "YYYY-MM-DD HH:mm" se houver hora,
+      "empresa_emitente": "nome da empresa",
+      "cnpj_emitente": "XX.XXX.XXX/XXXX-XX" ou null,
+      "numero_documento": "número" ou null,
+      "itens": [
+        {
+          "descricao": "nome do produto/serviço",
+          "quantidade": número ou null,
+          "valor_unitario": número ou null,
+          "valor_total": número
+        }
+      ],
+      "observacoes": "informações extras" ou null
+    }
+    
+    REGRAS:
+    - Se não conseguir identificar um campo, use null
+    - Para valores, sempre use números decimais (ex: 123.45)
+    - Para datas, tente converter para formato YYYY-MM-DD
+    - Se for extrato, cada transação é um item
+    - Se não houver itens detalhados, deixe array vazio []
+    `;
+    
+    const imagePart = {
+      inlineData: {
+        data: base64Data,
+        mimeType: imageFile.type,
+      },
+    };
+    
+    const result = await model.generateContent([prompt, imagePart]);
+    const response = await result.response;
+    const jsonText = response.text();
+    
+    try {
+      const cleanJsonText = cleanJSONResponse(jsonText);
+      const structured = JSON.parse(cleanJsonText) as DocumentFiscalData;
+      
+      // Validação básica
+      if (!structured || typeof structured.valor_total !== 'number') {
+        throw new Error('Estrutura inválida');
+      }
+      
+      return {
+        tipo: structured.tipo || 'outro',
+        valor_total: structured.valor_total || 0,
+        data: structured.data || new Date().toISOString().split('T')[0],
+        empresa_emitente: structured.empresa_emitente || undefined,
+        cnpj_emitente: structured.cnpj_emitente || undefined,
+        numero_documento: structured.numero_documento || undefined,
+        itens: Array.isArray(structured.itens) ? structured.itens : [],
+        observacoes: structured.observacoes || undefined
+      };
+    } catch (parseError) {
+      console.error('Erro ao fazer parse do JSON:', parseError);
+      throw new Error('Não foi possível processar os dados do documento. Verifique se a imagem está legível.');
+    }
+    
+  } catch (error) {
+    console.error('Erro ao processar documento fiscal:', error);
+    throw new Error('Erro ao processar o documento. Tente novamente com uma imagem mais clara.');
+  }
+}
+
+// Analisar gastos e gerar insights para relatórios
+export async function analyzeBusinessExpenses(documentos: DocumentFiscalData[]): Promise<{
+  total_gastos: number;
+  gastos_por_categoria: { [key: string]: number };
+  tendencias: string[];
+  recomendacoes: string[];
+}> {
+  try {
+    const genAI = getGeminiClient();
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    const prompt = `
+    Você é consultor financeiro especializado em confeitarias.
+    Analise estes gastos e documentos fiscais de uma confeitaria e gere insights:
+    
+    Documentos: ${JSON.stringify(documentos, null, 2)}
+    
+    Análise os dados e retorne JSON com:
+    {
+      "total_gastos": soma total de todos os gastos,
+      "gastos_por_categoria": {
+        "ingredientes": valor total,
+        "equipamentos": valor total,
+        "embalagens": valor total,
+        "marketing": valor total,
+        "outros": valor total
+      },
+      "tendencias": [
+        "Observação sobre padrões temporais",
+        "Observação sobre categorias"
+      ],
+      "recomendacoes": [
+        "Sugestão de economia",
+        "Oportunidade de melhoria"
+      ]
+    }
+    
+    Base as categorias nos itens encontrados e forneça insights úteis para o negócio.
+    `;
+    
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const jsonText = response.text();
+    
+    try {
+      const cleanJsonText = cleanJSONResponse(jsonText);
+      return JSON.parse(cleanJsonText);
+    } catch {
+      // Fallback para análise básica
+      const total = documentos.reduce((sum, doc) => sum + doc.valor_total, 0);
+      return {
+        total_gastos: total,
+        gastos_por_categoria: { outros: total },
+        tendencias: ['Análise em desenvolvimento'],
+        recomendacoes: ['Colete mais dados para insights detalhados']
+      };
+    }
+  } catch (error) {
+    console.error('Erro ao analisar gastos:', error);
+    const total = documentos.reduce((sum, doc) => sum + doc.valor_total, 0);
+    return {
+      total_gastos: total,
+      gastos_por_categoria: { outros: total },
+      tendencias: ['Análise temporariamente indisponível'],
+      recomendacoes: ['Tente novamente em alguns minutos']
+    };
   }
 }
