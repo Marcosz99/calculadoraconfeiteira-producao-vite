@@ -1,0 +1,94 @@
+### **8.2 - Catálogo Funcional**
+
+**INSTRUÇÃO PARA IA:**
+```
+IMPLEMENTAR a aba de PRODUTOS do catálogo:
+
+FUNCIONALIDADE PRINCIPAL:
+- Aba "Produtos" ao lado de "Personalização"
+- Lista de todas as receitas do usuário
+- Toggle ON/OFF para cada receita
+- Campos específicos para catálogo:
+  - Foto do produto final
+  - Descrição para clientes
+  - Preço público (pode ser diferente do calculado)
+  - Disponibilidade (sempre, sob encomenda)
+
+GERAÇÃO DO CATÁLOGO:
+- Apenas receitas ativadas aparecem
+- Layout responsivo automático
+- QR Code único para o catálogo
+- Link compartilhável: app.com/catalogo/{userId}
+- Página pública sem necessidade de login
+
+PÁGINA PÚBLICA:
+- Header com nome/logo da confeitaria
+- Grid de produtos com fotos
+- Preços atualizados
+- Botão WhatsApp para pedidos
+- Design baseado na personalização escolhida
+```
+
+---
+
+## 💰 **FASE 9: CONTROLE FINANCEIRO**
+
+### **9.1 - Upload de Comprovantes**
+
+**INSTRUÇÃO PARA IA:**
+```
+SISTEMA de controle financeiro por upload:
+
+FUNCIONALIDADE:
+- Seção "Financeiro" no menu
+- Upload de fotos de notas fiscais
+- Upload de comprovantes de venda
+- OCR para extrair valores automaticamente
+- IA para categorizar receitas/despesas
+
+PROCESSAMENTO:
+1. Google Vision para ler texto da nota
+2. Gemini para extrair dados estruturados
+3. Categorização automática
+4. Usuário confirma/corrige
+5. Salva no sistema financeiro
+
+DADOS EXTRAÍDOS:
+- Valor total
+- Data da transação
+- Categoria (ingredientes, equipamentos, vendas)
+- Fornecedor/Cliente
+- Método de pagamento
+
+RELATÓRIOS:
+- Receitas vs Despesas
+- Fluxo de caixa mensal
+- Categorização de gastos
+- Margem real do negócio
+```
+
+### **9.2 - Dashboard Financeiro**
+
+**INSTRUÇÃO PARA IA:**
+```
+CRIAR visão financeira completa:
+
+CARDS PRINCIPAIS:
+- Receita Total Mês
+- Despesas Total Mês
+- Lucro Líquido
+- Margem Real %
+
+GRÁFICOS:
+- Evolução de lucro (linha)
+- Despesas por categoria (pizza)
+- Comparativo mensal (barras)
+- Meta vs Realizado
+
+INSIGHTS:
+- "Gasto com ingredientes subiu 15%"
+- "Margem real: 28% (vs 35% calculada)"
+- "Melhor mês dos últimos 6"
+```
+
+---

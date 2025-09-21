@@ -958,6 +958,7 @@ export default function CustomCatalogPage() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   )
