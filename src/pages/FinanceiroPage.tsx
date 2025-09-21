@@ -10,6 +10,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { TransacaoFinanceira, GastoFixo, GastoPlanejado, ResumoFinanceiro, Orcamento, Cliente, Receita } from '../types'
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage, saveToLocalStorage } from '../utils/localStorage'
 import AdvancedCharts from '../components/AdvancedCharts'
+import { supabase } from '@/integrations/supabase/client'
 
 export default function FinanceiroPage() {
   const { user } = useAuth()
@@ -302,23 +303,51 @@ export default function FinanceiroPage() {
     setDadosExtraidos(null)
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 3000))
+      console.log('🔍 Processando comprovante com IA...', file.name)
+      
+      // Preparar FormData para envio do arquivo
+      const formData = new FormData()
+      formData.append('imageFile', file)
+      formData.append('tipo', tipo)
 
-      const dadosSimulados: Partial<TransacaoFinanceira> = {
+      // Chamar API do Gemini via Supabase Edge Function
+      const response = await fetch(`https://dbwbxzbtydeauczfleqx.supabase.co/functions/v1/process-financial-document`, {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ Erro HTTP:', errorText)
+        throw new Error('Erro ao processar o documento')
+      }
+
+      const data = await response.json()
+
+      if (data.error) {
+        console.error('❌ Erro na API:', data.error)
+        throw new Error('Erro ao processar o documento')
+      }
+
+      console.log('✅ Dados extraídos:', data)
+
+      const dadosExtraidos: Partial<TransacaoFinanceira> = {
         tipo,
-        valor: tipo === 'receita' ? 125.50 : 45.80,
-        data: new Date().toISOString().substring(0, 10),
-        categoria: tipo === 'receita' ? 'Vendas Docinhos' : 'Ingredientes',
-        descricao: tipo === 'receita' ? 'Venda de Brigadeiros' : 'Açúcar e Manteiga - Mercado',
-        metodo_pagamento: 'pix',
-        fornecedor_cliente: tipo === 'receita' ? 'Cliente Ana' : 'Mercado Central',
+        valor: data.valor_total || 0,
+        data: data.data || new Date().toISOString().substring(0, 10),
+        categoria: data.categoria || (tipo === 'receita' ? 'Vendas' : 'Gastos'),
+        descricao: data.descricao || data.empresa_emitente || 'Transação processada por IA',
+        metodo_pagamento: data.metodo_pagamento || 'transferencia',
+        fornecedor_cliente: data.empresa_emitente || (tipo === 'receita' ? 'Cliente' : 'Fornecedor'),
         extraido_por_ocr: true,
         verificado: false
       }
 
-      setDadosExtraidos(dadosSimulados)
+      setDadosExtraidos(dadosExtraidos)
+
     } catch (error) {
-      alert('❌ Erro ao processar comprovante. Tente novamente.')
+      console.error('❌ Erro no OCR:', error)
+      alert('❌ Erro ao processar comprovante. Verifique se a imagem está legível e tente novamente.')
     } finally {
       setProcessandoOCR(false)
     }
@@ -341,10 +370,22 @@ export default function FinanceiroPage() {
     setUploadType(null)
   }
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file && uploadType) {
-      processarComprovanteOCR(file, uploadType)
+      // Verificar se é uma imagem
+      if (!file.type.startsWith('image/')) {
+        alert('❌ Por favor, selecione apenas arquivos de imagem (JPG, PNG, etc)')
+        return
+      }
+      
+      // Verificar tamanho do arquivo (máximo 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('❌ Arquivo muito grande. Máximo 10MB')
+        return
+      }
+      
+      await processarComprovanteOCR(file, uploadType)
     }
   }
 

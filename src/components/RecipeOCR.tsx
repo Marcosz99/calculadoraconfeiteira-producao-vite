@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, X, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
-import { processRecipeImage, RecipeData } from '../services/geminiService';
+import { RecipeData } from '../services/geminiService';
 
 interface RecipeOCRProps {
   onRecipeExtracted: (recipe: RecipeData) => void;
@@ -30,8 +30,40 @@ export default function RecipeOCR({ onRecipeExtracted, onClose, isOpen }: Recipe
     try {
       setProcessingStep('Extraindo texto da imagem...');
       
-      // Process the image with OCR
-      const recipeData = await processRecipeImage(file);
+      console.log('🔍 Processando receita com IA...', file.name)
+      
+      // Preparar FormData para envio do arquivo
+      const formData = new FormData()
+      formData.append('imageFile', file)
+
+      // Chamar API do Gemini via Supabase Edge Function
+      const response = await fetch(`https://dbwbxzbtydeauczfleqx.supabase.co/functions/v1/process-recipe-ocr`, {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('❌ Erro HTTP:', errorText)
+        throw new Error('Erro ao processar a receita')
+      }
+
+      const data = await response.json()
+
+      if (data.error) {
+        console.error('❌ Erro na API:', data.error)
+        throw new Error('Erro ao processar a receita')
+      }
+
+      console.log('✅ Receita extraída:', data)
+
+      const recipeData: RecipeData = {
+        nome: data.nome || 'Receita Digitalizada',
+        ingredientes: data.ingredientes || [],
+        modo_preparo: data.modo_preparo || [],
+        tempo_estimado: data.tempo_preparo_minutos || null,
+        rendimento: data.rendimento || null
+      }
       
       setProcessingStep('Receita digitalizada com sucesso!');
       

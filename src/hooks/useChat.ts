@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ChatMessage, ChatSession } from '../types/chat'
-import { findAnswer } from '../utils/aiSearch'
-import { personalizeAIResponse, getUserContext } from '../utils/aiPersonalization'
 import { useCredits } from './useCredits'
+import { supabase } from '@/integrations/supabase/client'
 
 interface UseChatReturn {
   messages: ChatMessage[]
@@ -74,26 +73,28 @@ export function useChat(): UseChatReturn {
     setIsLoading(true)
 
     try {
-      // Simular delay da IA (1-3 segundos)
-      const delay = Math.random() * 2000 + 1000
-      await new Promise(resolve => setTimeout(resolve, delay))
-
-      // Buscar resposta na base de conhecimento
-      const searchResult = findAnswer(content)
-      
-      // Usar crédito
+      // Usar crédito ANTES de fazer a chamada
       const creditUsed = useCredit()
       if (!creditUsed) {
         throw new Error('Falha ao processar crédito')
       }
 
-      // Obter contexto do usuário para personalização
-      const userContext = getUserContext()
-      
-      // Personalizar resposta da IA
-      const aiResponse = personalizeAIResponse(searchResult, content, userContext)
-      const confidence = searchResult.confidence
-      const relatedQuestions = searchResult.relatedQuestions
+      // Chamar a API do Gemini via Supabase Edge Function
+      const { data, error } = await supabase.functions.invoke('docebot-chat', {
+        body: { 
+          message: content.trim(),
+          context: 'confeitaria'
+        }
+      })
+
+      if (error) {
+        console.error('Erro na chamada da API:', error)
+        throw new Error('Erro ao conectar com o DoceBot Pro')
+      }
+
+      const aiResponse = data?.response || 'Desculpe, não consegui processar sua pergunta. Tente novamente.'
+      const confidence = data?.confidence || null
+      const relatedQuestions = data?.related_questions || []
 
       const aiMessage: ChatMessage = {
         id: `ai_${Date.now()}`,
@@ -101,7 +102,7 @@ export function useChat(): UseChatReturn {
         content: aiResponse,
         timestamp: new Date(),
         confidence,
-        relatedQuestions
+        relatedQuestions: relatedQuestions.slice(0, 3) // Máximo 3 perguntas relacionadas
       }
 
       // Atualizar mensagens removendo loading e adicionando resposta
@@ -115,7 +116,9 @@ export function useChat(): UseChatReturn {
       const errorMessage: ChatMessage = {
         id: `ai_${Date.now()}`,
         sender: 'ai',
-        content: 'Ops! Algo deu errado. Tente novamente em alguns instantes. 😅',
+        content: error instanceof Error && error.message.includes('crédito') 
+          ? 'Seus créditos se esgotaram. Faça upgrade para continuar usando o DoceBot Pro!'
+          : 'Desculpe, estou com dificuldades técnicas no momento. Tente novamente em alguns instantes. 🤖✨',
         timestamp: new Date()
       }
 
