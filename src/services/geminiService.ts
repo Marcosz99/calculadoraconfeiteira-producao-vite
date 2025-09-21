@@ -83,12 +83,14 @@ export async function structureRecipeFromText(extractedText: string): Promise<Re
       "rendimento": "descrição do rendimento (string)" ou null
     }
     
-    REGRAS IMPORTANTES:
+    REGRAS IMPORTANTES para preservar nomes dos ingredientes:
+    - SEMPRE preserve o nome EXATO do ingrediente como escrito na receita original
     - Se algo não estiver claro, coloque null para números ou string vazia para texto
-    - Para unidades, use: g, ml, xícara, colher de sopa, colher de chá, unidade, pitada, etc
+    - Para unidades, padronize: g, ml, xícara, colher de sopa, colher de chá, unidade, pitada, etc
     - Para quantidades, converta frações: 1/2 = 0.5, 1/4 = 0.25, etc
     - Modo de preparo deve ser lista de passos numerados
     - Se não conseguir identificar o nome, use "Receita Digitalizada"
+    - CRUCIAL: Mantenha nomes de ingredientes como estão escritos (ex: "leite condensado", "açúcar cristal", "farinha de trigo")
     `;
     
     const result = await model.generateContent(prompt);
@@ -130,7 +132,7 @@ export async function structureRecipeFromText(extractedText: string): Promise<Re
   }
 }
 
-// Complete OCR process: extract + structure
+// Complete OCR process: extract + structure + validate ingredients
 export async function processRecipeImage(imageFile: File): Promise<RecipeData> {
   try {
     // Step 1: Extract text from image
@@ -142,6 +144,17 @@ export async function processRecipeImage(imageFile: File): Promise<RecipeData> {
     
     // Step 2: Structure the recipe data
     const structuredData = await structureRecipeFromText(extractedText);
+    
+    // Step 3: Validate and improve ingredient mapping while preserving original names
+    if (structuredData.ingredientes && structuredData.ingredientes.length > 0) {
+      try {
+        const validatedIngredients = await validateIngredients(structuredData.ingredientes);
+        structuredData.ingredientes = validatedIngredients;
+      } catch (validationError) {
+        console.warn('Erro na validação de ingredientes, usando dados originais:', validationError);
+        // Continue with original ingredients if validation fails
+      }
+    }
     
     return structuredData;
   } catch (error) {
