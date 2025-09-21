@@ -315,3 +315,58 @@ export interface TemplateOrcamento {
   padrao: boolean
   ativo: boolean
 }
+
+// Interfaces para o Sistema Financeiro Expandido
+export interface TransacaoFinanceira {
+  id: string
+  tipo: 'receita' | 'despesa'
+  valor: number
+  data: string
+  categoria: string
+  descricao: string
+  metodo_pagamento: 'dinheiro' | 'pix' | 'cartao_credito' | 'cartao_debito' | 'transferencia'
+  fornecedor_cliente?: string
+  imagem_comprovante?: string
+  extraido_por_ocr: boolean
+  verificado: boolean
+  criado_em: string
+}
+
+export interface GastoFixo {
+  id: string
+  usuario_id: string
+  nome: string
+  valor: number
+  categoria: string
+  data_vencimento?: string
+  recorrente: boolean
+  periodicidade?: 'mensal' | 'bimestral' | 'trimestral' | 'semestral' | 'anual'
+  ativo: boolean
+  criado_em: string
+  atualizado_em: string
+}
+
+export interface GastoPlanejado {
+  id: string
+  usuario_id: string
+  nome: string
+  valor_estimado: number
+  categoria: string
+  descricao?: string
+  data_prevista: string
+  prioridade: 'baixa' | 'media' | 'alta' | 'urgente'
+  status: 'planejado' | 'executado' | 'cancelado'
+  impacto_fluxo_caixa: number
+  criado_em: string
+  executado_em?: string
+}
+
+export interface ResumoFinanceiro {
+  receita_total_mes: number
+  despesa_total_mes: number
+  gastos_fixos_mes: number
+  lucro_liquido: number
+  margem_real: number
+  transacoes_mes: number
+  gastos_planejados_mes: number
+}
