@@ -32,6 +32,7 @@ import AiAssistantPage from './pages/AiAssistantPage'
 import MarketplacePage from './pages/MarketplacePage'
 import AdvancedCalculatorPage from './pages/AdvancedCalculatorPage'
 import CustomCatalogPage from './pages/CustomCatalogPage'
+import FinanceiroPage from './pages/FinanceiroPage'
 import PerfilPage from './pages/PerfilPage'
 import { ResetPlanButton } from './components/ResetPlanButton'
 
@@ -69,6 +70,7 @@ function App() {
             <Route path="/marketplace" element={<ProtectedRoute><MarketplacePage /></ProtectedRoute>} />
             <Route path="/advanced-calculator" element={<ProtectedRoute><AdvancedCalculatorPage /></ProtectedRoute>} />
             <Route path="/custom-catalog" element={<ProtectedRoute><CustomCatalogPage /></ProtectedRoute>} />
+            <Route path="/financeiro" element={<ProtectedRoute><FinanceiroPage /></ProtectedRoute>} />
             <Route path="/perfil" element={<ProtectedRoute><PerfilPage /></ProtectedRoute>} />
           </Routes>
           
