@@ -72,6 +72,7 @@ export interface Receita {
   atualizado_em: string
   custo_calculado?: number
   preco_sugerido?: number
+  origem: 'usuario' | 'ebook' | 'sistema' // FASE 6: Controlar origem da receita
 }
 
 export interface IngredienteSistema {
@@ -170,6 +171,56 @@ export interface ConfiguracaoUsuario {
   custo_hora_trabalho: number
   notificacoes_email: boolean
   notificacoes_whatsapp: boolean
+}
+
+// FASE 6: Sistema de Compartilhamento de Receitas
+export interface ReceitaCompartilhada {
+  id: string
+  receita_id: string
+  usuario_id: string
+  autor_nome: string
+  autor_anonimo: boolean
+  data_compartilhamento: string
+  publico: boolean
+  curtidas: number
+  salvamentos: number
+  comentarios: ComentarioReceita[]
+  visualizacoes: number
+  ativo: boolean
+}
+
+export interface ComentarioReceita {
+  id: string
+  receita_compartilhada_id: string
+  usuario_id: string
+  autor_nome: string
+  conteudo: string
+  data: string
+  curtidas: number
+}
+
+// FASE 7: Sistema Inteligente de Clientes  
+export interface QRCodeCadastro {
+  id: string
+  usuario_id: string
+  codigo_qr: string
+  nome_confeitaria: string
+  ativo: boolean
+  criado_em: string
+  expirado_em?: string
+  clientes_cadastrados: number
+}
+
+export interface ImportacaoIA {
+  id: string
+  usuario_id: string
+  tipo: 'whatsapp' | 'csv' | 'txt'
+  dados_originais: string
+  dados_extraidos: any
+  status: 'processando' | 'concluido' | 'erro'
+  clientes_importados: number
+  erro_detalhes?: string
+  criado_em: string
 }
 
 export interface DadosConfeitaria {

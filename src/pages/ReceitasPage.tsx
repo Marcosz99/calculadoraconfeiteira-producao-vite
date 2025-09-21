@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Search, Filter, Clock, Users, Star, Edit, Trash2, Eye, X, Camera } from 'lucide-react'
+import { ArrowLeft, Plus, Search, Filter, Clock, Users, Star, Edit, Trash2, Eye, X, Camera, Share2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
-import { Receita, Categoria, ReceitaIngrediente, IngredienteUsuario } from '../types'
+import { Receita, Categoria, ReceitaIngrediente, IngredienteUsuario, ReceitaCompartilhada } from '../types'
 import { LOCAL_STORAGE_KEYS, saveToLocalStorage, getFromLocalStorage } from '../utils/localStorage'
 import { useSubscriptionLimits } from '../hooks/useSubscriptionLimits'
 import { UpgradeModal } from '../components/UpgradeModal'
@@ -35,18 +35,75 @@ export default function ReceitasPage() {
   })
   const [ingredientesReceita, setIngredientesReceita] = useState<ReceitaIngrediente[]>([])
   const [showOCRModal, setShowOCRModal] = useState(false)
+  
+  // Estados para compartilhamento (Fase 6)
+  const [showShareModal, setShowShareModal] = useState(false)
+  const [receitaParaCompartilhar, setReceitaParaCompartilhar] = useState<Receita | null>(null)
+  const [compartilhamentoAnonimo, setCompartilhamentoAnonimo] = useState(false)
+  const [receitasCompartilhadas, setReceitasCompartilhadas] = useState<ReceitaCompartilhada[]>([])
 
   useEffect(() => {
     if (user) {
       const savedReceitas = getFromLocalStorage<Receita[]>(LOCAL_STORAGE_KEYS.RECEITAS, [])
       const savedCategorias = getFromLocalStorage<Categoria[]>(LOCAL_STORAGE_KEYS.CATEGORIAS, [])
       const savedIngredientes = getFromLocalStorage<IngredienteUsuario[]>(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [])
+      const savedReceitasCompartilhadas = getFromLocalStorage<ReceitaCompartilhada[]>('receitas_compartilhadas', [])
       
       setReceitas(savedReceitas.filter(r => r.usuario_id === user.id))
       setCategorias(savedCategorias.filter(c => c.usuario_id === user.id))
       setIngredientes(savedIngredientes.filter(i => i.usuario_id === user.id))
+      setReceitasCompartilhadas(savedReceitasCompartilhadas)
     }
   }, [user])
+
+  // FASE 6: Funções de compartilhamento de receitas
+  const abrirModalCompartilhamento = (receita: Receita) => {
+    // FASE 6: Validação - só permite compartilhar receitas do usuário
+    if (receita.origem !== 'usuario') {
+      alert('❌ Apenas receitas criadas por você podem ser compartilhadas com a comunidade.')
+      return
+    }
+    setReceitaParaCompartilhar(receita)
+    setShowShareModal(true)
+  }
+
+  const confirmarCompartilhamento = () => {
+    if (!receitaParaCompartilhar || !user) return
+
+    const novaReceitaCompartilhada: ReceitaCompartilhada = {
+      id: Date.now().toString(),
+      receita_id: receitaParaCompartilhar.id,
+      usuario_id: user.id,
+      autor_nome: compartilhamentoAnonimo ? 'Anônimo' : (user.name || 'Confeiteiro(a)'),
+      autor_anonimo: compartilhamentoAnonimo,
+      data_compartilhamento: new Date().toISOString(),
+      publico: true,
+      curtidas: 0,
+      salvamentos: 0,
+      comentarios: [],
+      visualizacoes: 0,
+      ativo: true
+    }
+
+    const novasReceitasCompartilhadas = [...receitasCompartilhadas, novaReceitaCompartilhada]
+    setReceitasCompartilhadas(novasReceitasCompartilhadas)
+    saveToLocalStorage('receitas_compartilhadas', novasReceitasCompartilhadas)
+
+    setShowShareModal(false)
+    setReceitaParaCompartilhar(null)
+    setCompartilhamentoAnonimo(false)
+    alert('✅ Receita compartilhada com a comunidade!')
+  }
+
+  const fecharModalCompartilhamento = () => {
+    setShowShareModal(false)
+    setReceitaParaCompartilhar(null)
+    setCompartilhamentoAnonimo(false)
+  }
+
+  const receitaJaCompartilhada = (receitaId: string) => {
+    return receitasCompartilhadas.some(rc => rc.receita_id === receitaId && rc.ativo)
+  }
 
   const filteredReceitas = receitas.filter(receita => {
     const matchesSearch = receita.nome.toLowerCase().includes(searchTerm.toLowerCase())
@@ -394,6 +451,17 @@ export default function ReceitasPage() {
                       </h3>
                       <div className="flex items-center space-x-2">
                         <button
+                          onClick={() => abrirModalCompartilhamento(receita)}
+                          className={`transition-colors ${
+                            receitaJaCompartilhada(receita.id)
+                              ? 'text-green-500 hover:text-green-600'
+                              : 'text-gray-400 hover:text-blue-500'
+                          }`}
+                          title={receitaJaCompartilhada(receita.id) ? 'Receita já compartilhada' : 'Compartilhar com a comunidade'}
+                        >
+                          <Share2 className="h-4 w-4" />
+                        </button>
+                        <button
                           onClick={() => editReceita(receita)}
                           className="text-gray-400 hover:text-blue-500 transition-colors"
                         >
@@ -712,6 +780,66 @@ export default function ReceitasPage() {
         onClose={() => setShowOCRModal(false)}
         onRecipeExtracted={handleOCRRecipe}
       />
+
+      {/* Modal de Compartilhamento - FASE 6 */}
+      {showShareModal && receitaParaCompartilhar && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Compartilhar com a Comunidade
+              </h3>
+              <button
+                onClick={fecharModalCompartilhamento}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+            
+            <div className="mb-6">
+              <p className="text-gray-600 mb-4">
+                Você está prestes a compartilhar a receita <strong>"{receitaParaCompartilhar.nome}"</strong> com a comunidade DoceCalc.
+              </p>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-blue-700">
+                  ℹ️ Sua receita ficará visível para todos os confeiteiros da comunidade e poderá receber curtidas e comentários.
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="compartilhamento-anonimo"
+                  checked={compartilhamentoAnonimo}
+                  onChange={(e) => setCompartilhamentoAnonimo(e.target.checked)}
+                  className="w-4 h-4 text-pink-600 bg-gray-100 border-gray-300 rounded focus:ring-pink-500"
+                />
+                <label htmlFor="compartilhamento-anonimo" className="text-sm text-gray-600">
+                  Compartilhar anonimamente (seu nome não aparecerá)
+                </label>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={fecharModalCompartilhamento}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmarCompartilhamento}
+                className="px-6 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 flex items-center space-x-2"
+              >
+                <Share2 className="h-4 w-4" />
+                <span>Compartilhar</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
