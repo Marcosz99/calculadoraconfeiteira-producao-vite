@@ -6,13 +6,15 @@ interface FinancialActionButtonsProps {
   onUploadDespesa: () => void
   onManualReceita: () => void
   onManualDespesa: () => void
+  onGastoPlanejado: () => void
 }
 
 export function FinancialActionButtons({
   onUploadReceita,
   onUploadDespesa,
   onManualReceita,
-  onManualDespesa
+  onManualDespesa,
+  onGastoPlanejado
 }: FinancialActionButtonsProps) {
   const [showReceitaMenu, setShowReceitaMenu] = useState(false)
   const [showDespesaMenu, setShowDespesaMenu] = useState(false)
@@ -128,6 +130,14 @@ export function FinancialActionButtons({
           />
         )}
       </div>
+
+      {/* Botão Gasto Planejado */}
+      <button 
+        onClick={onGastoPlanejado}
+        className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 flex items-center"
+      >
+        🎯 + Gasto Planejado
+      </button>
     </div>
   )
 }

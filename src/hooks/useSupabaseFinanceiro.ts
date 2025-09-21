@@ -102,13 +102,13 @@ export function useSupabaseFinanceiro() {
 
       if (error) throw error;
 
-      setTransacoes(prev => [data, ...prev]);
+      setTransacoes(prev => [data as TransacaoFinanceira, ...prev]);
       toast({
         title: '✅ Transação salva',
         description: `${transacaoData.tipo === 'receita' ? 'Receita' : 'Despesa'} de R$ ${transacaoData.valor.toFixed(2)} adicionada`,
       });
 
-      return data;
+      return data as TransacaoFinanceira;
     } catch (err: any) {
       console.error('Erro ao adicionar transação:', err);
       toast({
@@ -198,13 +198,13 @@ export function useSupabaseFinanceiro() {
 
       if (error) throw error;
 
-      setGastosPlanejados(prev => [...prev, data]);
+      setGastosPlanejados(prev => [...prev, data as GastoPlanejado]);
       toast({
         title: '✅ Gasto planejado salvo',
         description: `Gasto "${gastoData.nome}" de R$ ${gastoData.valor_estimado.toFixed(2)} adicionado`,
       });
 
-      return data;
+      return data as GastoPlanejado;
     } catch (err: any) {
       console.error('Erro ao adicionar gasto planejado:', err);
       toast({

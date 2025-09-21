@@ -32,6 +32,8 @@ import AdvancedCharts from '@/components/AdvancedCharts'
 import { FinancialActionButtons } from '@/components/FinancialActionButtons'
 import { useSupabaseFinanceiro, TransacaoFinanceira, GastoPlanejado } from '@/hooks/useSupabaseFinanceiro'
 
+import { processFinancialDataForCharts } from '@/utils/chartDataProcessor'
+
 export default function FinanceiroPage() {
   const { toast } = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -84,11 +86,8 @@ export default function FinanceiroPage() {
     observacoes: ''
   })
 
-  // Calcular dados para gráficos
-  const dadosGraficos = {
-    receitas: transacoes.filter(t => t.tipo === 'receita'),
-    despesas: transacoes.filter(t => t.tipo === 'despesa')
-  }
+  // Processar dados para gráficos
+  const chartData = processFinancialDataForCharts(transacoes)
 
   // Função para salvar transação manual
   const salvarTransacaoManual = async () => {
@@ -356,10 +355,7 @@ export default function FinanceiroPage() {
         </TabsList>
 
         <TabsContent value="visao-geral">
-          <AdvancedCharts 
-            receitas={dadosGraficos.receitas}
-            despesas={dadosGraficos.despesas}
-          />
+          <AdvancedCharts {...chartData} />
         </TabsContent>
 
         <TabsContent value="receitas">
@@ -627,7 +623,7 @@ export default function FinanceiroPage() {
                       type="number"
                       step="0.01"
                       value={dadosExtraidos.valor || 0}
-                      onChange={(e) => setDadosExtraidos(prev => ({ ...prev, valor: parseFloat(e.target.value) }))}
+                      onChange={(e) => setDadosExtraidos((prev: any) => ({ ...prev, valor: parseFloat(e.target.value) }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                     />
                   </div>
@@ -637,7 +633,7 @@ export default function FinanceiroPage() {
                     <input
                       type="text"
                       value={dadosExtraidos.descricao || ''}
-                      onChange={(e) => setDadosExtraidos(prev => ({ ...prev, descricao: e.target.value }))}
+                      onChange={(e) => setDadosExtraidos((prev: any) => ({ ...prev, descricao: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                     />
                   </div>
@@ -647,7 +643,7 @@ export default function FinanceiroPage() {
                     <input
                       type="date"
                       value={dadosExtraidos.data || ''}
-                      onChange={(e) => setDadosExtraidos(prev => ({ ...prev, data: e.target.value }))}
+                      onChange={(e) => setDadosExtraidos((prev: any) => ({ ...prev, data: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                     />
                   </div>
@@ -656,7 +652,7 @@ export default function FinanceiroPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
                     <select
                       value={dadosExtraidos.categoria || ''}
-                      onChange={(e) => setDadosExtraidos(prev => ({ ...prev, categoria: e.target.value }))}
+                      onChange={(e) => setDadosExtraidos((prev: any) => ({ ...prev, categoria: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
                     >
                       {uploadType === 'receita' ? (
