@@ -25,6 +25,7 @@
     "@supabase/supabase-js": "^2.57.4",
     "@types/qrcode": "^1.5.5",
     "class-variance-authority": "^0.7.0",
+    "cloudinary": "^2.7.0",
     "clsx": "^2.1.1",
     "lovable-tagger": "^1.1.9",
     "lucide-react": "^0.292.0",
