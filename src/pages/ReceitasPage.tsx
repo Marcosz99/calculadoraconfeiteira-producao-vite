@@ -74,7 +74,7 @@ export default function ReceitasPage() {
       id: Date.now().toString(),
       receita_id: receitaParaCompartilhar.id,
       usuario_id: user.id,
-      autor_nome: compartilhamentoAnonimo ? 'Anônimo' : (user.name || 'Confeiteiro(a)'),
+      autor_nome: compartilhamentoAnonimo ? 'Anônimo' : (user.email?.split('@')[0] || 'Confeiteiro(a)'),
       autor_anonimo: compartilhamentoAnonimo,
       data_compartilhamento: new Date().toISOString(),
       publico: true,
@@ -206,7 +206,8 @@ export default function ReceitasPage() {
       tags: [formData.categoria.toLowerCase()],
       ativo: true,
       criado_em: editingReceita?.criado_em || new Date().toISOString(),
-      atualizado_em: new Date().toISOString()
+      atualizado_em: new Date().toISOString(),
+      origem: 'usuario' as const
     }
 
     let updatedReceitas

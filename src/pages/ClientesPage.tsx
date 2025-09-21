@@ -97,7 +97,7 @@ export default function ClientesPage() {
       id: Date.now().toString(),
       usuario_id: user.id,
       codigo_qr: `https://docecalc.app/cadastro/${user.id}/${Date.now()}`,
-      nome_confeitaria: user.name || 'Minha Confeitaria',
+      nome_confeitaria: user?.email?.split('@')[0] || 'Minha Confeitaria',
       ativo: true,
       criado_em: new Date().toISOString(),
       clientes_cadastrados: 0
