@@ -12,9 +12,11 @@ type UserProfile = {
   nome_negocio?: string
   whatsapp?: string
   instagram?: string
+  telefone?: string
   endereco?: string
   cidade?: string
   estado?: string
+  cep?: string
   bio?: string
   foto_perfil?: string
 }
