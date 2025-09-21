@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Plus, Search, Filter, Clock, Users, Star, Edit, Trash2, Eye, X, Camera, Share2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { Receita, Categoria, ReceitaIngrediente, IngredienteUsuario, ReceitaCompartilhada } from '../types'
-import { LOCAL_STORAGE_KEYS, saveToLocalStorage, getFromLocalStorage } from '../utils/localStorage'
+import { supabase } from '@/integrations/supabase/client'
 import { useSubscriptionLimits } from '../hooks/useSubscriptionLimits'
 import { UpgradeModal } from '../components/UpgradeModal'
 import { LimitBadge } from '../components/LimitBadge'
@@ -44,17 +44,43 @@ export default function ReceitasPage() {
 
   useEffect(() => {
     if (user) {
-      const savedReceitas = getFromLocalStorage<Receita[]>(LOCAL_STORAGE_KEYS.RECEITAS, [])
-      const savedCategorias = getFromLocalStorage<Categoria[]>(LOCAL_STORAGE_KEYS.CATEGORIAS, [])
-      const savedIngredientes = getFromLocalStorage<IngredienteUsuario[]>(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [])
-      const savedReceitasCompartilhadas = getFromLocalStorage<ReceitaCompartilhada[]>('receitas_compartilhadas', [])
-      
-      setReceitas(savedReceitas.filter(r => r.usuario_id === user.id))
-      setCategorias(savedCategorias.filter(c => c.usuario_id === user.id))
-      setIngredientes(savedIngredientes.filter(i => i.usuario_id === user.id))
-      setReceitasCompartilhadas(savedReceitasCompartilhadas)
+      loadDataFromSupabase()
     }
   }, [user])
+
+  const loadDataFromSupabase = async () => {
+    if (!user) return
+    
+    try {
+      // Carregar receitas
+      const { data: receitasData } = await supabase
+        .from('receitas')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+      
+      // Carregar categorias
+      const { data: categoriasData } = await supabase
+        .from('categorias')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('ordem', { ascending: true })
+      
+      // Carregar ingredientes
+      const { data: ingredientesData } = await supabase
+        .from('ingredientes_usuario')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('nome', { ascending: true })
+      
+      setReceitas(receitasData || [])
+      setCategorias(categoriasData || [])
+      setIngredientes(ingredientesData || [])
+      
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error)
+    }
+  }
 
   // FASE 6: Funções de compartilhamento de receitas
   const abrirModalCompartilhamento = (receita: Receita) => {
@@ -125,18 +151,23 @@ export default function ReceitasPage() {
     return categorias.find(c => c.id === id)
   }
 
-  const deleteReceita = (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir esta receita?')) {
-      const updatedReceitas = receitas.map(r => 
-        r.id === id ? { ...r, ativo: false } : r
-      )
-      setReceitas(updatedReceitas)
-      
-      const allReceitas = getFromLocalStorage<Receita[]>(LOCAL_STORAGE_KEYS.RECEITAS, [])
-      const updatedAllReceitas = allReceitas.map(r => 
-        r.id === id ? { ...r, ativo: false } : r
-      )
-      saveToLocalStorage(LOCAL_STORAGE_KEYS.RECEITAS, updatedAllReceitas)
+  const deleteReceita = async (id: string) => {
+    if (!window.confirm('Tem certeza que deseja excluir esta receita?')) return
+
+    try {
+      const { error } = await supabase
+        .from('receitas')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user?.id)
+
+      if (error) throw error
+
+      setReceitas(prev => prev.filter(r => r.id !== id))
+      alert('✅ Receita excluída com sucesso!')
+    } catch (error) {
+      console.error('Erro ao excluir receita:', error)
+      alert('❌ Erro ao excluir receita. Tente novamente.')
     }
   }
 
@@ -187,46 +218,55 @@ export default function ReceitasPage() {
     setShowOCRModal(false)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user || !formData.nome.trim()) return
 
-    const receitaData: Receita = {
-      id: editingReceita?.id || Date.now().toString(),
-      usuario_id: user.id,
-      categoria_id: formData.categoria_id || (formData.categoria === 'Bolos' ? 'cat_bolos' : 'cat_' + formData.categoria.toLowerCase()),
-      nome: formData.nome.trim(),
-      descricao: '',
-      modo_preparo: formData.modo_preparo.filter(step => step.trim()),
-      tempo_preparo_mins: formData.tempo_preparo_mins,
-      rendimento: formData.rendimento.trim(),
-      dificuldade: formData.tempo_preparo_mins <= 30 ? 'iniciante' : formData.tempo_preparo_mins <= 120 ? 'intermediario' : 'avancado',
-      foto_principal: formData.foto_principal,
-      ingredientes: ingredientesReceita,
-      tags: [formData.categoria.toLowerCase()],
-      ativo: true,
-      criado_em: editingReceita?.criado_em || new Date().toISOString(),
-      atualizado_em: new Date().toISOString(),
-      origem: 'usuario' as const
+    try {
+      const receitaData = {
+        user_id: user.id,
+        categoria_id: formData.categoria_id || null,
+        nome: formData.nome.trim(),
+        descricao: '',
+        modo_preparo: formData.modo_preparo.filter(step => step.trim()).join('\n'),
+        tempo_preparo: formData.tempo_preparo_mins,
+        rendimento: formData.rendimento.trim() || null,
+        ingredientes: ingredientesReceita,
+        observacoes: ''
+      }
+
+      if (editingReceita) {
+        // Atualizar receita existente
+        const { data, error } = await supabase
+          .from('receitas')
+          .update(receitaData)
+          .eq('id', editingReceita.id)
+          .eq('user_id', user.id)
+          .select()
+          .single()
+
+        if (error) throw error
+
+        setReceitas(prev => prev.map(r => r.id === editingReceita.id ? data : r))
+      } else {
+        // Criar nova receita
+        const { data, error } = await supabase
+          .from('receitas')
+          .insert(receitaData)
+          .select()
+          .single()
+
+        if (error) throw error
+
+        setReceitas(prev => [data, ...prev])
+      }
+
+      resetForm()
+      alert(editingReceita ? '✅ Receita atualizada!' : '✅ Receita criada!')
+    } catch (error) {
+      console.error('Erro ao salvar receita:', error)
+      alert('❌ Erro ao salvar receita. Tente novamente.')
     }
-
-    let updatedReceitas
-    if (editingReceita) {
-      updatedReceitas = receitas.map(r => 
-        r.id === editingReceita.id ? receitaData : r
-      )
-    } else {
-      updatedReceitas = [...receitas, receitaData]
-    }
-
-    setReceitas(updatedReceitas)
-
-    // Salvar todas as receitas
-    const allReceitas = getFromLocalStorage<Receita[]>(LOCAL_STORAGE_KEYS.RECEITAS, [])
-    const otherUsersReceitas = allReceitas.filter(r => r.usuario_id !== user.id)
-    saveToLocalStorage(LOCAL_STORAGE_KEYS.RECEITAS, [...otherUsersReceitas, ...updatedReceitas])
-
-    resetForm()
   }
 
   const editReceita = (receita: Receita) => {
