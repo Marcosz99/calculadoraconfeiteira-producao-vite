@@ -21,14 +21,18 @@ export function useDataMigration() {
     if (!user?.id) return;
 
     // Check if migration already completed
-    if (migrationService.isMigrationCompleted(user.id)) {
-      setMigrationStatus({
+    if (migrationStatus.isCompleted || migrationService.isMigrationCompleted(user.id)) {
+      setMigrationStatus(prev => ({
+        ...prev,
         isLoading: false,
         isCompleted: true,
         hasError: false
-      });
+      }));
       return;
     }
+
+    // Prevent multiple migrations
+    if (migrationStatus.isLoading) return;
 
     // Auto-migrate data on login
     const performMigration = async () => {
@@ -48,6 +52,7 @@ export function useDataMigration() {
             hasError: false
           });
 
+          // Show toast only once when migration completes
           toast({
             title: "Dados migrados com sucesso!",
             description: "Seus dados foram transferidos para a nuvem.",
@@ -58,12 +63,6 @@ export function useDataMigration() {
             isCompleted: false,
             hasError: true
           });
-
-          toast({
-            title: "Migração parcial",
-            description: "Alguns dados foram migrados. Verifique o console para detalhes.",
-            variant: "destructive",
-          });
         }
       } catch (error) {
         console.error('Erro na migração:', error);
@@ -72,20 +71,14 @@ export function useDataMigration() {
           isCompleted: false,
           hasError: true
         });
-
-        toast({
-          title: "Erro na migração",
-          description: "Houve um problema ao migrar seus dados. Tente novamente.",
-          variant: "destructive",
-        });
       }
     };
 
-    // Only perform migration if not already done
-    const timer = setTimeout(performMigration, 2000); // Delay to ensure user is fully loaded
+    // Only perform migration if not already done or in progress
+    const timer = setTimeout(performMigration, 2000);
 
     return () => clearTimeout(timer);
-  }, [user?.id, toast]);
+  }, [user?.id]); // Removed toast from dependencies to prevent infinite loop
 
   return migrationStatus;
 }

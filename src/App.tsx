@@ -37,8 +37,8 @@ import PerfilPage from './pages/PerfilPage'
 import { ResetPlanButton } from './components/ResetPlanButton'
 
 function AppContent() {
-  // Initialize data migration on app start
-  useDataMigration();
+  // Data migration is now disabled as system is fully cloud-based
+  // useDataMigration();
   
   return (
     <div className="w-full min-h-screen bg-background text-foreground">
