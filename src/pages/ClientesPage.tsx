@@ -4,7 +4,7 @@ import { ArrowLeft, Plus, Search, User, Phone, Mail, Calendar, Edit, Trash2, Mes
 import { useAuth } from '../contexts/AuthContext'
 import { Cliente, QRCodeCadastro, ImportacaoIA } from '../types'
 import QRCodeGenerator from '../components/QRCodeGenerator'
-import { LOCAL_STORAGE_KEYS, saveToLocalStorage, getFromLocalStorage } from '../utils/localStorage'
+import { supabase } from '@/integrations/supabase/client'
 
 export default function ClientesPage() {
   const { user } = useAuth()
@@ -39,10 +39,27 @@ export default function ClientesPage() {
 
   useEffect(() => {
     if (user) {
-      const savedClientes = getFromLocalStorage<Cliente[]>(LOCAL_STORAGE_KEYS.CLIENTES, [])
-      setClientes(savedClientes.filter(c => c.usuario_id === user.id && c.ativo))
+      loadClientesFromSupabase()
     }
   }, [user])
+
+  const loadClientesFromSupabase = async () => {
+    if (!user) return
+    
+    try {
+      const { data, error } = await supabase
+        .from('clientes')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('nome', { ascending: true })
+      
+      if (error) throw error
+      
+      setClientes(data || [])
+    } catch (error) {
+      console.error('Erro ao carregar clientes:', error)
+    }
+  }
 
   const filteredClientes = clientes.filter(cliente => {
     const searchLower = searchTerm.toLowerCase()
@@ -51,43 +68,54 @@ export default function ClientesPage() {
            cliente.email?.toLowerCase().includes(searchLower)
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user) return
 
-    const clienteData: Cliente = {
-      id: editingCliente?.id || Date.now().toString(),
-      usuario_id: user.id,
-      nome: formData.nome,
-      telefone: formData.telefone,
-      whatsapp: formData.whatsapp,
-      email: formData.email,
-      endereco_completo: formData.endereco_completo,
-      data_nascimento: formData.data_nascimento,
-      observacoes: formData.observacoes,
-      criado_em: editingCliente?.criado_em || new Date().toISOString(),
-      ativo: true,
-      historico_pedidos: editingCliente?.historico_pedidos || 0,
-      valor_total_gasto: editingCliente?.valor_total_gasto || 0
+    try {
+      const clienteData = {
+        user_id: user.id,
+        nome: formData.nome,
+        telefone: formData.telefone || null,
+        whatsapp: formData.whatsapp || null,
+        email: formData.email || null,
+        endereco_completo: formData.endereco_completo || null,
+        data_nascimento: formData.data_nascimento || null,
+        observacoes: formData.observacoes || null,
+      }
+
+      if (editingCliente) {
+        // Atualizar cliente existente
+        const { data, error } = await supabase
+          .from('clientes')
+          .update(clienteData)
+          .eq('id', editingCliente.id)
+          .eq('user_id', user.id)
+          .select()
+          .single()
+
+        if (error) throw error
+
+        setClientes(prev => prev.map(c => c.id === editingCliente.id ? data : c))
+      } else {
+        // Criar novo cliente
+        const { data, error } = await supabase
+          .from('clientes')
+          .insert(clienteData)
+          .select()
+          .single()
+
+        if (error) throw error
+
+        setClientes(prev => [data, ...prev])
+      }
+
+      resetForm()
+      alert(editingCliente ? '✅ Cliente atualizado!' : '✅ Cliente criado!')
+    } catch (error) {
+      console.error('Erro ao salvar cliente:', error)
+      alert('❌ Erro ao salvar cliente. Tente novamente.')
     }
-
-    let updatedClientes
-    if (editingCliente) {
-      updatedClientes = clientes.map(c => 
-        c.id === editingCliente.id ? clienteData : c
-      )
-    } else {
-      updatedClientes = [...clientes, clienteData]
-    }
-
-    setClientes(updatedClientes)
-
-    // Salvar todos os clientes
-    const allClientes = getFromLocalStorage<Cliente[]>(LOCAL_STORAGE_KEYS.CLIENTES, [])
-    const otherUsersClientes = allClientes.filter(c => c.usuario_id !== user.id)
-    saveToLocalStorage(LOCAL_STORAGE_KEYS.CLIENTES, [...otherUsersClientes, ...updatedClientes])
-
-    resetForm()
   }
 
   // FASE 7: Funções do Sistema Inteligente de Clientes
@@ -358,18 +386,23 @@ export default function ClientesPage() {
     setShowModal(true)
   }
 
-  const deleteCliente = (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir este cliente?')) {
-      const updatedClientes = clientes.map(c => 
-        c.id === id ? { ...c, ativo: false } : c
-      )
-      setClientes(updatedClientes.filter(c => c.ativo))
-      
-      const allClientes = getFromLocalStorage<Cliente[]>(LOCAL_STORAGE_KEYS.CLIENTES, [])
-      const updatedAllClientes = allClientes.map(c => 
-        c.id === id ? { ...c, ativo: false } : c
-      )
-      saveToLocalStorage(LOCAL_STORAGE_KEYS.CLIENTES, updatedAllClientes)
+  const deleteCliente = async (id: string) => {
+    if (!window.confirm('Tem certeza que deseja excluir este cliente?')) return
+
+    try {
+      const { error } = await supabase
+        .from('clientes')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user?.id)
+
+      if (error) throw error
+
+      setClientes(prev => prev.filter(c => c.id !== id))
+      alert('✅ Cliente excluído com sucesso!')
+    } catch (error) {
+      console.error('Erro ao excluir cliente:', error)
+      alert('❌ Erro ao excluir cliente. Tente novamente.')
     }
   }
 

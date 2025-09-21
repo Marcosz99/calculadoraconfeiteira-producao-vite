@@ -4,7 +4,7 @@ import { ArrowLeft, Plus, Search, FileText, Calendar, DollarSign, User, Edit, Tr
 import QRCode from 'qrcode'
 import { useAuth } from '../contexts/AuthContext'
 import { Orcamento, OrcamentoItem, Cliente, Receita } from '../types'
-import { LOCAL_STORAGE_KEYS, saveToLocalStorage, getFromLocalStorage } from '../utils/localStorage'
+import { supabase } from '@/integrations/supabase/client'
 
 export default function OrcamentosPage() {
   const { user } = useAuth()
@@ -30,15 +30,46 @@ export default function OrcamentosPage() {
 
   useEffect(() => {
     if (user) {
-      const savedOrcamentos = getFromLocalStorage<Orcamento[]>(LOCAL_STORAGE_KEYS.ORCAMENTOS, [])
-      const savedClientes = getFromLocalStorage<Cliente[]>(LOCAL_STORAGE_KEYS.CLIENTES, [])
-      const savedReceitas = getFromLocalStorage<Receita[]>(LOCAL_STORAGE_KEYS.RECEITAS, [])
-      
-      setOrcamentos(savedOrcamentos.filter(o => o.usuario_id === user.id))
-      setClientes(savedClientes.filter(c => c.usuario_id === user.id && c.ativo))
-      setReceitas(savedReceitas.filter(r => r.usuario_id === user.id && r.ativo))
+      loadDataFromSupabase()
     }
   }, [user])
+
+  const loadDataFromSupabase = async () => {
+    if (!user) return
+    
+    try {
+      // Carregar orçamentos
+      const { data: orcamentosData, error: orcamentosError } = await supabase
+        .from('orcamentos')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+      
+      // Carregar clientes
+      const { data: clientesData, error: clientesError } = await supabase
+        .from('clientes')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('nome', { ascending: true })
+      
+      // Carregar receitas
+      const { data: receitasData, error: receitasError } = await supabase
+        .from('receitas')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('nome', { ascending: true })
+      
+      if (orcamentosError) throw orcamentosError
+      if (clientesError) throw clientesError
+      if (receitasError) throw receitasError
+      
+      setOrcamentos(orcamentosData || [])
+      setClientes(clientesData || [])
+      setReceitas(receitasData || [])
+    } catch (error) {
+      console.error('Erro ao carregar dados:', error)
+    }
+  }
 
   const filteredOrcamentos = orcamentos.filter(orcamento => {
     const cliente = clientes.find(c => c.id === orcamento.cliente_id)
@@ -77,47 +108,59 @@ export default function OrcamentosPage() {
     return itens.reduce((total, item) => total + item.valor_total, 0)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!user || itensOrcamento.length === 0) return
 
-    const valorTotal = calcularTotalOrcamento(itensOrcamento)
-    const numeroOrcamento = editingOrcamento?.numero_orcamento || 
-      `ORC-${Date.now().toString().slice(-6)}`
+    try {
+      const valorTotal = calcularTotalOrcamento(itensOrcamento)
+      const numeroOrcamento = editingOrcamento?.numero || 
+        `ORC-${Date.now().toString().slice(-6)}`
 
-    const orcamentoData: Orcamento = {
-      id: editingOrcamento?.id || Date.now().toString(),
-      usuario_id: user.id,
-      cliente_id: formData.cliente_id || '',
-      cliente_nome_avulso: formData.cliente_nome_avulso,
-      numero_orcamento: numeroOrcamento,
-      data_criacao: editingOrcamento?.data_criacao || new Date().toISOString(),
-      data_validade: formData.data_validade,
-      status: 'rascunho',
-      valor_total: valorTotal,
-      descricao: formData.descricao,
-      observacoes: formData.observacoes,
-      incluir_qr_code: formData.incluir_qr_code,
-      itens: itensOrcamento
+      const orcamentoData = {
+        user_id: user.id,
+        cliente_id: formData.cliente_id || null,
+        numero: numeroOrcamento,
+        data_evento: formData.data_validade || null,
+        status: 'rascunho',
+        valor_total: valorTotal,
+        valor_final: valorTotal,
+        observacoes: formData.observacoes || null,
+        itens: itensOrcamento
+      }
+
+      if (editingOrcamento) {
+        // Atualizar orçamento existente
+        const { data, error } = await supabase
+          .from('orcamentos')
+          .update(orcamentoData)
+          .eq('id', editingOrcamento.id)
+          .eq('user_id', user.id)
+          .select()
+          .single()
+
+        if (error) throw error
+
+        setOrcamentos(prev => prev.map(o => o.id === editingOrcamento.id ? data : o))
+      } else {
+        // Criar novo orçamento
+        const { data, error } = await supabase
+          .from('orcamentos')
+          .insert(orcamentoData)
+          .select()
+          .single()
+
+        if (error) throw error
+
+        setOrcamentos(prev => [data, ...prev])
+      }
+
+      resetForm()
+      alert(editingOrcamento ? '✅ Orçamento atualizado!' : '✅ Orçamento criado!')
+    } catch (error) {
+      console.error('Erro ao salvar orçamento:', error)
+      alert('❌ Erro ao salvar orçamento. Tente novamente.')
     }
-
-    let updatedOrcamentos
-    if (editingOrcamento) {
-      updatedOrcamentos = orcamentos.map(o => 
-        o.id === editingOrcamento.id ? orcamentoData : o
-      )
-    } else {
-      updatedOrcamentos = [...orcamentos, orcamentoData]
-    }
-
-    setOrcamentos(updatedOrcamentos)
-
-    // Salvar todos os orçamentos
-    const allOrcamentos = getFromLocalStorage<Orcamento[]>(LOCAL_STORAGE_KEYS.ORCAMENTOS, [])
-    const otherUsersOrcamentos = allOrcamentos.filter(o => o.usuario_id !== user.id)
-    saveToLocalStorage(LOCAL_STORAGE_KEYS.ORCAMENTOS, [...otherUsersOrcamentos, ...updatedOrcamentos])
-
-    resetForm()
   }
 
   const resetForm = () => {
@@ -148,28 +191,43 @@ export default function OrcamentosPage() {
     setShowModal(true)
   }
 
-  const deleteOrcamento = (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir este orçamento?')) {
-      const updatedOrcamentos = orcamentos.filter(o => o.id !== id)
-      setOrcamentos(updatedOrcamentos)
-      
-      const allOrcamentos = getFromLocalStorage<Orcamento[]>(LOCAL_STORAGE_KEYS.ORCAMENTOS, [])
-      const updatedAllOrcamentos = allOrcamentos.filter(o => o.id !== id)
-      saveToLocalStorage(LOCAL_STORAGE_KEYS.ORCAMENTOS, updatedAllOrcamentos)
+  const deleteOrcamento = async (id: string) => {
+    if (!window.confirm('Tem certeza que deseja excluir este orçamento?')) return
+
+    try {
+      const { error } = await supabase
+        .from('orcamentos')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user?.id)
+
+      if (error) throw error
+
+      setOrcamentos(prev => prev.filter(o => o.id !== id))
+      alert('✅ Orçamento excluído com sucesso!')
+    } catch (error) {
+      console.error('Erro ao excluir orçamento:', error)
+      alert('❌ Erro ao excluir orçamento. Tente novamente.')
     }
   }
 
-  const changeStatus = (id: string, newStatus: Orcamento['status']) => {
-    const updatedOrcamentos = orcamentos.map(o => 
-      o.id === id ? { ...o, status: newStatus } : o
-    )
-    setOrcamentos(updatedOrcamentos)
-    
-    const allOrcamentos = getFromLocalStorage<Orcamento[]>(LOCAL_STORAGE_KEYS.ORCAMENTOS, [])
-    const updatedAllOrcamentos = allOrcamentos.map(o => 
-      o.id === id ? { ...o, status: newStatus } : o
-    )
-    saveToLocalStorage(LOCAL_STORAGE_KEYS.ORCAMENTOS, updatedAllOrcamentos)
+  const changeStatus = async (id: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('orcamentos')
+        .update({ status: newStatus })
+        .eq('id', id)
+        .eq('user_id', user?.id)
+
+      if (error) throw error
+
+      setOrcamentos(prev => prev.map(o => 
+        o.id === id ? { ...o, status: newStatus } : o
+      ))
+    } catch (error) {
+      console.error('Erro ao alterar status:', error)
+      alert('❌ Erro ao alterar status. Tente novamente.')
+    }
   }
 
   const adicionarItem = () => {
