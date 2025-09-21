@@ -741,11 +741,9 @@ export default function ClientesPage() {
                 </p>
                 
                 <div className="bg-gray-50 p-4 rounded-lg mb-6">
-                  <QRCodeGenerator
-                    value={qrCodeCadastro.codigo_qr}
-                    size={200}
-                    className="mx-auto"
-                  />
+                  <div className="w-48 h-48 bg-gray-200 mx-auto rounded-lg flex items-center justify-center">
+                    <QrCode className="h-16 w-16 text-gray-400" />
+                  </div>
                   <p className="text-sm text-gray-500 mt-2">
                     {qrCodeCadastro.nome_confeitaria}
                   </p>
@@ -832,7 +830,7 @@ João Silva: Um bolo de chocolate para 20 pessoas..."
                       <div key={index} className="bg-gray-50 p-3 rounded-lg flex items-center justify-between">
                         <div>
                           <p className="font-medium text-gray-900">{cliente.nome}</p>
-                          <p className="text-sm text-gray-600">{formatarTelefone(cliente.telefone)}</p>
+                          <p className="text-sm text-gray-600">{cliente.telefone ? formatarTelefone(cliente.telefone) : 'Não informado'}</p>
                         </div>
                         <CheckCircle className="h-5 w-5 text-green-500" />
                       </div>
@@ -943,11 +941,11 @@ João Silva: Um bolo de chocolate para 20 pessoas..."
                           {previewImport.map((cliente, index) => (
                             <tr key={index} className="border-b">
                               <td className="p-3">{cliente.nome}</td>
-                              <td className="p-3">{formatarTelefone(cliente.telefone)}</td>
+                              <td className="p-3">{cliente.telefone ? formatarTelefone(cliente.telefone) : 'Não informado'}</td>
                               <td className="p-3">{cliente.email || '-'}</td>
                               <td className="p-3">
                                 <div className="flex items-center space-x-1">
-                                  {validarTelefone(cliente.telefone) ? (
+                                  {cliente.telefone && validarTelefone(cliente.telefone) ? (
                                     <CheckCircle className="h-4 w-4 text-green-500" />
                                   ) : (
                                     <span className="text-red-500 text-xs">Telefone inválido</span>

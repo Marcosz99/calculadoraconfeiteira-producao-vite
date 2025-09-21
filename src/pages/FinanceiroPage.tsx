@@ -125,8 +125,8 @@ export default function FinanceiroPage() {
     if (!dadosExtraidos) return
 
     const novaTransacao: TransacaoFinanceira = {
-      id: Date.now().toString(),
       ...dadosExtraidos as TransacaoFinanceira,
+      id: Date.now().toString(),
       criado_em: new Date().toISOString()
     }
 
