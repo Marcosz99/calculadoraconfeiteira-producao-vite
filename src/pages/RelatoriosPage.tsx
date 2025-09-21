@@ -1,16 +1,23 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowLeft, TrendingUp, DollarSign, Package, Users, Calendar, Download, BarChart3 } from 'lucide-react'
+import { ArrowLeft, TrendingUp, DollarSign, Package, Users, Calendar, Download, BarChart3, Upload, FileText, Plus } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { Orcamento, Cliente, Receita } from '../types'
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage } from '../utils/localStorage'
+import DocumentManager, { StoredDocument } from '../components/DocumentManager'
+import AdvancedCharts from '../components/AdvancedCharts'
+import { analyzeBusinessExpenses } from '../services/geminiService'
 
 export default function RelatoriosPage() {
   const { user } = useAuth()
   const [orcamentos, setOrcamentos] = useState<Orcamento[]>([])
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [receitas, setReceitas] = useState<Receita[]>([])
+  const [documentos, setDocumentos] = useState<StoredDocument[]>([])
   const [periodoFiltro, setPeriodoFiltro] = useState('30') // 30 dias
+  const [activeTab, setActiveTab] = useState('overview')
+  const [showDocumentManager, setShowDocumentManager] = useState(false)
+  const [analiseDespesas, setAnaliseDespesas] = useState<any>(null)
 
   useEffect(() => {
     if (user) {
@@ -23,6 +30,15 @@ export default function RelatoriosPage() {
       setReceitas(savedReceitas.filter(r => r.usuario_id === user.id && r.ativo))
     }
   }, [user])
+
+  // Analisar despesas quando documentos mudam
+  useEffect(() => {
+    if (documentos.length > 0) {
+      analyzeBusinessExpenses(documentos)
+        .then(analise => setAnaliseDespesas(analise))
+        .catch(console.error)
+    }
+  }, [documentos])
 
   // Filtrar orçamentos por período
   const getDataInicio = () => {
@@ -41,6 +57,7 @@ export default function RelatoriosPage() {
   // Métricas principais
   const metricas = {
     totalVendas: orcamentosAprovados.reduce((total, o) => total + o.valor_total, 0),
+    totalGastos: documentos.reduce((total, d) => total + d.valor_total, 0),
     totalOrcamentos: orcamentosFiltrados.length,
     orcamentosAprovados: orcamentosAprovados.length,
     taxaAprovacao: orcamentosFiltrados.length > 0 
@@ -49,7 +66,8 @@ export default function RelatoriosPage() {
     ticketMedio: orcamentosAprovados.length > 0 
       ? orcamentosAprovados.reduce((total, o) => total + o.valor_total, 0) / orcamentosAprovados.length 
       : 0,
-    clientesAtivos: new Set(orcamentosAprovados.map(o => o.cliente_id)).size
+    clientesAtivos: new Set(orcamentosAprovados.map(o => o.cliente_id)).size,
+    lucroLiquido: orcamentosAprovados.reduce((total, o) => total + o.valor_total, 0) - documentos.reduce((total, d) => total + d.valor_total, 0)
   }
 
   // Produtos mais vendidos
@@ -102,30 +120,62 @@ export default function RelatoriosPage() {
       .slice(0, 5)
   }
 
-  // Vendas por dia (últimos 30 dias)
-  const vendasPorDia = () => {
-    const hoje = new Date()
-    const dias = []
+  // Preparar dados para gráficos
+  const prepareChartData = () => {
+    const vendasMensais = []
+    const today = new Date()
     
-    for (let i = 29; i >= 0; i--) {
-      const data = new Date(hoje.getTime() - i * 24 * 60 * 60 * 1000)
-      const dataStr = data.toISOString().split('T')[0]
+    for (let i = 5; i >= 0; i--) {
+      const month = new Date(today.getFullYear(), today.getMonth() - i, 1)
+      const monthName = month.toLocaleDateString('pt-BR', { month: 'short' })
       
-      const vendasDia = orcamentosAprovados
-        .filter(o => o.data_criacao.split('T')[0] === dataStr)
+      const vendasMes = orcamentosAprovados
+        .filter(o => {
+          const dataOrcamento = new Date(o.data_criacao)
+          return dataOrcamento.getMonth() === month.getMonth() && 
+                 dataOrcamento.getFullYear() === month.getFullYear()
+        })
         .reduce((total, o) => total + o.valor_total, 0)
       
-      dias.push({
-        data: data.getDate() + '/' + (data.getMonth() + 1),
-        valor: vendasDia
+      const gastosMes = documentos
+        .filter(d => {
+          const dataDoc = new Date(d.data)
+          return dataDoc.getMonth() === month.getMonth() && 
+                 dataDoc.getFullYear() === month.getFullYear()
+        })
+        .reduce((total, d) => total + d.valor_total, 0)
+      
+      vendasMensais.push({
+        name: monthName,
+        vendas: vendasMes,
+        gastos: gastosMes,
+        lucro: vendasMes - gastosMes
       })
     }
-    
-    return dias
-  }
 
-  const dadosVendasDiarias = vendasPorDia()
-  const maxVenda = Math.max(...dadosVendasDiarias.map(d => d.valor))
+    const gastosCategoria = analiseDespesas?.gastos_por_categoria ? 
+      Object.entries(analiseDespesas.gastos_por_categoria).map(([categoria, valor]) => ({
+        name: categoria,
+        value: valor as number
+      })) : []
+
+    const receitasPopulares = produtosMaisVendidos().map(p => ({
+      name: p.nome,
+      value: p.valor
+    }))
+
+    const crescimentoMensal = vendasMensais.map(v => ({
+      name: v.name,
+      value: v.vendas
+    }))
+
+    return {
+      vendasMensais,
+      gastosCategoria,
+      receitasPopulares,
+      crescimentoMensal
+    }
+  }
 
   const exportarRelatorio = () => {
     const dados = {
@@ -134,7 +184,8 @@ export default function RelatoriosPage() {
       metricas,
       produtosMaisVendidos: produtosMaisVendidos(),
       clientesMaisValiosos: clientesMaisValiosos(),
-      vendasDiarias: dadosVendasDiarias
+      documentos: documentos.length,
+      analiseDespesas
     }
     
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dados, null, 2))
@@ -145,6 +196,8 @@ export default function RelatoriosPage() {
     downloadAnchor.click()
     downloadAnchor.remove()
   }
+
+  const chartData = prepareChartData()
 
   return (
     <div className="min-h-screen bg-background">
@@ -180,6 +233,14 @@ export default function RelatoriosPage() {
             </select>
             
             <button
+              onClick={() => setShowDocumentManager(true)}
+              className="flex items-center space-x-2 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors"
+            >
+              <Upload className="h-5 w-5" />
+              <span>Upload Nota Fiscal</span>
+            </button>
+            
+            <button
               onClick={exportarRelatorio}
               className="flex items-center space-x-2 bg-purple-500 text-white px-6 py-3 rounded-lg hover:bg-purple-600 transition-colors"
             >
@@ -189,208 +250,273 @@ export default function RelatoriosPage() {
           </div>
         </div>
 
-        {/* Métricas Principais */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total de Vendas</p>
-                <p className="text-2xl font-bold text-green-600">
-                  R$ {metricas.totalVendas.toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {orcamentosAprovados.length} orçamentos aprovados
-                </p>
-              </div>
-              <DollarSign className="h-8 w-8 text-green-500" />
-            </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Taxa de Aprovação</p>
-                <p className="text-2xl font-bold text-blue-600">
-                  {metricas.taxaAprovacao.toFixed(1)}%
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {metricas.orcamentosAprovados} de {metricas.totalOrcamentos} orçamentos
-                </p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-blue-500" />
-            </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Ticket Médio</p>
-                <p className="text-2xl font-bold text-purple-600">
-                  R$ {metricas.ticketMedio.toFixed(2)}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Valor médio por pedido
-                </p>
-              </div>
-              <BarChart3 className="h-8 w-8 text-purple-500" />
-            </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Clientes Ativos</p>
-                <p className="text-2xl font-bold text-orange-600">
-                  {metricas.clientesAtivos}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Clientes com pedidos
-                </p>
-              </div>
-              <Users className="h-8 w-8 text-orange-500" />
-            </div>
+        {/* Tabs de Navegação */}
+        <div className="mb-6">
+          <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'overview'
+                  ? 'bg-white text-purple-600 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Visão Geral
+            </button>
+            <button
+              onClick={() => setActiveTab('charts')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'charts'
+                  ? 'bg-white text-purple-600 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Gráficos Avançados
+            </button>
+            <button
+              onClick={() => setActiveTab('documents')}
+              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                activeTab === 'documents'
+                  ? 'bg-white text-purple-600 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Documentos Fiscais
+            </button>
           </div>
         </div>
 
-        {/* Gráfico de Vendas */}
-        <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">
-            Vendas Diárias - Últimos 30 dias
-          </h3>
-          
-          <div className="space-y-2">
-            {dadosVendasDiarias.map((dia, index) => (
-              <div key={index} className="flex items-center space-x-3">
-                <div className="w-16 text-sm text-gray-600 text-right">
-                  {dia.data}
-                </div>
-                <div className="flex-1 flex items-center">
-                  <div 
-                    className="bg-purple-500 h-6 rounded"
-                    style={{
-                      width: maxVenda > 0 ? `${(dia.valor / maxVenda) * 100}%` : '0%',
-                      minWidth: dia.valor > 0 ? '20px' : '0px'
-                    }}
-                  ></div>
-                  <span className="ml-3 text-sm font-medium text-gray-900">
-                    R$ {dia.valor.toFixed(2)}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
-          {/* Produtos Mais Vendidos */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">
-              Produtos Mais Vendidos
-            </h3>
-            
-            {produtosMaisVendidos().length === 0 ? (
-              <div className="text-center py-8">
-                <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">Nenhuma venda no período</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {produtosMaisVendidos().map((produto, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-bold text-purple-600">
-                          {index + 1}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{produto.nome}</p>
-                        <p className="text-sm text-gray-500">
-                          {produto.quantidade} unidades vendidas
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-green-600">
-                        R$ {produto.valor.toFixed(2)}
-                      </p>
-                    </div>
+        {/* Tab Content */}
+        {activeTab === 'overview' && (
+          <div>
+            {/* Métricas Principais */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Total de Vendas</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      R$ {metricas.totalVendas.toFixed(2)}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {orcamentosAprovados.length} orçamentos aprovados
+                    </p>
                   </div>
-                ))}
+                  <DollarSign className="h-8 w-8 text-green-500" />
+                </div>
+              </div>
+              
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Total de Gastos</p>
+                    <p className="text-2xl font-bold text-red-600">
+                      R$ {metricas.totalGastos.toFixed(2)}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {documentos.length} documentos analisados
+                    </p>
+                  </div>
+                  <FileText className="h-8 w-8 text-red-500" />
+                </div>
+              </div>
+              
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Lucro Líquido</p>
+                    <p className={`text-2xl font-bold ${metricas.lucroLiquido >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      R$ {metricas.lucroLiquido.toFixed(2)}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {metricas.lucroLiquido >= 0 ? 'Lucro' : 'Prejuízo'} no período
+                    </p>
+                  </div>
+                  <TrendingUp className={`h-8 w-8 ${metricas.lucroLiquido >= 0 ? 'text-green-500' : 'text-red-500'}`} />
+                </div>
+              </div>
+              
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Ticket Médio</p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      R$ {metricas.ticketMedio.toFixed(2)}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Por orçamento aprovado
+                    </p>
+                  </div>
+                  <Users className="h-8 w-8 text-blue-500" />
+                </div>
+              </div>
+            </div>
+
+            {/* Produtos e Clientes */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 mb-8">
+              {/* Produtos Mais Vendidos */}
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                  Produtos Mais Vendidos
+                </h3>
+                
+                {produtosMaisVendidos().length === 0 ? (
+                  <div className="text-center py-8">
+                    <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">Nenhuma venda no período</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {produtosMaisVendidos().map((produto, index) => (
+                      <div key={index} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-bold text-purple-600">
+                              {index + 1}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">{produto.nome}</p>
+                            <p className="text-sm text-gray-500">
+                              {produto.quantidade} unidades vendidas
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-green-600">
+                            R$ {produto.valor.toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Clientes Mais Valiosos */}
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">
+                  Clientes Mais Valiosos
+                </h3>
+                
+                {clientesMaisValiosos().length === 0 ? (
+                  <div className="text-center py-8">
+                    <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500">Nenhum cliente no período</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {clientesMaisValiosos().map((cliente, index) => (
+                      <div key={index} className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-bold text-blue-600">
+                              {index + 1}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">{cliente.nome}</p>
+                            <p className="text-sm text-gray-500">
+                              {cliente.pedidos} pedidos realizados
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-bold text-green-600">
+                            R$ {cliente.valor.toFixed(2)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'charts' && (
+          <div>
+            <AdvancedCharts
+              vendasMensais={chartData.vendasMensais}
+              gastosCategoria={chartData.gastosCategoria}
+              receitasPopulares={chartData.receitasPopulares}
+              crescimentoMensal={chartData.crescimentoMensal}
+            />
+          </div>
+        )}
+
+        {activeTab === 'documents' && (
+          <div>
+            {user && (
+              <DocumentManager
+                userId={user.id}
+                onDocumentsChange={setDocumentos}
+              />
+            )}
+            
+            {analiseDespesas && (
+              <div className="mt-8 bg-white p-6 rounded-lg shadow-md">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Análise de Despesas por IA
+                </h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-medium text-gray-700 mb-3">Tendências</h4>
+                    <ul className="space-y-2">
+                      {analiseDespesas.tendencias?.map((tendencia: string, index: number) => (
+                        <li key={index} className="text-sm text-gray-600 flex items-start">
+                          <span className="text-blue-500 mr-2">•</span>
+                          {tendencia}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-gray-700 mb-3">Recomendações</h4>
+                    <ul className="space-y-2">
+                      {analiseDespesas.recomendacoes?.map((recomendacao: string, index: number) => (
+                        <li key={index} className="text-sm text-gray-600 flex items-start">
+                          <span className="text-green-500 mr-2">•</span>
+                          {recomendacao}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
               </div>
             )}
           </div>
-
-          {/* Clientes Mais Valiosos */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">
-              Clientes Mais Valiosos
-            </h3>
-            
-            {clientesMaisValiosos().length === 0 ? (
-              <div className="text-center py-8">
-                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500">Nenhum cliente no período</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {clientesMaisValiosos().map((cliente, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-bold text-blue-600">
-                          {index + 1}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{cliente.nome}</p>
-                        <p className="text-sm text-gray-500">
-                          {cliente.pedidos} pedidos realizados
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-green-600">
-                        R$ {cliente.valor.toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Resumo do Período */}
-        <div className="bg-white p-6 rounded-lg shadow-md mt-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">
-            Resumo do Período ({periodoFiltro} dias)
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-600 mb-2">
-                {orcamentosAprovados.length}
-              </div>
-              <div className="text-sm text-gray-600">Vendas Realizadas</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-2">
-                {new Set(orcamentosAprovados.map(o => o.cliente_id)).size}
-              </div>
-              <div className="text-sm text-gray-600">Clientes Únicos</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-2">
-                {orcamentosAprovados.reduce((total, o) => total + o.itens.length, 0)}
-              </div>
-              <div className="text-sm text-gray-600">Itens Vendidos</div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
+
+      {/* Modal de Upload de Documentos */}
+      {showDocumentManager && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Gerenciar Documentos Fiscais</h2>
+                <button
+                  onClick={() => setShowDocumentManager(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ×
+                </button>
+              </div>
+              
+              {user && (
+                <DocumentManager
+                  userId={user.id}
+                  onDocumentsChange={setDocumentos}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

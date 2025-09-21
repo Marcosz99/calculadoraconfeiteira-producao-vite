@@ -33,6 +33,8 @@ export default function ClientesPage() {
   const [arquivoCSV, setArquivoCSV] = useState<File | null>(null)
   const [previewImport, setPreviewImport] = useState<Cliente[]>([])
   const [processandoIA, setProcessandoIA] = useState(false)
+  const [mappingFields, setMappingFields] = useState<{[key: string]: string}>({})
+  const [validandoCEP, setValidandoCEP] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -108,66 +110,97 @@ export default function ClientesPage() {
     setShowQRModal(true)
   }
 
-  // 2. IA de Texto para extrair dados do WhatsApp
+  // 2. IA de Texto para extrair dados do WhatsApp (Gemini API)
   const processarDadosWhatsApp = async () => {
     if (!dadosWhatsApp.trim() || !user) return
     
     setProcessandoIA(true)
     
     try {
-      // Simular processamento de IA (em produção usaria API real)
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      // Extrair dados básicos usando regex simples (simulação)
-      const linhas = dadosWhatsApp.split('\n')
-      const clientesExtraidos: Cliente[] = []
-      
-      let nomeAtual = ''
-      let telefoneAtual = ''
-      
-      for (const linha of linhas) {
-        // Tentar extrair nome e telefone de conversas WhatsApp
-        const matchTelefone = linha.match(/\+?[\d\s\(\)\-]{10,}/g)
-        const matchNome = linha.match(/^([A-Za-zÀ-ÿ\s]+)[\s:]/g)
+      // Usar Gemini API para extrair dados estruturados
+      const prompt = `
+        Você é especialista em extrair dados de contatos de conversas do WhatsApp.
+        Analise esta conversa e extraia TODOS os contatos mencionados:
         
-        if (matchNome && matchNome[0]) {
-          nomeAtual = matchNome[0].replace(':', '').trim()
-        }
+        Conversa:
+        ${dadosWhatsApp}
         
-        if (matchTelefone && matchTelefone[0] && nomeAtual) {
-          telefoneAtual = matchTelefone[0].replace(/\D/g, '')
-          
-          if (telefoneAtual.length >= 10 && nomeAtual.length > 2) {
-            const novoCliente: Cliente = {
-              id: Date.now().toString() + Math.random().toString(),
-              usuario_id: user.id,
-              nome: nomeAtual,
-              telefone: telefoneAtual,
-              whatsapp: telefoneAtual,
-              email: '',
-              endereco_completo: '',
-              data_nascimento: '',
-              observacoes: 'Importado via IA do WhatsApp',
-              criado_em: new Date().toISOString(),
-              ativo: true,
-              historico_pedidos: 0,
-              valor_total_gasto: 0
+        Retorne JSON exatamente neste formato:
+        {
+          "clientes": [
+            {
+              "nome": "nome completo da pessoa",
+              "telefone": "apenas números, sem formatação",
+              "preferencias": "produtos ou sabores mencionados",
+              "observacoes": "informações extras relevantes"
             }
-            
-            clientesExtraidos.push(novoCliente)
-            nomeAtual = ''
-            telefoneAtual = ''
-          }
+          ]
         }
+        
+        REGRAS:
+        - Extraia apenas pessoas reais (não empresas ou marcas)
+        - Inclua apenas telefones válidos (10-11 dígitos)
+        - Se não houver telefone, coloque string vazia
+        - Seja preciso com os nomes (use o nome como mencionado)
+        - Em observações, inclua data de aniversário se mencionada
+      `
+      
+      // Simular chamada da API Gemini (implementar quando tiver API key)
+      const mockResponse = {
+        clientes: extractBasicClientData(dadosWhatsApp)
       }
+      
+      const clientesExtraidos = mockResponse.clientes.map(cliente => ({
+        id: Date.now().toString() + Math.random().toString(),
+        usuario_id: user.id,
+        nome: cliente.nome,
+        telefone: cliente.telefone,
+        whatsapp: cliente.telefone,
+        email: '',
+        endereco_completo: '',
+        data_nascimento: '',
+        observacoes: `Importado via IA do WhatsApp\n${cliente.observacoes || ''}${cliente.preferencias ? '\nPreferências: ' + cliente.preferencias : ''}`,
+        criado_em: new Date().toISOString(),
+        ativo: true,
+        historico_pedidos: 0,
+        valor_total_gasto: 0
+      }))
       
       setClientesIA(clientesExtraidos)
       
     } catch (error) {
-      alert('Erro ao processar dados. Tente novamente.')
+      alert('Erro ao processar dados. Verifique o texto e tente novamente.')
     } finally {
       setProcessandoIA(false)
     }
+  }
+  
+  // Função auxiliar para extrair dados básicos (fallback)
+  const extractBasicClientData = (texto: string) => {
+    const linhas = texto.split('\n')
+    const clientes = []
+    
+    for (const linha of linhas) {
+      // Buscar padrões mais sofisticados
+      const matchTelefone = linha.match(/\b[\d\s\(\)\-]{10,}\b/g)
+      const matchNome = linha.match(/([A-Z][a-zÀ-ÿ]+(?:\s+[A-Z][a-zÀ-ÿ]+)*)/g)
+      
+      if (matchNome && matchTelefone) {
+        const nome = matchNome[0]
+        const telefone = matchTelefone[0].replace(/\D/g, '')
+        
+        if (telefone.length >= 10 && nome.length > 2) {
+          clientes.push({
+            nome,
+            telefone,
+            preferencias: '',
+            observacoes: ''
+          })
+        }
+      }
+    }
+    
+    return clientes
   }
 
   // 3. Import de arquivo CSV/TXT
@@ -284,6 +317,29 @@ export default function ClientesPage() {
     setEditingCliente(null)
     setShowModal(false)
   }
+  
+  // Validação e enriquecimento de dados
+  const validarCEP = async (cep: string) => {
+    if (!cep || cep.length !== 8) return
+    
+    setValidandoCEP(true)
+    try {
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
+      const data = await response.json()
+      
+      if (!data.erro) {
+        setFormData(prev => ({
+          ...prev,
+          endereco_completo: `${data.logradouro}, ${data.bairro}, ${data.localidade}/${data.uf}`
+        }))
+      }
+    } catch (error) {
+      console.error('Erro ao buscar CEP:', error)
+    } finally {
+      setValidandoCEP(false)
+    }
+  }
+  
 
   const editCliente = (cliente: Cliente) => {
     setFormData({
