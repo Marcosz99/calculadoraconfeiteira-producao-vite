@@ -100,7 +100,7 @@ export const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-md w-full p-6">
+      <div className="bg-white rounded-lg w-11/12 max-w-md p-4 sm:p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
             <span className="text-sm font-medium text-gray-600">
@@ -126,11 +126,11 @@ export const OnboardingTutorial: React.FC<OnboardingTutorialProps> = ({
             <Icon className="h-8 w-8 text-pink-600" />
           </div>
           
-          <h2 className="text-xl font-semibold text-gray-900 mb-3">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3">
             {currentStepData.title}
           </h2>
           
-          <p className="text-gray-600 leading-relaxed">
+          <p className="text-sm sm:text-base text-gray-600 leading-relaxed px-2">
             {currentStepData.description}
           </p>
         </div>
