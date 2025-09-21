@@ -503,6 +503,47 @@ export type Database = {
           },
         ]
       }
+      user_credits: {
+        Row: {
+          id: string
+          user_id: string
+          plan_type: string
+          credits_ia: number
+          credits_used_this_month: number
+          reset_date: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          plan_type?: string
+          credits_ia?: number
+          credits_used_this_month?: number
+          reset_date: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          plan_type?: string
+          credits_ia?: number
+          credits_used_this_month?: number
+          reset_date?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_credits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
