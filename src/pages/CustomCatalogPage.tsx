@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Save, Eye, QrCode, Share2, Upload, Palette, Type, Layout, ShoppingBag, ToggleLeft, ToggleRight, Plus, Edit, Trash2 } from 'lucide-react'

@@ -68,11 +68,11 @@ export function useSupabaseCredits() {
             .select()
             .single()
 
-          if (updateError) throw updateError
-          setCredits(updatedCredits)
-        } else {
-          setCredits(existingCredits)
-        }
+      if (updateError) throw updateError
+      setCredits(updatedCredits as UserCredits)
+    } else {
+      setCredits(existingCredits as UserCredits)
+    }
       } else {
         // Criar registro de créditos inicial
         const nextMonth = new Date()
@@ -91,8 +91,8 @@ export function useSupabaseCredits() {
           .select()
           .single()
 
-        if (insertError) throw insertError
-        setCredits(newCredits)
+    if (insertError) throw insertError
+    setCredits(newCredits as UserCredits)
       }
     } catch (err: any) {
       console.error('Erro ao carregar créditos:', err)
@@ -128,9 +128,9 @@ export function useSupabaseCredits() {
         .select()
         .single()
 
-      if (error) throw error
+    if (error) throw error
 
-      setCredits(updatedCredits)
+    setCredits(updatedCredits as UserCredits)
       return true
     } catch (err: any) {
       console.error('Erro ao usar crédito:', err)
@@ -159,9 +159,9 @@ export function useSupabaseCredits() {
         .select()
         .single()
 
-      if (error) throw error
+    if (error) throw error
 
-      setCredits(updatedCredits)
+    setCredits(updatedCredits as UserCredits)
       
       // Também atualizar no perfil
       await supabase

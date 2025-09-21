@@ -109,6 +109,58 @@ export interface ReceitaIngrediente {
   ordem: number
 }
 
+// Database interfaces (matching actual Supabase schema)
+interface DBCliente {
+  id: string
+  user_id: string
+  nome: string
+  telefone?: string | null
+  whatsapp?: string | null
+  email?: string | null
+  endereco?: string | null
+  cidade?: string | null
+  estado?: string | null
+  data_nascimento?: string | null
+  observacoes?: string | null
+  ativo?: boolean | null
+  created_at: string
+  updated_at: string
+}
+
+// Database interfaces (matching actual Supabase schema)
+interface DBIngrediente {
+  id: string
+  user_id: string
+  nome: string
+  categoria: string
+  preco_medio: number
+  unidade_padrao: string
+  estoque: number | null
+  data_ultima_compra: string | null
+  fornecedor: string | null
+  created_at: string
+  updated_at: string
+}
+
+// Database interfaces (matching actual Supabase schema)
+interface DBReceita {
+  id: string
+  user_id: string
+  nome: string
+  categoria_id: string | null
+  ingredientes: any
+  modo_preparo: string | null
+  tempo_preparo: number | null
+  rendimento: string | null
+  custo_total: number | null
+  preco_sugerido: number | null
+  margem_lucro: number | null
+  descricao: string | null
+  observacoes: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface Cliente {
   id: string
   usuario_id: string

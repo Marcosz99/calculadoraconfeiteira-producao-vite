@@ -23,10 +23,24 @@ interface UseCreditsReturn {
   error: string | null
   
   // Funções
-  useCredit: () => boolean
+  useCredit: () => Promise<boolean>
   canUseIA: () => boolean
   upgradePlanType: (newPlanType: UserPlan['planType']) => void
   refreshPlan: () => void
+}
+
+// Helper function defined first
+const createDefaultPlan = (planType: UserPlan['planType'] = 'gratuito'): UserPlan => {
+  const nextMonth = new Date()
+  nextMonth.setMonth(nextMonth.getMonth() + 1, 1)
+  nextMonth.setHours(0, 0, 0, 0)
+  
+  return {
+    planType,
+    creditsIA: CREDITS_CONFIG[planType],
+    creditsUsedThisMonth: 0,
+    resetDate: nextMonth.toISOString(),
+  }
 }
 
 export function useCredits(): UseCreditsReturn {
@@ -43,19 +57,6 @@ export function useCredits(): UseCreditsReturn {
       loadUserPlan()
     }
   }, [user])
-
-  const createDefaultPlan = (planType: UserPlan['planType'] = 'gratuito'): UserPlan => {
-    const nextMonth = new Date()
-    nextMonth.setMonth(nextMonth.getMonth() + 1, 1)
-    nextMonth.setHours(0, 0, 0, 0)
-    
-    return {
-      planType,
-      creditsIA: CREDITS_CONFIG[planType],
-      creditsUsedThisMonth: 0,
-      resetDate: nextMonth.toISOString(),
-    }
-  }
 
   const loadUserPlan = async () => {
     if (!user) return

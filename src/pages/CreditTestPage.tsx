@@ -13,9 +13,9 @@ export default function CreditTestPage() {
     setTestResults(prev => [...prev, `${new Date().toLocaleTimeString()}: ${result}`])
   }
 
-  const handleUseCredit = () => {
+  const handleUseCredit = async () => {
     if (canUseIA()) {
-      const success = useCredit()
+      const success = await useCredit()
       if (success) {
         addTestResult(`✅ Crédito usado com sucesso. Restam: ${remainingCredits - 1}`)
       } else {

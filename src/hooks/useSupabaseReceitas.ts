@@ -62,7 +62,17 @@ export function useSupabaseReceitas() {
         .from('receitas')
         .insert({
           user_id: user.id,
-          ...receitaData
+          nome: receitaData.nome || '',
+          categoria_id: receitaData.categoria_id,
+          ingredientes: receitaData.ingredientes || [],
+          modo_preparo: receitaData.modo_preparo,
+          tempo_preparo: receitaData.tempo_preparo,
+          rendimento: receitaData.rendimento,
+          custo_total: receitaData.custo_total,
+          preco_sugerido: receitaData.preco_sugerido,
+          margem_lucro: receitaData.margem_lucro,
+          descricao: receitaData.descricao,
+          observacoes: receitaData.observacoes
         })
         .select()
         .single()

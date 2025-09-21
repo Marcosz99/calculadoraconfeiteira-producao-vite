@@ -58,7 +58,13 @@ export function useSupabaseIngredientes() {
         .from('ingredientes_usuario')
         .insert({
           user_id: user.id,
-          ...ingredienteData
+          nome: ingredienteData.nome || '',
+          categoria: ingredienteData.categoria || '',
+          preco_medio: ingredienteData.preco_medio || 0,
+          unidade_padrao: ingredienteData.unidade_padrao || 'un',
+          estoque: ingredienteData.estoque,
+          data_ultima_compra: ingredienteData.data_ultima_compra,
+          fornecedor: ingredienteData.fornecedor
         })
         .select()
         .single()
