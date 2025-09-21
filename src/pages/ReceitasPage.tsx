@@ -8,7 +8,7 @@ import { useSubscriptionLimits } from '../hooks/useSubscriptionLimits'
 import { UpgradeModal } from '../components/UpgradeModal'
 import { LimitBadge } from '../components/LimitBadge'
 import IntelligentIngredientSearch from '../components/ui/IntelligentIngredientSearch'
-import { IngredienteConfeitaria } from '../data/ingredientes-confeitaria'
+import { IngredienteConfeitaria, INGREDIENTES_CONFEITARIA } from '../data/ingredientes-confeitaria'
 
 export default function ReceitasPage() {
   const { user } = useAuth()
@@ -84,6 +84,7 @@ export default function ReceitasPage() {
     setFormData({
       nome: '',
       categoria: 'Bolos',
+      categoria_id: '',
       modo_preparo: [''],
       tempo_preparo_mins: 60,
       rendimento: '',
@@ -139,6 +140,7 @@ export default function ReceitasPage() {
     setFormData({
       nome: receita.nome,
       categoria: receita.categoria_id ? categorias.find(c => c.id === receita.categoria_id)?.nome || 'Bolos' : 'Bolos',
+      categoria_id: receita.categoria_id,
       modo_preparo: receita.modo_preparo.length > 0 ? receita.modo_preparo : [''],
       tempo_preparo_mins: receita.tempo_preparo_mins,
       rendimento: receita.rendimento,
@@ -367,7 +369,7 @@ export default function ReceitasPage() {
                       </div>
                       
                       <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {receita.categoria || 'Outros'}
+                        {getCategoriaById(receita.categoria_id)?.nome || 'Outros'}
                       </span>
                     </div>
                     

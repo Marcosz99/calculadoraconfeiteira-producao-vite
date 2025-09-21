@@ -69,6 +69,7 @@ export interface Receita {
   tags: string[]
   ativo: boolean
   criado_em: string
+  atualizado_em: string
   custo_calculado?: number
   preco_sugerido?: number
 }
