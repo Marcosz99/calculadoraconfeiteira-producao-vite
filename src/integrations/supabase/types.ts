@@ -292,6 +292,45 @@ export type Database = {
         }
         Relationships: []
       }
+      gastos_planejados: {
+        Row: {
+          categoria: string
+          created_at: string
+          data_vencimento: string | null
+          id: string
+          nome: string
+          observacoes: string | null
+          pago: boolean | null
+          updated_at: string
+          user_id: string
+          valor_estimado: number
+        }
+        Insert: {
+          categoria: string
+          created_at?: string
+          data_vencimento?: string | null
+          id?: string
+          nome: string
+          observacoes?: string | null
+          pago?: boolean | null
+          updated_at?: string
+          user_id: string
+          valor_estimado: number
+        }
+        Update: {
+          categoria?: string
+          created_at?: string
+          data_vencimento?: string | null
+          id?: string
+          nome?: string
+          observacoes?: string | null
+          pago?: boolean | null
+          updated_at?: string
+          user_id?: string
+          valor_estimado?: number
+        }
+        Relationships: []
+      }
       historico_ia: {
         Row: {
           created_at: string
@@ -657,6 +696,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      transacoes_financeiras: {
+        Row: {
+          categoria: string
+          comprovante_url: string | null
+          created_at: string
+          dados_ocr: Json | null
+          data_transacao: string
+          descricao: string | null
+          id: string
+          metodo_pagamento: string | null
+          tipo: string
+          updated_at: string
+          user_id: string
+          valor: number
+        }
+        Insert: {
+          categoria: string
+          comprovante_url?: string | null
+          created_at?: string
+          dados_ocr?: Json | null
+          data_transacao: string
+          descricao?: string | null
+          id?: string
+          metodo_pagamento?: string | null
+          tipo: string
+          updated_at?: string
+          user_id: string
+          valor: number
+        }
+        Update: {
+          categoria?: string
+          comprovante_url?: string | null
+          created_at?: string
+          dados_ocr?: Json | null
+          data_transacao?: string
+          descricao?: string | null
+          id?: string
+          metodo_pagamento?: string | null
+          tipo?: string
+          updated_at?: string
+          user_id?: string
+          valor?: number
+        }
+        Relationships: []
       }
     }
     Views: {
