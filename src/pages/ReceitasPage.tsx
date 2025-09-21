@@ -18,23 +18,17 @@ export default function ReceitasPage() {
   const [ingredientes, setIngredientes] = useState<IngredienteUsuario[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [categoriaFiltro, setCategoriaFiltro] = useState('todas')
-  const [dificuldadeFiltro, setDificuldadeFiltro] = useState('todas')
   const [showModal, setShowModal] = useState(false)
   const [editingReceita, setEditingReceita] = useState<Receita | null>(null)
   const [formData, setFormData] = useState({
     nome: '',
-    descricao: '',
-    categoria_id: '',
+    categoria: 'Bolos',
     modo_preparo: [''],
     tempo_preparo_mins: 60,
     rendimento: '',
-    dificuldade: 'intermediario' as 'iniciante' | 'intermediario' | 'avancado',
-    tags: [] as string[],
-    preco_sugerido: 0,
     foto_principal: ''
   })
   const [ingredientesReceita, setIngredientesReceita] = useState<ReceitaIngrediente[]>([])
-  const [tagInput, setTagInput] = useState('')
 
   useEffect(() => {
     if (user) {
@@ -49,12 +43,10 @@ export default function ReceitasPage() {
   }, [user])
 
   const filteredReceitas = receitas.filter(receita => {
-    const matchesSearch = receita.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         receita.descricao.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategoria = categoriaFiltro === 'todas' || receita.categoria_id === categoriaFiltro
-    const matchesDificuldade = dificuldadeFiltro === 'todas' || receita.dificuldade === dificuldadeFiltro
+    const matchesSearch = receita.nome.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesCategoria = categoriaFiltro === 'todas' || receita.categoria === categoriaFiltro
     
-    return matchesSearch && matchesCategoria && matchesDificuldade && receita.ativo
+    return matchesSearch && matchesCategoria && receita.ativo
   })
 
   const getDificuldadeColor = (dificuldade: string) => {
@@ -88,18 +80,13 @@ export default function ReceitasPage() {
   const resetForm = () => {
     setFormData({
       nome: '',
-      descricao: '',
-      categoria_id: '',
+      categoria: 'Bolos',
       modo_preparo: [''],
       tempo_preparo_mins: 60,
       rendimento: '',
-      dificuldade: 'intermediario',
-      tags: [],
-      preco_sugerido: 0,
       foto_principal: ''
     })
     setIngredientesReceita([])
-    setTagInput('')
     setEditingReceita(null)
     setShowModal(false)
   }
@@ -111,19 +98,19 @@ export default function ReceitasPage() {
     const receitaData: Receita = {
       id: editingReceita?.id || Date.now().toString(),
       usuario_id: user.id,
-      categoria_id: formData.categoria_id,
+      categoria: formData.categoria,
       nome: formData.nome.trim(),
-      descricao: formData.descricao.trim(),
+      descricao: '',
       modo_preparo: formData.modo_preparo.filter(step => step.trim()),
       tempo_preparo_mins: formData.tempo_preparo_mins,
       rendimento: formData.rendimento.trim(),
-      dificuldade: formData.dificuldade,
+      dificuldade: formData.tempo_preparo_mins <= 30 ? 'iniciante' : formData.tempo_preparo_mins <= 120 ? 'intermediario' : 'avancado',
       foto_principal: formData.foto_principal,
       ingredientes: ingredientesReceita,
-      tags: formData.tags,
+      tags: [formData.categoria.toLowerCase()],
       ativo: true,
       criado_em: editingReceita?.criado_em || new Date().toISOString(),
-      preco_sugerido: formData.preco_sugerido > 0 ? formData.preco_sugerido : undefined
+      atualizado_em: new Date().toISOString()
     }
 
     let updatedReceitas
@@ -148,14 +135,10 @@ export default function ReceitasPage() {
   const editReceita = (receita: Receita) => {
     setFormData({
       nome: receita.nome,
-      descricao: receita.descricao,
-      categoria_id: receita.categoria_id,
+      categoria: receita.categoria || 'Bolos',
       modo_preparo: receita.modo_preparo.length > 0 ? receita.modo_preparo : [''],
       tempo_preparo_mins: receita.tempo_preparo_mins,
       rendimento: receita.rendimento,
-      dificuldade: receita.dificuldade,
-      tags: receita.tags,
-      preco_sugerido: receita.preco_sugerido || 0,
       foto_principal: receita.foto_principal || ''
     })
     setIngredientesReceita(receita.ingredientes)
@@ -209,22 +192,6 @@ export default function ReceitasPage() {
     })
   }
 
-  const adicionarTag = () => {
-    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
-      setFormData({
-        ...formData,
-        tags: [...formData.tags, tagInput.trim()]
-      })
-      setTagInput('')
-    }
-  }
-
-  const removerTag = (tag: string) => {
-    setFormData({
-      ...formData,
-      tags: formData.tags.filter(t => t !== tag)
-    })
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -379,9 +346,6 @@ export default function ReceitasPage() {
                       </div>
                     </div>
                     
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                      {receita.descricao}
-                    </p>
                     
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-4 text-sm text-gray-500">
@@ -395,8 +359,8 @@ export default function ReceitasPage() {
                         </div>
                       </div>
                       
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDificuldadeColor(receita.dificuldade)}`}>
-                        {receita.dificuldade}
+                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {receita.categoria || 'Outros'}
                       </span>
                     </div>
                     
@@ -409,11 +373,6 @@ export default function ReceitasPage() {
                         <span className="text-sm text-gray-600">{categoria?.nome}</span>
                       </div>
                       
-                      {receita.preco_sugerido && (
-                        <span className="text-lg font-bold text-green-600">
-                          R$ {receita.preco_sugerido.toFixed(2)}
-                        </span>
-                      )}
                     </div>
                     
                     {receita.tags.length > 0 && (
@@ -474,76 +433,56 @@ export default function ReceitasPage() {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Categoria
+                      Categoria *
                     </label>
                     <select
-                      value={formData.categoria_id}
-                      onChange={(e) => setFormData({...formData, categoria_id: e.target.value})}
+                      value={formData.categoria}
+                      onChange={(e) => setFormData({...formData, categoria: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
+                      required
                     >
-                      <option value="">Selecione uma categoria</option>
-                      {categorias.map(categoria => (
-                        <option key={categoria.id} value={categoria.id}>
-                          {categoria.nome}
-                        </option>
-                      ))}
+                      <option value="Bolos">Bolos</option>
+                      <option value="Doces">Doces</option>
+                      <option value="Salgados">Salgados</option>
+                      <option value="Outros">Outros</option>
                     </select>
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Descrição
-                  </label>
-                  <textarea
-                    value={formData.descricao}
-                    onChange={(e) => setFormData({...formData, descricao: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    rows={3}
-                    placeholder="Descreva sua receita..."
-                  />
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Tempo de Preparo (min)
+                      Tempo de Preparo: {Math.floor(formData.tempo_preparo_mins / 60)}h {formData.tempo_preparo_mins % 60}min
                     </label>
                     <input
-                      type="number"
+                      type="range"
+                      min="15"
+                      max="240"
+                      step="15"
                       value={formData.tempo_preparo_mins}
-                      onChange={(e) => setFormData({...formData, tempo_preparo_mins: parseInt(e.target.value) || 0})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-                      min="1"
+                      onChange={(e) => setFormData({...formData, tempo_preparo_mins: parseInt(e.target.value)})}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                     />
+                    <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <span>15min</span>
+                      <span>2h</span>
+                      <span>4h</span>
+                    </div>
                   </div>
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Rendimento
+                      Rendimento *
                     </label>
                     <input
                       type="text"
                       value={formData.rendimento}
                       onChange={(e) => setFormData({...formData, rendimento: e.target.value})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-                      placeholder="Ex: 20 unidades, 1 torta"
+                      placeholder="Ex: 12 porções, 1 bolo grande"
+                      required
                     />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Dificuldade
-                    </label>
-                    <select
-                      value={formData.dificuldade}
-                      onChange={(e) => setFormData({...formData, dificuldade: e.target.value as any})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    >
-                      <option value="iniciante">Iniciante</option>
-                      <option value="intermediario">Intermediário</option>
-                      <option value="avancado">Avançado</option>
-                    </select>
                   </div>
                 </div>
 
@@ -675,60 +614,7 @@ export default function ReceitasPage() {
                   </div>
                 </div>
 
-                {/* Tags */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Tags
-                  </label>
-                  <div className="flex items-center space-x-2 mb-2">
-                    <input
-                      type="text"
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), adicionarTag())}
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-                      placeholder="Digite uma tag e pressione Enter"
-                    />
-                    <button
-                      type="button"
-                      onClick={adicionarTag}
-                      className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
-                    >
-                      Adicionar
-                    </button>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {formData.tags.map(tag => (
-                      <span 
-                        key={tag}
-                        className="inline-flex items-center px-3 py-1 bg-pink-100 text-pink-800 text-sm rounded-full"
-                      >
-                        #{tag}
-                        <button
-                          type="button"
-                          onClick={() => removerTag(tag)}
-                          className="ml-2 text-pink-600 hover:text-pink-800"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Preço Sugerido (R$)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.preco_sugerido}
-                    onChange={(e) => setFormData({...formData, preco_sugerido: parseFloat(e.target.value) || 0})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-                    placeholder="0.00"
-                  />
-                </div>
                 
                 <div className="flex justify-end space-x-4 mt-6">
                   <button
