@@ -1,3 +1,4 @@
+// Updated from blueprint:javascript_gemini integration
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Gemini AI with runtime check
@@ -417,3 +418,198 @@ export async function analyzeBusinessExpenses(documentos: DocumentFiscalData[]):
     };
   }
 }
+
+// Advanced Gemini services for DoceCalc comprehensive implementation
+
+// Generate recipe suggestions based on ingredients
+export async function generateRecipeSuggestions(ingredientes: string[]): Promise<{
+  receitas: Array<{
+    nome: string;
+    ingredientes_necessarios: string[];
+    dificuldade: 'iniciante' | 'intermediario' | 'avancado';
+    tempo_preparo: number;
+    descricao_breve: string;
+  }>;
+}> {
+  try {
+    const genAI = getGeminiClient();
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    const prompt = `
+    Você é um expert confeiteiro brasileiro. Com base nestes ingredientes disponíveis, sugira 5 receitas de doces/confeitaria que podem ser feitas:
+    
+    Ingredientes disponíveis: ${ingredientes.join(', ')}
+    
+    Retorne JSON exatamente neste formato:
+    {
+      "receitas": [
+        {
+          "nome": "Nome da receita",
+          "ingredientes_necessarios": ["ingrediente1", "ingrediente2"],
+          "dificuldade": "iniciante" | "intermediario" | "avancado",
+          "tempo_preparo": minutos (number),
+          "descricao_breve": "Breve descrição da receita"
+        }
+      ]
+    }
+    
+    Priorize receitas que usem mais ingredientes da lista disponível.
+    `;
+    
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const jsonText = response.text();
+    
+    try {
+      const cleanJsonText = cleanJSONResponse(jsonText);
+      return JSON.parse(cleanJsonText);
+    } catch {
+      return { receitas: [] };
+    }
+  } catch (error) {
+    console.error('Erro ao gerar sugestões de receitas:', error);
+    return { receitas: [] };
+  }
+}
+
+// Optimize pricing based on market analysis
+export async function optimizePricing(receita: any, mercado: string): Promise<{
+  preco_sugerido: number;
+  margem_recomendada: number;
+  analise_competitiva: string;
+  justificativa: string;
+}> {
+  try {
+    const genAI = getGeminiClient();
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    const prompt = `
+    Você é consultor de precificação para confeitarias no mercado ${mercado}.
+    Analise esta receita e sugira preço otimizado:
+    
+    Receita: ${JSON.stringify(receita, null, 2)}
+    Mercado: ${mercado}
+    
+    Considere:
+    - Custo dos ingredientes
+    - Complexidade da receita
+    - Tempo de preparo
+    - Padrão de preços no mercado ${mercado}
+    - Margem de lucro saudável
+    
+    Retorne JSON:
+    {
+      "preco_sugerido": number,
+      "margem_recomendada": number (porcentagem),
+      "analise_competitiva": "string",
+      "justificativa": "string"
+    }
+    `;
+    
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const jsonText = response.text();
+    
+    try {
+      const cleanJsonText = cleanJSONResponse(jsonText);
+      return JSON.parse(cleanJsonText);
+    } catch {
+      return {
+        preco_sugerido: 0,
+        margem_recomendada: 60,
+        analise_competitiva: 'Análise indisponível',
+        justificativa: 'Erro na análise'
+      };
+    }
+  } catch (error) {
+    console.error('Erro na otimização de preços:', error);
+    return {
+      preco_sugerido: 0,
+      margem_recomendada: 60,
+      analise_competitiva: 'Análise temporariamente indisponível',
+      justificativa: 'Tente novamente em alguns minutos'
+    };
+  }
+}
+
+// Parse client data from WhatsApp/CSV text
+export async function parseClientData(texto: string): Promise<{
+  clientes_extraidos: Array<{
+    nome: string;
+    telefone?: string;
+    whatsapp?: string;
+    email?: string;
+    observacoes?: string;
+  }>;
+  total_encontrados: number;
+}> {
+  try {
+    const genAI = getGeminiClient();
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    
+    const prompt = `
+    Você é especialista em extração de dados de clientes.
+    Analise este texto (pode ser de WhatsApp, CSV, ou lista) e extraia informações de clientes:
+    
+    Texto: ${texto}
+    
+    Identifique e extraia:
+    - Nomes de pessoas
+    - Números de telefone/WhatsApp
+    - Emails
+    - Qualquer observação relevante
+    
+    Retorne JSON:
+    {
+      "clientes_extraidos": [
+        {
+          "nome": "Nome completo",
+          "telefone": "(XX) XXXXX-XXXX" ou null,
+          "whatsapp": "(XX) XXXXX-XXXX" ou null,
+          "email": "email@example.com" ou null,
+          "observacoes": "informações extras" ou null
+        }
+      ],
+      "total_encontrados": number
+    }
+    
+    Se não conseguir extrair dados estruturados, retorne arrays vazios.
+    `;
+    
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const jsonText = response.text();
+    
+    try {
+      const cleanJsonText = cleanJSONResponse(jsonText);
+      return JSON.parse(cleanJsonText);
+    } catch {
+      return { clientes_extraidos: [], total_encontrados: 0 };
+    }
+  } catch (error) {
+    console.error('Erro ao extrair dados de clientes:', error);
+    return { clientes_extraidos: [], total_encontrados: 0 };
+  }
+}
+
+// Complete Gemini service object for easy import
+export const geminiServices = {
+  // Image Analysis
+  extractTextFromImage,
+  structureRecipeFromText,
+  processRecipeImage,
+  analyzeRecipePhoto: processRecipeImage, // Alias
+  
+  // Document Processing
+  processDocumentFiscal,
+  extractReceiptData: processDocumentFiscal, // Alias
+  
+  // Business Intelligence
+  analyzeBusinessExpenses,
+  generateRecipeSuggestions,
+  optimizePricing,
+  parseClientData,
+  
+  // Utilities
+  validateIngredients
+};
