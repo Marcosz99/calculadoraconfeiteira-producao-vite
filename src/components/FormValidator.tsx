@@ -89,13 +89,18 @@ export const validators = {
   },
   
   number: (value: string) => {
-    if (!value) return ''
-    return /^\d+(\.\d+)?$/.test(value) ? '' : 'Digite apenas números'
+    if (!value || value.trim() === '') return ''
+    const normalized = value.replace(',', '.')
+    return /^\d+([.,]\d+)?$/.test(value) && !isNaN(parseFloat(normalized)) ? '' : 'Digite apenas números (use vírgula ou ponto para decimais)'
   },
   
   positiveNumber: (value: string) => {
-    if (!value) return ''
-    const num = parseFloat(value)
+    if (!value || value.trim() === '') return ''
+    const normalized = value.replace(',', '.')
+    if (!/^\d+([.,]\d+)?$/.test(value) || isNaN(parseFloat(normalized))) {
+      return 'Digite apenas números (use vírgula ou ponto para decimais)'
+    }
+    const num = parseFloat(normalized)
     return num > 0 ? '' : 'Deve ser um número positivo'
   }
 }

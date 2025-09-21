@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Calculator, Scale, Tag, ShoppingCart, FileText, Download } from 'lucide-react'
+import { parseNumericInput, formatForInput } from '../utils/numberUtils'
 
 export default function FerramentasPage() {
   const [conversorTab, setConversorTab] = useState('volume')
@@ -12,8 +13,8 @@ export default function FerramentasPage() {
   })
   
   // Estados para conversores
-  const [volumeInput, setVolumeInput] = useState({ valor: 0, unidade: 'ml' })
-  const [pesoInput, setPesoInput] = useState({ valor: 0, unidade: 'g' })
+  const [volumeInput, setVolumeInput] = useState({ valor: null as number | null, unidade: 'ml' })
+  const [pesoInput, setPesoInput] = useState({ valor: null as number | null, unidade: 'g' })
   
   // Conversões de volume
   const conversoesVolume = {
@@ -34,12 +35,14 @@ export default function FerramentasPage() {
     'colher-chá-açúcar': 4
   }
   
-  const converterVolume = (valor: number, deUnidade: string, paraUnidade: string) => {
+  const converterVolume = (valor: number | null, deUnidade: string, paraUnidade: string) => {
+    if (valor === null || valor === 0) return 0
     const valorEmMl = valor * conversoesVolume[deUnidade as keyof typeof conversoesVolume]
     return valorEmMl / conversoesVolume[paraUnidade as keyof typeof conversoesVolume]
   }
   
-  const converterPeso = (valor: number, deUnidade: string, paraUnidade: string) => {
+  const converterPeso = (valor: number | null, deUnidade: string, paraUnidade: string) => {
+    if (valor === null || valor === 0) return 0
     const valorEmG = valor * conversoesPeso[deUnidade as keyof typeof conversoesPeso]
     return valorEmG / conversoesPeso[paraUnidade as keyof typeof conversoesPeso]
   }
@@ -263,9 +266,10 @@ export default function FerramentasPage() {
                     </label>
                     <input
                       type="number"
-                      value={volumeInput.valor}
-                      onChange={(e) => setVolumeInput({...volumeInput, valor: parseFloat(e.target.value) || 0})}
+                      value={formatForInput(volumeInput.valor)}
+                      onChange={(e) => setVolumeInput({...volumeInput, valor: parseNumericInput(e.target.value)})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Digite o valor"
                     />
                   </div>
                   <div>
@@ -311,9 +315,10 @@ export default function FerramentasPage() {
                     </label>
                     <input
                       type="number"
-                      value={pesoInput.valor}
-                      onChange={(e) => setPesoInput({...pesoInput, valor: parseFloat(e.target.value) || 0})}
+                      value={formatForInput(pesoInput.valor)}
+                      onChange={(e) => setPesoInput({...pesoInput, valor: parseNumericInput(e.target.value)})}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Digite o valor"
                     />
                   </div>
                   <div>
@@ -381,8 +386,12 @@ export default function FerramentasPage() {
                   type="number"
                   step="0.01"
                   value={etiquetaData.preco}
-                  onChange={(e) => setEtiquetaData({...etiquetaData, preco: parseFloat(e.target.value) || 0})}
+                  onChange={(e) => {
+                    const valor = parseNumericInput(e.target.value)
+                    setEtiquetaData({...etiquetaData, preco: valor || 0})
+                  }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Digite o preço"
                 />
               </div>
               

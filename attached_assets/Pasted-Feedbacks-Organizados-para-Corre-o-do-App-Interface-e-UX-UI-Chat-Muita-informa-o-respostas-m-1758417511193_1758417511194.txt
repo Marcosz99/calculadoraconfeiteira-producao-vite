@@ -1,0 +1,62 @@
+Feedbacks Organizados para Correção do App
+🎨 Interface e UX/UI
+
+Chat: Muita informação, respostas mais diretas e precisas
+Cores: Arrumar as cores no catálogo/cardápio
+Responsividade: Corrigir erros de responsividade mobile
+Botão Modo Receita: Deixar mais claro o botão de modo receita
+Onboarding: Usuário entra confuso, precisa de orientação sobre o que fazer
+
+🧮 Campos Numéricos e Cálculos
+
+Zeros Fixos: Problema geral - campos com "0" fixo que não podem ser apagados em toda aplicação
+Vírgulas/Pontos: Corrigir vírgulas que não viram ponto
+Cálculo Inteligente: Para ingredientes comprados em quantidade (ex: 30 ovos por R$20), calcular valor unitário automaticamente
+Unidades: Campo "unidade" não tem símbolo entre parênteses como os outros (litros tem "(l)")
+
+📦 Gestão de Ingredientes
+
+Categorias: Chocolates e ovos na lista de categorias não fazem sentido
+Edição: Botão de editar só clicando no ingrediente (abrir direto a tela de edição)
+Atualização: Ingredientes não estão atualizando em tempo real
+IA Sugestões: Implementar IA para sugerir ingredientes similares aos favoritos
+Alertas de Estoque: Avisar quando estiver acabando o estoque
+Decoração: Esclarecer se decoração tem relação com ingredientes
+
+👨‍🍳 Receitas
+Criação de Receitas
+
+Independência de Estoque: Permitir criar e salvar receitas sem ter ingredientes no estoque
+Categorias: Receitas sem categorias (aba existe mas vazia)
+Campos Obrigatórios: Tempo de preparo, rendimento, categoria - questionar se todas são necessárias
+Confusão nas Unidades: Sistema pergunta unidade repetidamente
+
+Informações da Receita
+
+Tempo: Adicionar opção de horas além de minutos
+Utensílios: Adicionar lista de utensílios necessários com links de afiliação
+Dicas: Seção opcional de dicas no final com opção de compartilhar na comunidade
+Preço Sugerido: Esclarecer se é preço unitário ou do produto completo
+Compartilhamento: Função para compartilhar receitas
+
+👥 Gestão de Clientes
+
+Cadastro Facilitado: Integração com WhatsApp para facilitar cadastro
+Automação: Reduzir preenchimento manual cliente por cliente
+
+📊 Relatórios e Analytics
+Melhorias Necessárias
+
+Relatórios Avançados: Sistema atual muito simples
+Gráficos: Implementar gráficos detalhados
+Períodos Personalizáveis: Opções de 7 dias, datas customizadas (não mostrar 30 dias automaticamente)
+Formato de Datas: Padronizar formato "01/09" ao invés de "1/9"
+Métricas: Adicionar "pedido mínimo" além do ticket médio existente
+
+🔧 Correções Técnicas Prioritárias
+
+Campos com zeros que não podem ser apagados
+Atualização em tempo real dos ingredientes
+Responsividade mobile
+Cálculos automáticos de preços unitários
+Sistema de unidades inconsistente

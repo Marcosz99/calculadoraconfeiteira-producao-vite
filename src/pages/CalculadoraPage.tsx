@@ -4,13 +4,14 @@ import { ArrowLeft, Calculator, Plus, Minus, Save, History, Download, PieChart }
 import { useAuth } from '../contexts/AuthContext'
 import { IngredienteUsuario, Receita, CalculoPreco } from '../types'
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage, saveToLocalStorage } from '../utils/localStorage'
+import { parseNumericInput, formatForInput } from '../utils/numberUtils'
 
 interface Ingrediente {
   id: string
   nome: string
-  quantidade: number
+  quantidade: number | null
   unidade: string
-  precoUnitario: number
+  precoUnitario: number | null
 }
 
 export default function CalculadoraPage() {
@@ -37,11 +38,11 @@ export default function CalculadoraPage() {
     }
   }, [user])
 
-  const [margem, setMargem] = useState(30)
-  const [custoFixo, setCustoFixo] = useState(5.00)
-  const [custoMaoObra, setCustoMaoObra] = useState(0)
-  const [tempoPreparoHoras, setTempoPreparoHoras] = useState(1)
-  const [custoHora, setCustoHora] = useState(25)
+  const [margem, setMargem] = useState<number | null>(30)
+  const [custoFixo, setCustoFixo] = useState<number | null>(5.00)
+  const [custoMaoObra, setCustoMaoObra] = useState<number | null>(null)
+  const [tempoPreparoHoras, setTempoPreparoHoras] = useState<number | null>(1)
+  const [custoHora, setCustoHora] = useState<number | null>(25)
 
   const [showAddModal, setShowAddModal] = useState(false)
   const [tipoAdicao, setTipoAdicao] = useState<'manual' | 'lista'>('manual')
@@ -55,9 +56,9 @@ export default function CalculadoraPage() {
     const novoIngrediente: Ingrediente = {
       id: Date.now().toString(),
       nome: '',
-      quantidade: 0,
+      quantidade: null,
       unidade: 'g',
-      precoUnitario: 0
+      precoUnitario: null
     }
     setIngredientes([...ingredientes, novoIngrediente])
     setShowAddModal(false)
@@ -71,7 +72,7 @@ export default function CalculadoraPage() {
       const novoIngrediente: Ingrediente = {
         id: Date.now().toString(),
         nome: ingredienteRef.nome,
-        quantidade: 0,
+        quantidade: null,
         unidade: ingredienteRef.unidade,
         precoUnitario: ingredienteRef.preco_atual
       }
@@ -93,15 +94,21 @@ export default function CalculadoraPage() {
 
   const calcularCustoIngredientes = () => {
     return ingredientes.reduce((total, ing) => {
-      return total + (ing.quantidade * ing.precoUnitario)
+      const quantidade = ing.quantidade || 0
+      const preco = ing.precoUnitario || 0
+      return total + (quantidade * preco)
     }, 0)
   }
 
   const calcularPrecoFinal = () => {
     const custoIngredientes = calcularCustoIngredientes()
-    const custoMaoObraTotal = tempoPreparoHoras * custoHora
-    const custoTotal = custoIngredientes + custoFixo + custoMaoObraTotal
-    return custoTotal * (1 + margem / 100)
+    const tempo = tempoPreparoHoras || 0
+    const valorHora = custoHora || 0
+    const fixo = custoFixo || 0
+    const margemCalculo = margem || 0
+    const custoMaoObraTotal = tempo * valorHora
+    const custoTotal = custoIngredientes + fixo + custoMaoObraTotal
+    return custoTotal * (1 + margemCalculo / 100)
   }
   
   const salvarCalculo = () => {
@@ -110,15 +117,15 @@ export default function CalculadoraPage() {
     const calculo: CalculoPreco = {
       receita_id: nomeReceita || 'Cálculo Manual',
       custo_ingredientes: calcularCustoIngredientes(),
-      custo_fixo: custoFixo,
-      custo_mao_obra: tempoPreparoHoras * custoHora,
-      margem_lucro: margem,
+      custo_fixo: custoFixo || 0,
+      custo_mao_obra: (tempoPreparoHoras || 0) * (custoHora || 0),
+      margem_lucro: margem || 0,
       preco_final: calcularPrecoFinal(),
       breakdown: ingredientes.map(ing => ({
         ingrediente_id: ing.id,
         nome: ing.nome,
-        quantidade: ing.quantidade,
-        custo: ing.quantidade * ing.precoUnitario
+        quantidade: ing.quantidade || 0,
+        custo: (ing.quantidade || 0) * (ing.precoUnitario || 0)
       }))
     }
     
@@ -156,18 +163,18 @@ export default function CalculadoraPage() {
       data: new Date().toLocaleDateString('pt-BR'),
       ingredientes: ingredientes.map(ing => ({
         nome: ing.nome,
-        quantidade: ing.quantidade,
+        quantidade: ing.quantidade || 0,
         unidade: ing.unidade,
-        preco_unitario: ing.precoUnitario,
-        custo_total: ing.quantidade * ing.precoUnitario
+        preco_unitario: ing.precoUnitario || 0,
+        custo_total: (ing.quantidade || 0) * (ing.precoUnitario || 0)
       })),
       custos: {
         ingredientes: calcularCustoIngredientes(),
-        fixo: custoFixo,
-        mao_obra: tempoPreparoHoras * custoHora,
-        total: calcularCustoIngredientes() + custoFixo + (tempoPreparoHoras * custoHora)
+        fixo: custoFixo || 0,
+        mao_obra: (tempoPreparoHoras || 0) * (custoHora || 0),
+        total: calcularCustoIngredientes() + (custoFixo || 0) + ((tempoPreparoHoras || 0) * (custoHora || 0))
       },
-      margem_lucro: margem,
+      margem_lucro: margem || 0,
       preco_final: calcularPrecoFinal()
     }
     
@@ -287,10 +294,10 @@ export default function CalculadoraPage() {
                         </label>
                         <input
                           type="number"
-                          value={ingrediente.quantidade}
-                          onChange={(e) => atualizarIngrediente(ingrediente.id, 'quantidade', parseFloat(e.target.value) || 0)}
+                          value={formatForInput(ingrediente.quantidade)}
+                          onChange={(e) => atualizarIngrediente(ingrediente.id, 'quantidade', parseNumericInput(e.target.value))}
                           className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
-                          placeholder="500"
+                          placeholder="Digite a quantidade"
                         />
                       </div>
                       
@@ -318,10 +325,10 @@ export default function CalculadoraPage() {
                         <input
                           type="number"
                           step="0.01"
-                          value={ingrediente.precoUnitario}
-                          onChange={(e) => atualizarIngrediente(ingrediente.id, 'precoUnitario', parseFloat(e.target.value) || 0)}
+                          value={formatForInput(ingrediente.precoUnitario)}
+                          onChange={(e) => atualizarIngrediente(ingrediente.id, 'precoUnitario', parseNumericInput(e.target.value))}
                           className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
-                          placeholder="0.006"
+                          placeholder="Digite o preço por unidade"
                         />
                       </div>
                     </div>
@@ -346,8 +353,9 @@ export default function CalculadoraPage() {
                     <input
                       type="number"
                       step="0.5"
-                      value={tempoPreparoHoras}
-                      onChange={(e) => setTempoPreparoHoras(parseFloat(e.target.value) || 0)}
+                      value={formatForInput(tempoPreparoHoras)}
+                      onChange={(e) => setTempoPreparoHoras(parseNumericInput(e.target.value))}
+                      placeholder="Digite o tempo"
                       className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                     />
                   </div>
@@ -358,8 +366,9 @@ export default function CalculadoraPage() {
                     <input
                       type="number"
                       step="0.01"
-                      value={custoHora}
-                      onChange={(e) => setCustoHora(parseFloat(e.target.value) || 0)}
+                      value={formatForInput(custoHora)}
+                      onChange={(e) => setCustoHora(parseNumericInput(e.target.value))}
+                      placeholder="Digite o custo por hora"
                       className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                     />
                   </div>
@@ -370,8 +379,9 @@ export default function CalculadoraPage() {
                   </label>
                   <input
                     type="number"
-                    value={margem}
-                    onChange={(e) => setMargem(parseFloat(e.target.value) || 0)}
+                    value={formatForInput(margem)}
+                    onChange={(e) => setMargem(parseNumericInput(e.target.value))}
+                    placeholder="Digite a margem"
                     className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                   />
                 </div>
@@ -382,8 +392,9 @@ export default function CalculadoraPage() {
                   <input
                     type="number"
                     step="0.01"
-                    value={custoFixo}
-                    onChange={(e) => setCustoFixo(parseFloat(e.target.value) || 0)}
+                    value={formatForInput(custoFixo)}
+                    onChange={(e) => setCustoFixo(parseNumericInput(e.target.value))}
+                    placeholder="Digite o custo fixo"
                     className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring bg-background text-foreground"
                   />
                 </div>
@@ -404,19 +415,19 @@ export default function CalculadoraPage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Custo Fixo:</span>
-                  <span className="font-medium text-foreground">R$ {custoFixo.toFixed(2)}</span>
+                  <span className="font-medium text-foreground">R$ {(custoFixo || 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground text-xs lg:text-sm">Mão de Obra ({tempoPreparoHoras}h x R${custoHora}):</span>
-                  <span className="font-medium text-foreground">R$ {(tempoPreparoHoras * custoHora).toFixed(2)}</span>
+                  <span className="text-muted-foreground text-xs lg:text-sm">Mão de Obra ({tempoPreparoHoras || 0}h x R${custoHora || 0}):</span>
+                  <span className="font-medium text-foreground">R$ {((tempoPreparoHoras || 0) * (custoHora || 0)).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center border-t border-border pt-2">
                   <span className="text-muted-foreground">Subtotal:</span>
-                  <span className="font-medium">R$ {(calcularCustoIngredientes() + custoFixo + (tempoPreparoHoras * custoHora)).toFixed(2)}</span>
+                  <span className="font-medium">R$ {(calcularCustoIngredientes() + (custoFixo || 0) + ((tempoPreparoHoras || 0) * (custoHora || 0))).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Margem ({margem}%):</span>
-                  <span className="font-medium">R$ {((calcularCustoIngredientes() + custoFixo + (tempoPreparoHoras * custoHora)) * (margem / 100)).toFixed(2)}</span>
+                  <span className="text-gray-600">Margem ({margem || 0}%):</span>
+                  <span className="font-medium">R$ {((calcularCustoIngredientes() + (custoFixo || 0) + ((tempoPreparoHoras || 0) * (custoHora || 0))) * ((margem || 0) / 100)).toFixed(2)}</span>
                 </div>
                 <hr />
                 <div className="flex justify-between text-lg font-bold">
@@ -438,8 +449,8 @@ export default function CalculadoraPage() {
                       <h4 className="font-medium text-gray-700 mb-2">Breakdown por Ingrediente:</h4>
                       {ingredientes.map(ing => (
                         <div key={ing.id} className="flex justify-between text-sm">
-                          <span className="text-gray-600">{ing.nome} ({ing.quantidade}{ing.unidade}):</span>
-                          <span>R$ {(ing.quantidade * ing.precoUnitario).toFixed(2)}</span>
+                          <span className="text-gray-600">{ing.nome} ({ing.quantidade || 0}{ing.unidade}):</span>
+                          <span>R$ {((ing.quantidade || 0) * (ing.precoUnitario || 0)).toFixed(2)}</span>
                         </div>
                       ))}
                     </div>
