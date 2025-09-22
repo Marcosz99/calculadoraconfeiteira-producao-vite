@@ -1,14 +1,13 @@
 import { useAuth } from '@/contexts/AuthContext'
-import { supabase } from '@/integrations/supabase/client'
 import { useState, useEffect } from 'react'
 
 export const useSubscriptionLimits = () => {
   const { user, profile } = useAuth()
   const [usage, setUsage] = useState({
     receitas: 0,
-    orcamentos: 0,
-    clientes: 0,
-    ingredientes: 0
+    ingredientes: 0,
+    calculos: 0,
+    doceBotUsos: 0
   })
 
   const isProfessional = profile?.plano === 'professional'
@@ -16,78 +15,129 @@ export const useSubscriptionLimits = () => {
   useEffect(() => {
     if (!user) return
 
-    const fetchUsage = async () => {
+    const loadUsage = () => {
       try {
-        const [receitas, ingredientes, clientes, orcamentos] = await Promise.all([
-          supabase.from('receitas').select('id', { count: 'exact' }).eq('user_id', user.id),
-          supabase.from('ingredientes_usuario').select('id', { count: 'exact' }).eq('user_id', user.id),
-          supabase.from('clientes').select('id', { count: 'exact' }).eq('user_id', user.id),
-          supabase.from('orcamentos').select('id', { count: 'exact' }).eq('user_id', user.id)
-        ])
+        // Carregar dados do localStorage
+        const receitas = JSON.parse(localStorage.getItem(`receitas_${user.id}`) || '[]')
+        const ingredientes = JSON.parse(localStorage.getItem(`ingredientes_${user.id}`) || '[]')
+        const calculos = parseInt(localStorage.getItem(`calculos_count_${user.id}`) || '0')
+        const doceBotUsos = parseInt(localStorage.getItem(`docebot_usos_${user.id}`) || '0')
 
         setUsage({
-          receitas: receitas.count || 0,
-          orcamentos: orcamentos.count || 0,
-          clientes: clientes.count || 0,
-          ingredientes: ingredientes.count || 0
+          receitas: receitas.length,
+          ingredientes: ingredientes.length,
+          calculos: calculos,
+          doceBotUsos: doceBotUsos
         })
       } catch (error) {
-        console.error('Erro ao buscar uso:', error)
+        console.error('Erro ao carregar estatísticas de uso:', error)
       }
     }
 
-    fetchUsage()
+    loadUsage()
   }, [user])
   
   const limits = {
-    receitas: isProfessional ? null : 5,
-    orcamentos: isProfessional ? null : 3,
-    clientes: isProfessional ? null : 10,
-    ingredientes: isProfessional ? null : 50,
-    catalogoPublico: isProfessional ? null : 3,
-    backup: isProfessional,
+    receitas: isProfessional ? Infinity : 5,
+    ingredientes: isProfessional ? Infinity : 15,
+    calculos: isProfessional ? Infinity : 3,
+    doceBotUsos: isProfessional ? 100 : 5
+  }
+
+  // Acesso a funcionalidades específicas
+  const featureAccess = {
+    marketplace: isProfessional,
+    financeiro: isProfessional,
+    catalogo: isProfessional,
+    comunidade: true, // Sempre disponível
     relatorios: isProfessional,
-    comunidade: isProfessional,
-    ferramentas: isProfessional
+    backup: isProfessional
   }
   
   const canAddReceita = () => {
     if (isProfessional) return true
-    return usage.receitas < 5
-  }
-  
-  const canAddOrcamento = () => {
-    if (isProfessional) return true
-    return usage.orcamentos < 3
-  }
-  
-  const canAddCliente = () => {
-    if (isProfessional) return true
-    return usage.clientes < 10
+    return usage.receitas < limits.receitas
   }
   
   const canAddIngrediente = () => {
     if (isProfessional) return true
-    return usage.ingredientes < 50
+    return usage.ingredientes < limits.ingredientes
   }
-  
-  const canUseFeature = (feature: string) => {
+
+  const canUseCalculadora = () => {
     if (isProfessional) return true
-    
-    const freeFeatures = ['receitas', 'orcamentos', 'calculadora', 'ingredientes']
-    return freeFeatures.includes(feature)
+    return usage.calculos < limits.calculos
+  }
+
+  const canUseDoceBot = () => {
+    return usage.doceBotUsos < limits.doceBotUsos
+  }
+
+  const incrementCalculos = () => {
+    if (!user) return false
+    if (!canUseCalculadora()) return false
+
+    const newCount = usage.calculos + 1
+    localStorage.setItem(`calculos_count_${user.id}`, newCount.toString())
+    setUsage(prev => ({ ...prev, calculos: newCount }))
+    return true
+  }
+
+  const incrementDoceBotUsos = () => {
+    if (!user) return false
+    if (!canUseDoceBot()) return false
+
+    const newCount = usage.doceBotUsos + 1
+    localStorage.setItem(`docebot_usos_${user.id}`, newCount.toString())
+    setUsage(prev => ({ ...prev, doceBotUsos: newCount }))
+    return true
+  }
+
+  const hasFeatureAccess = (feature: keyof typeof featureAccess) => {
+    return featureAccess[feature]
   }
   
-  const getRemainingCount = (type: 'receitas' | 'orcamentos' | 'clientes' | 'ingredientes') => {
-    if (isProfessional) return null
-    const limit = limits[type] as number
+  const getRemainingCount = (type: keyof typeof limits) => {
+    if (isProfessional && type !== 'doceBotUsos') return Infinity
+    const limit = limits[type]
     return Math.max(0, limit - usage[type])
   }
   
-  const getUsagePercentage = (type: 'receitas' | 'orcamentos' | 'clientes' | 'ingredientes') => {
-    if (isProfessional) return 0
-    const limit = limits[type] as number
+  const getUsagePercentage = (type: keyof typeof limits) => {
+    const limit = limits[type]
+    if (limit === Infinity) return 0
     return Math.min(100, (usage[type] / limit) * 100)
+  }
+
+  const getLimitMessage = (type: keyof typeof limits) => {
+    const remaining = getRemainingCount(type)
+    const limit = limits[type]
+
+    if (remaining === Infinity) {
+      return 'Ilimitado'
+    }
+
+    if (remaining === 0) {
+      return `Limite atingido (${limit}/${limit}). Faça upgrade para continuar!`
+    }
+
+    return `${remaining} restantes de ${limit}`
+  }
+
+  const refreshUsage = () => {
+    if (!user) return
+    
+    const receitas = JSON.parse(localStorage.getItem(`receitas_${user.id}`) || '[]')
+    const ingredientes = JSON.parse(localStorage.getItem(`ingredientes_${user.id}`) || '[]')
+    const calculos = parseInt(localStorage.getItem(`calculos_count_${user.id}`) || '0')
+    const doceBotUsos = parseInt(localStorage.getItem(`docebot_usos_${user.id}`) || '0')
+
+    setUsage({
+      receitas: receitas.length,
+      ingredientes: ingredientes.length,
+      calculos: calculos,
+      doceBotUsos: doceBotUsos
+    })
   }
   
   return {
@@ -95,12 +145,23 @@ export const useSubscriptionLimits = () => {
     isProfessional,
     limits,
     usage,
+    featureAccess,
+    
+    // Verificações de limite
     canAddReceita,
-    canAddOrcamento,
-    canAddCliente,
     canAddIngrediente,
-    canUseFeature,
+    canUseCalculadora,
+    canUseDoceBot,
+    hasFeatureAccess,
+    
+    // Incrementadores
+    incrementCalculos,
+    incrementDoceBotUsos,
+    
+    // Utilitários
     getRemainingCount,
-    getUsagePercentage
+    getUsagePercentage,
+    getLimitMessage,
+    refreshUsage
   }
 }

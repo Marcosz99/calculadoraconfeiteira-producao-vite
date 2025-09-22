@@ -14,7 +14,9 @@ export default function UpgradePage() {
     
     try {
       if (method === 'pix') {
-        navigate('/upgrade/pix')
+        // PIX temporariamente desabilitado
+        alert('PIX temporariamente indisponível. Use cartão de crédito.')
+        return
       } else {
         navigate('/upgrade/stripe')
       }

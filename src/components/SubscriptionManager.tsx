@@ -173,9 +173,12 @@ export const SubscriptionManager = () => {
 
         {/* Valor da Assinatura */}
         {subscriptionStatus?.subscribed && (
-          <div className="flex items-center justify-between py-3 border-t border-gray-200">
-            <span className="text-gray-600">Valor mensal:</span>
-            <span className="font-semibold text-gray-900">R$ 39,90</span>
+          <div className="py-3 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-600">Valor mensal:</span>
+              <span className="font-semibold text-gray-900">R$ 19,90</span>
+            </div>
+            <p className="text-xs text-gray-400 text-right mt-1">plano anual · 12x</p>
           </div>
         )}
 

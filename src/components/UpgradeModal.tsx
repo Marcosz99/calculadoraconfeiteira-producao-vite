@@ -67,20 +67,22 @@ export const UpgradeModal = ({ isOpen, onClose, feature, onUpgrade }: UpgradeMod
           </h4>
           
           <button
-            onClick={() => handleUpgrade('pix')}
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+            disabled
+            className="w-full bg-gray-400 text-gray-600 font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 cursor-not-allowed opacity-60"
+            title="PIX temporariamente indisponível"
           >
             <QrCode className="w-5 h-5" />
-            Pagar com PIX
-            <span className="bg-green-500 px-2 py-1 rounded text-xs ml-2">Instantâneo</span>
+            PIX (Em breve)
+            <span className="bg-gray-300 px-2 py-1 rounded text-xs ml-2">Indisponível</span>
           </button>
           
           <button
             onClick={() => handleUpgrade('card')}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-4 px-4 rounded-lg flex items-center justify-center gap-2 transition-all transform hover:scale-105 shadow-lg animate-pulse border-2 border-yellow-400"
           >
             <CreditCard className="w-5 h-5" />
-            Pagar com Cartão
+            💳 Assinar por R$ 19,90/mês
+            <span className="bg-yellow-400 text-black px-2 py-1 rounded text-xs ml-2 font-bold">7 dias grátis!</span>
           </button>
         </div>
         

@@ -68,9 +68,9 @@ export default function DashboardPage() {
               {profile?.plano !== 'professional' && (
                 <Link 
                   to="/upgrade" 
-                  className="bg-white bg-opacity-20 hover:bg-opacity-30 px-3 py-1 rounded-full text-sm font-medium transition-colors"
+                  className="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-2 rounded-full text-base font-bold transition-colors shadow-lg animate-pulse"
                 >
-                  Fazer Upgrade ✨
+                  🚀 UPGRADE - R$ 19,90/mês
                 </Link>
               )}
             </div>

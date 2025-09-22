@@ -210,11 +210,12 @@ export default function SubscriptionDashboardPage() {
                           </span>
                         </div>
                         <p className="text-blue-800 text-lg font-semibold">
-                          R$ 39,90
+                          R$ 19,90
                         </p>
                         <p className="text-sm text-blue-600">
                           Cobrança automática
                         </p>
+                        <p className="text-xs text-blue-400">plano anual · 12x</p>
                       </div>
                     </div>
                   </div>

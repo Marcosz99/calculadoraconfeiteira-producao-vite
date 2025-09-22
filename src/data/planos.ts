@@ -10,31 +10,34 @@ export const planos: Plano[] = [
     descricao: 'Ideal para começar',
     funcionalidades: [
       'Até 5 receitas cadastradas',
-      'Calculadora básica de custos',
-      '3 orçamentos por mês',
-      'Biblioteca com 20 ingredientes padrão',
-      'Acesso web básico'
+      'Até 15 ingredientes',
+      '3 cálculos na calculadora',
+      '5 usos do DoceBot IA',
+      'Acesso total à comunidade'
     ]
   },
   {
     id: 'professional',
     nome: 'Profissional',
-    preco_mensal: 39.90,
+    preco_mensal: 19.90,
+    preco_anual: 238.80,
+    desconto_anual: '12x R$ 19,90',
+    teste_gratis: '7 dias grátis',
     limite_receitas: null,
     limite_orcamentos: null,
-    descricao: 'Acesso completo a todas as funcionalidades',
+    descricao: 'Plano anual com 100% das funcionalidades',
     popular: true,
     funcionalidades: [
       'Receitas ilimitadas',
-      'Orçamentos ilimitados',
-      'Gestão completa de ingredientes',
-      'Gestão completa de clientes',
-      'Controle completo de pedidos',
-      'Relatórios completos',
+      'Ingredientes ilimitados',
+      'Calculadora ilimitada',
+      '100 créditos DoceBot IA/mês',
+      'Acesso total ao Marketplace',
+      'Gestão financeira completa',
+      'Catálogo personalizado',
+      'Relatórios avançados',
       'Backup automático',
-      'Catálogo público ilimitado',
       'Comunidade completa',
-      'Todas as ferramentas',
       'Suporte prioritário'
     ]
   }
