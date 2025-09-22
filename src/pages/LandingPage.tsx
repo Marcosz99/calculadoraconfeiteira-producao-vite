@@ -206,7 +206,7 @@ export default function LandingPage() {
               <div className="text-sm sm:text-base text-gray-600">Confeiteiras BR</div>
             </div>
             <div className="text-center hover-lift p-4 rounded-lg">
-              <div className="text-2xl sm:text-3xl font-bold text-pink-600">R$ 39,90</div>
+              <div className="text-2xl sm:text-3xl font-bold text-pink-600">R$ 19,90</div>
               <div className="text-sm sm:text-base text-gray-600">Por mês apenas</div>
             </div>
           </div>
@@ -445,7 +445,7 @@ export default function LandingPage() {
               </div>
               <div className="text-center mb-6">
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Plano Profissional</h3>
-                <div className="text-3xl sm:text-4xl font-bold text-pink-500">R$ 39,90</div>
+                <div className="text-3xl sm:text-4xl font-bold text-pink-500">R$ 19,90</div>
                 <p className="text-gray-600">Por mês</p>
               </div>
                <ul className="space-y-3 mb-8">
