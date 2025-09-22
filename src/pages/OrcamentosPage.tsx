@@ -39,34 +39,14 @@ export default function OrcamentosPage() {
     if (!user) return
     
     try {
-      // Carregar orçamentos
-      const { data: orcamentosData, error: orcamentosError } = await supabase
-        .from('orcamentos')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+      // Carregar de localStorage temporariamente
+      const storedOrcamentos = localStorage.getItem(`orcamentos_${user.id}`)
+      const storedClientes = localStorage.getItem(`clientes_${user.id}`)
+      const storedReceitas = localStorage.getItem(`receitas_${user.id}`)
       
-      // Carregar clientes
-      const { data: clientesData, error: clientesError } = await supabase
-        .from('clientes')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('nome', { ascending: true })
-      
-      // Carregar receitas
-      const { data: receitasData, error: receitasError } = await supabase
-        .from('receitas')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('nome', { ascending: true })
-      
-      if (orcamentosError) throw orcamentosError
-      if (clientesError) throw clientesError
-      if (receitasError) throw receitasError
-      
-      setOrcamentos(orcamentosData || [])
-      setClientes(clientesData || [])
-      setReceitas(receitasData || [])
+      if (storedOrcamentos) setOrcamentos(JSON.parse(storedOrcamentos))
+      if (storedClientes) setClientes(JSON.parse(storedClientes))
+      if (storedReceitas) setReceitas(JSON.parse(storedReceitas))
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
     }
@@ -111,49 +91,47 @@ export default function OrcamentosPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!user || itensOrcamento.length === 0) return
+    if (!user || itensOrcamento.length === 0) {
+      alert('❌ Adicione pelo menos um item ao orçamento')
+      return
+    }
 
     try {
       const valorTotal = calcularTotalOrcamento(itensOrcamento)
-      const numeroOrcamento = editingOrcamento?.numero || 
+      const numeroOrcamento = editingOrcamento?.numero_orcamento || 
         `ORC-${Date.now().toString().slice(-6)}`
 
-      const orcamentoData = {
-        user_id: user.id,
-        cliente_id: formData.cliente_id || null,
-        numero: numeroOrcamento,
-        data_evento: formData.data_validade || null,
+      const novoOrcamento = {
+        id: editingOrcamento?.id || Date.now().toString(),
+        usuario_id: user.id,
+        cliente_id: formData.cliente_id || '',
+        cliente_nome_avulso: formData.cliente_nome_avulso || '',
+        numero_orcamento: numeroOrcamento,
+        descricao: formData.descricao || '',
+        data_validade: formData.data_validade || new Date().toISOString().split('T')[0],
         status: 'rascunho',
         valor_total: valorTotal,
         valor_final: valorTotal,
-        observacoes: formData.observacoes || null,
-        itens: itensOrcamento
+        observacoes: formData.observacoes || '',
+        incluir_qr_code: formData.incluir_qr_code,
+        itens: itensOrcamento,
+        criado_em: editingOrcamento?.criado_em || new Date().toISOString(),
+        atualizado_em: new Date().toISOString()
       }
 
+      let updatedOrcamentos
       if (editingOrcamento) {
-        // Atualizar orçamento existente
-        const { data, error } = await supabase
-          .from('orcamentos')
-          .update(orcamentoData)
-          .eq('id', editingOrcamento.id)
-          .eq('user_id', user.id)
-          .select()
-          .single()
-
-        if (error) throw error
-
-        setOrcamentos(prev => prev.map(o => o.id === editingOrcamento.id ? data : o))
+        updatedOrcamentos = orcamentos.map(o => o.id === editingOrcamento.id ? novoOrcamento : o)
       } else {
-        // Criar novo orçamento
-        const { data, error } = await supabase
-          .from('orcamentos')
-          .insert(orcamentoData)
-          .select()
-          .single()
+        updatedOrcamentos = [novoOrcamento, ...orcamentos]
+      }
+      
+      setOrcamentos(updatedOrcamentos)
+      localStorage.setItem(`orcamentos_${user.id}`, JSON.stringify(updatedOrcamentos))
 
-        if (error) throw error
-
-        setOrcamentos(prev => [data, ...prev])
+      // Gerar QR Code se solicitado
+      if (formData.incluir_qr_code) {
+        await gerarQRCode(novoOrcamento)
       }
 
       resetForm()
@@ -196,15 +174,9 @@ export default function OrcamentosPage() {
     if (!window.confirm('Tem certeza que deseja excluir este orçamento?')) return
 
     try {
-      const { error } = await supabase
-        .from('orcamentos')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user?.id)
-
-      if (error) throw error
-
-      setOrcamentos(prev => prev.filter(o => o.id !== id))
+      const updatedOrcamentos = orcamentos.filter(o => o.id !== id)
+      setOrcamentos(updatedOrcamentos)
+      localStorage.setItem(`orcamentos_${user?.id}`, JSON.stringify(updatedOrcamentos))
       alert('✅ Orçamento excluído com sucesso!')
     } catch (error) {
       console.error('Erro ao excluir orçamento:', error)
@@ -214,22 +186,31 @@ export default function OrcamentosPage() {
 
   const changeStatus = async (id: string, newStatus: string) => {
     try {
-      const { error } = await supabase
-        .from('orcamentos')
-        .update({ status: newStatus })
-        .eq('id', id)
-        .eq('user_id', user?.id)
-
-      if (error) throw error
-
-      setOrcamentos(prev => prev.map(o => 
+      const updatedOrcamentos = orcamentos.map(o => 
         o.id === id ? { ...o, status: newStatus } : o
-      ))
+      );
+      setOrcamentos(updatedOrcamentos);
+      localStorage.setItem(`orcamentos_${user?.id}`, JSON.stringify(updatedOrcamentos));
+      alert(`✅ Status alterado para ${newStatus}!`);
     } catch (error) {
-      console.error('Erro ao alterar status:', error)
-      alert('❌ Erro ao alterar status. Tente novamente.')
+      console.error('Erro ao alterar status:', error);
+      alert('❌ Erro ao alterar status. Tente novamente.');
     }
-  }
+  };
+
+  // Função para gerar QR Code do orçamento
+  const gerarQRCode = async (orcamento: any) => {
+    try {
+      const qrData = `DoceCalc - Orçamento ${orcamento.numero_orcamento}\nValor: R$ ${orcamento.valor_total.toFixed(2)}\nWhatsApp: (11) 99999-9999`;
+      const qrCodeImage = await QRCode.toDataURL(qrData);
+      setQrCodeImage(qrCodeImage);
+      setCurrentOrcamento(orcamento);
+      setShowQRModal(true);
+    } catch (error) {
+      console.error('Erro ao gerar QR Code:', error);
+      alert('❌ Erro ao gerar QR Code');
+    }
+  };
 
   const adicionarItem = () => {
     const novoItem: OrcamentoItem = {

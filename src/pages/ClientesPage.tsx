@@ -69,17 +69,11 @@ export default function ClientesPage() {
     if (!user) return
     
     try {
-      const { data, error } = await supabase
-        .from('clientes')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('nome', { ascending: true })
-      
-      if (error) throw error
-      
-      // @ts-ignore - Database schema mismatch
-      const convertedClientes = (data || []).map(convertDBClienteToCliente)
-      setClientes(convertedClientes)
+      // Usar localStorage temporariamente para demonstração
+      const storedClientes = localStorage.getItem(`clientes_${user.id}`)
+      if (storedClientes) {
+        setClientes(JSON.parse(storedClientes))
+      }
     } catch (error) {
       console.error('Erro ao carregar clientes:', error)
     }
@@ -97,42 +91,31 @@ export default function ClientesPage() {
     if (!user) return
 
     try {
-      const clienteData = {
-        user_id: user.id,
+      const novoCliente = {
+        id: editingCliente?.id || Date.now().toString(),
+        usuario_id: user.id,
         nome: formData.nome,
-        telefone: formData.telefone || null,
-        whatsapp: formData.whatsapp || null,
-        email: formData.email || null,
-        endereco_completo: formData.endereco_completo || null,
-        data_nascimento: formData.data_nascimento || null,
-        observacoes: formData.observacoes || null,
+        telefone: formData.telefone || '',
+        whatsapp: formData.whatsapp || formData.telefone || '',
+        email: formData.email || '',
+        endereco_completo: formData.endereco_completo || '',
+        data_nascimento: formData.data_nascimento || '',
+        observacoes: formData.observacoes || '',
+        criado_em: editingCliente?.criado_em || new Date().toISOString(),
+        ativo: true,
+        historico_pedidos: editingCliente?.historico_pedidos || 0,
+        valor_total_gasto: editingCliente?.valor_total_gasto || 0
       }
 
+      let updatedClientes
       if (editingCliente) {
-        // Atualizar cliente existente
-        const { data, error } = await supabase
-          .from('clientes')
-          .update(clienteData)
-          .eq('id', editingCliente.id)
-          .eq('user_id', user.id)
-          .select()
-          .single()
-
-        if (error) throw error
-
-        setClientes(prev => prev.map(c => c.id === editingCliente.id ? data : c))
+        updatedClientes = clientes.map(c => c.id === editingCliente.id ? novoCliente : c)
       } else {
-        // Criar novo cliente
-        const { data, error } = await supabase
-          .from('clientes')
-          .insert(clienteData)
-          .select()
-          .single()
-
-        if (error) throw error
-
-        setClientes(prev => [data, ...prev])
+        updatedClientes = [novoCliente, ...clientes]
       }
+      
+      setClientes(updatedClientes)
+      localStorage.setItem(`clientes_${user.id}`, JSON.stringify(updatedClientes))
 
       resetForm()
       alert(editingCliente ? '✅ Cliente atualizado!' : '✅ Cliente criado!')
@@ -414,15 +397,9 @@ export default function ClientesPage() {
     if (!window.confirm('Tem certeza que deseja excluir este cliente?')) return
 
     try {
-      const { error } = await supabase
-        .from('clientes')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user?.id)
-
-      if (error) throw error
-
-      setClientes(prev => prev.filter(c => c.id !== id))
+      const updatedClientes = clientes.filter(c => c.id !== id)
+      setClientes(updatedClientes)
+      localStorage.setItem(`clientes_${user?.id}`, JSON.stringify(updatedClientes))
       alert('✅ Cliente excluído com sucesso!')
     } catch (error) {
       console.error('Erro ao excluir cliente:', error)
