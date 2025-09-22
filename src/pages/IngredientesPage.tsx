@@ -394,7 +394,7 @@ export default function IngredientesPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          R$ {ingrediente.preco_atual.toFixed(2)}
+                          R$ {(Number(ingrediente.preco_atual) || 0).toFixed(2)}
                         </div>
                         <div className="text-xs text-gray-500">por {ingrediente.unidade}</div>
                       </td>

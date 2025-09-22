@@ -241,15 +241,24 @@ export default function ReceitasPage() {
   }
 
   const editReceita = (receita: Receita) => {
+    // Converter modo_preparo (string no banco) em array para o formulário
+    const modoArray = typeof receita.modo_preparo === 'string'
+      ? (receita.modo_preparo ? receita.modo_preparo.split('\n') : [''])
+      : Array.isArray(receita.modo_preparo) ? receita.modo_preparo : ['']
+
     setFormData({
       nome: receita.nome,
       categoria: receita.categoria_id ? categorias.find(c => c.id === receita.categoria_id)?.nome || 'Bolos' : 'Bolos',
       categoria_id: receita.categoria_id,
-      modo_preparo: receita.modo_preparo.length > 0 ? receita.modo_preparo : [''],
-      tempo_preparo_mins: receita.tempo_preparo_mins,
-      rendimento: receita.rendimento,
-      foto_principal: receita.foto_principal || ''
+      modo_preparo: modoArray,
+      tempo_preparo_mins: Number(receita.tempo_preparo) || 60,
+      rendimento: receita.rendimento || '',
+      foto_principal: (receita as any).foto_principal || ''
     })
+    setIngredientesReceita((receita as any).ingredientes || [])
+    setEditingReceita(receita)
+    setShowModal(true)
+  }
     setIngredientesReceita(receita.ingredientes)
     setEditingReceita(receita)
     setShowModal(true)
@@ -480,7 +489,7 @@ export default function ReceitasPage() {
                           <Edit className="h-4 w-4" />
                         </button>
                         <button
-                          onClick={() => deleteReceita(receita.id)}
+                          onClick={() => handleDeleteReceita(receita.id)}
                           className="text-gray-400 hover:text-red-500 transition-colors"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -493,11 +502,11 @@ export default function ReceitasPage() {
                       <div className="flex items-center space-x-4 text-sm text-gray-500">
                         <div className="flex items-center space-x-1">
                           <Clock className="h-4 w-4" />
-                          <span>{receita.tempo_preparo_mins}min</span>
+                          <span>{Number(receita.tempo_preparo) || 0}min</span>
                         </div>
                         <div className="flex items-center space-x-1">
                           <Users className="h-4 w-4" />
-                          <span>{receita.rendimento}</span>
+                          <span>{receita.rendimento || '-'}</span>
                         </div>
                       </div>
                       
@@ -517,9 +526,10 @@ export default function ReceitasPage() {
                       
                     </div>
                     
-                    {receita.tags.length > 0 && (
+                    {/* Tags (se existirem) */}
+                    {Array.isArray((receita as any).tags) && (receita as any).tags.length > 0 && (
                       <div className="mt-4 flex flex-wrap gap-1">
-                        {receita.tags.slice(0, 3).map(tag => (
+                        {(receita as any).tags.slice(0, 3).map((tag: string) => (
                           <span 
                             key={tag}
                             className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
@@ -527,9 +537,9 @@ export default function ReceitasPage() {
                             #{tag}
                           </span>
                         ))}
-                        {receita.tags.length > 3 && (
+                        {(receita as any).tags.length > 3 && (
                           <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-                            +{receita.tags.length - 3}
+                            +{(receita as any).tags.length - 3}
                           </span>
                         )}
                       </div>
