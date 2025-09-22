@@ -129,7 +129,7 @@ export default function ReceitasPage() {
     const matchesSearch = receita.nome.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategoria = categoriaFiltro === 'todas' || receita.categoria_id === categoriaFiltro
     
-    return matchesSearch && matchesCategoria && receita.ativo
+    return matchesSearch && matchesCategoria
   })
 
   const getDificuldadeColor = (dificuldade: string) => {
@@ -219,18 +219,11 @@ export default function ReceitasPage() {
       }
 
       if (editingReceita) {
-        // Atualizar receita existente
-        const { data, error } = await supabase
-          .from('receitas')
-          .update(receitaData)
-          .eq('id', editingReceita.id)
-          .eq('user_id', user.id)
-          .select()
-          .single()
-
-        if (error) throw error
-
-        setReceitas(prev => prev.map(r => r.id === editingReceita.id ? data : r))
+        // Atualizar receita existente usando o hook
+        const ok = await updateReceita(editingReceita.id, receitaData)
+        if (!ok) {
+          throw new Error('Erro ao atualizar receita')
+        }
       } else {
         // Criar nova receita usando o hook
         const savedReceita = await addReceita(receitaData)

@@ -148,14 +148,15 @@ const IntelligentIngredientSearch: React.FC<IntelligentIngredientSearchProps> = 
             placeholder="Buscar ingredientes (ex: farinha, açúcar...)"
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
-          {searchTerm && (
-            <button
-              onClick={() => setSearchTerm('')}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          )}
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            )}
         </div>
 
         {/* Categorias */}
@@ -165,6 +166,7 @@ const IntelligentIngredientSearch: React.FC<IntelligentIngredientSearchProps> = 
               {categorias.map(categoria => (
                 <button
                   key={categoria}
+                  type="button"
                   onClick={() => setSelectedCategory(categoria)}
                   className={`px-3 py-1 rounded-full text-sm transition-colors ${
                     selectedCategory === categoria
@@ -209,6 +211,7 @@ const IntelligentIngredientSearch: React.FC<IntelligentIngredientSearchProps> = 
                         </div>
                       </div>
                       <button
+                        type="button"
                         onClick={() => handleAddIngredient(ingrediente)}
                         className="ml-2 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
                       >
@@ -230,6 +233,7 @@ const IntelligentIngredientSearch: React.FC<IntelligentIngredientSearchProps> = 
                 </span>
                 {filteredIngredients.length > 0 && (
                   <button
+                    type="button"
                     onClick={() => setIsExpanded(false)}
                     className="text-sm text-gray-500 hover:text-gray-700"
                   >
@@ -263,6 +267,7 @@ const IntelligentIngredientSearch: React.FC<IntelligentIngredientSearchProps> = 
                         )}
                       </div>
                       <button
+                        type="button"
                         onClick={() => handleAddIngredient(ingrediente)}
                         className="ml-2 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors"
                       >
@@ -293,6 +298,7 @@ const IntelligentIngredientSearch: React.FC<IntelligentIngredientSearchProps> = 
           {(searchTerm || maisUsados.length > 0) && (
             <div className="mt-4 text-center">
               <button
+                type="button"
                 onClick={() => {
                   setIsExpanded(false)
                   setSearchTerm('')
