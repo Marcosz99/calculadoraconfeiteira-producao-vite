@@ -22,8 +22,8 @@ export default function DashboardPage() {
       // Calcular receita do dia (orçamentos aprovados de hoje)
       const hoje = new Date().toISOString().split('T')[0]
       const receitaHoje = orcamentos
-        .filter(o => o.status === 'aprovado' && o.criado_em?.split('T')[0] === hoje)
-        .reduce((total, o) => total + (o.valor_total || 0), 0)
+        .filter((o: any) => o.status === 'aprovado' && o.criado_em?.split('T')[0] === hoje)
+        .reduce((total: number, o: any) => total + (o.valor_total || 0), 0)
 
       setStats({
         receitas: receitas.length,

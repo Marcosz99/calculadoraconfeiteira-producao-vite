@@ -2,7 +2,7 @@ import { Crown } from 'lucide-react'
 import { useSubscriptionLimits } from '@/hooks/useSubscriptionLimits'
 
 interface LimitBadgeProps {
-  type: 'receitas' | 'orcamentos' | 'clientes' | 'ingredientes'
+  type: 'receitas' | 'ingredientes'
   className?: string
 }
 

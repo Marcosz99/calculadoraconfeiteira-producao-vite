@@ -59,7 +59,7 @@ serve(async (req) => {
       customer_email: customerId ? undefined : userEmail,
       line_items: [
         {
-          price: "price_1S944mEkyU3B9iiUQfeEaMVL", // DoceCalc Professional price ID
+          price: "price_1S9yyoEkyU3B9iiU7Kbq64dK", // DoceCalc Professional - Anual R$19,90
           quantity: 1,
         },
       ],
