@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { Receita, Categoria, ReceitaIngrediente, IngredienteUsuario, ReceitaCompartilhada } from '../types'
 import { supabase } from '@/integrations/supabase/client'
 import { useSubscriptionLimits } from '../hooks/useSubscriptionLimits'
+import { useSupabaseReceitas } from '../hooks/useSupabaseReceitas'
 import { UpgradeModal } from '../components/UpgradeModal'
 import { LimitBadge } from '../components/LimitBadge'
 import IntelligentIngredientSearch from '../components/ui/IntelligentIngredientSearch'
@@ -17,8 +18,8 @@ export default function ReceitasPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const { canAddReceita, isProfessional, usage, limits } = useSubscriptionLimits()
+  const { receitas, loading, addReceita, updateReceita, deleteReceita } = useSupabaseReceitas()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
-  const [receitas, setReceitas] = useState<Receita[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [ingredientes, setIngredientes] = useState<IngredienteUsuario[]>([])
   const [searchTerm, setSearchTerm] = useState('')
@@ -53,13 +54,6 @@ export default function ReceitasPage() {
     if (!user) return
     
     try {
-      // Carregar receitas
-      const { data: receitasData } = await supabase
-        .from('receitas')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-      
       // Carregar categorias
       const { data: categoriasData } = await supabase
         .from('categorias')
@@ -74,7 +68,6 @@ export default function ReceitasPage() {
         .eq('user_id', user.id)
         .order('nome', { ascending: true })
       
-      setReceitas(receitasData || [])
       setCategorias(categoriasData || [])
       setIngredientes(ingredientesData || [])
       
@@ -152,22 +145,11 @@ export default function ReceitasPage() {
     return categorias.find(c => c.id === id)
   }
 
-  const deleteReceita = async (id: string) => {
+  const handleDeleteReceita = async (id: string) => {
     if (!window.confirm('Tem certeza que deseja excluir esta receita?')) return
 
-    try {
-      const { error } = await supabase
-        .from('receitas')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user?.id)
-
-      if (error) throw error
-
-      setReceitas(prev => prev.filter(r => r.id !== id))
-      alert('✅ Receita excluída com sucesso!')
-    } catch (error) {
-      console.error('Erro ao excluir receita:', error)
+    const success = await deleteReceita(id)
+    if (!success) {
       alert('❌ Erro ao excluir receita. Tente novamente.')
     }
   }
@@ -250,20 +232,15 @@ export default function ReceitasPage() {
 
         setReceitas(prev => prev.map(r => r.id === editingReceita.id ? data : r))
       } else {
-        // Criar nova receita
-        const { data, error } = await supabase
-          .from('receitas')
-          .insert(receitaData)
-          .select()
-          .single()
-
-        if (error) throw error
-
-        setReceitas(prev => [data, ...prev])
+        // Criar nova receita usando o hook
+        const savedReceita = await addReceita(receitaData)
+        if (!savedReceita) {
+          throw new Error('Erro ao salvar receita')
+        }
       }
 
       resetForm()
-      alert(editingReceita ? '✅ Receita atualizada!' : '✅ Receita criada!')
+      // Não precisa mais do alert, o hook já mostra o toast
     } catch (error) {
       console.error('Erro ao salvar receita:', error)
       alert('❌ Erro ao salvar receita. Tente novamente.')
