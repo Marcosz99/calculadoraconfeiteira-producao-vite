@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Calculator, TrendingUp, Users, DollarSign, Package, FileText, BarChart3, Crown, MessageSquare, BookOpen, TestTube, Bot, ShoppingBag, Brain, Palette, User, Plus, ArrowRight, Zap, Target, Clock, Star } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
@@ -6,6 +6,32 @@ import { AppLayout } from '../components/Layout'
 
 export default function DashboardPage() {
   const { user, profile } = useAuth()
+  const [stats, setStats] = useState({
+    receitas: 0,
+    ingredientes: 0,
+    receitaHoje: 0
+  })
+
+  useEffect(() => {
+    if (user) {
+      // Carregar dados reais do usuário
+      const receitas = JSON.parse(localStorage.getItem(`receitas_${user.id}`) || '[]')
+      const ingredientes = JSON.parse(localStorage.getItem(`ingredientes_${user.id}`) || '[]')
+      const orcamentos = JSON.parse(localStorage.getItem(`orcamentos_${user.id}`) || '[]')
+      
+      // Calcular receita do dia (orçamentos aprovados de hoje)
+      const hoje = new Date().toISOString().split('T')[0]
+      const receitaHoje = orcamentos
+        .filter(o => o.status === 'aprovado' && o.criado_em?.split('T')[0] === hoje)
+        .reduce((total, o) => total + (o.valor_total || 0), 0)
+
+      setStats({
+        receitas: receitas.length,
+        ingredientes: ingredientes.length,
+        receitaHoje
+      })
+    }
+  }, [user])
 
   if (!user) {
     return (
@@ -60,7 +86,7 @@ export default function DashboardPage() {
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-600">Receitas</p>
-                <p className="text-lg font-semibold text-gray-900">15</p>
+                <p className="text-lg font-semibold text-gray-900">{stats.receitas}</p>
               </div>
             </div>
           </div>
@@ -72,7 +98,7 @@ export default function DashboardPage() {
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-600">Ingredientes</p>
-                <p className="text-lg font-semibold text-gray-900">32</p>
+                <p className="text-lg font-semibold text-gray-900">{stats.ingredientes}</p>
               </div>
             </div>
           </div>
@@ -84,7 +110,9 @@ export default function DashboardPage() {
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-600">Receita Hoje</p>
-                <p className="text-lg font-semibold text-gray-900">R$ 250,00</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  R$ {stats.receitaHoje.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </p>
               </div>
             </div>
           </div>
