@@ -259,10 +259,6 @@ export default function ReceitasPage() {
     setEditingReceita(receita)
     setShowModal(true)
   }
-    setIngredientesReceita(receita.ingredientes)
-    setEditingReceita(receita)
-    setShowModal(true)
-  }
 
   // Adicionar ingrediente do sistema inteligente
   const adicionarIngredienteInteligente = (ingrediente: IngredienteConfeitaria) => {
