@@ -172,6 +172,8 @@ export default function PerfilPage() {
           user_id: user.id,
           ...config,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         })
 
       if (configError) throw configError

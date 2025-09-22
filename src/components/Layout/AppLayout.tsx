@@ -44,14 +44,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <div className="h-screen flex overflow-hidden bg-gray-50">
-      {/* Sidebar Desktop */}
-      <div className={`hidden lg:flex lg:flex-shrink-0 transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-16'}`}>
+      {/* Sidebar Desktop - Always visible */}
+      <div className="hidden lg:flex lg:flex-shrink-0 w-64">
         <div className="flex flex-col w-full">
           <div className="flex items-center h-16 flex-shrink-0 px-4 bg-white border-r border-gray-200">
             <Calculator className="h-8 w-8" style={{ color: 'var(--primary)' }} />
-            {sidebarOpen && (
-              <span className="ml-2 text-xl font-bold text-gray-900">DoceCalc</span>
-            )}
+            <span className="ml-2 text-xl font-bold text-gray-900">DoceCalc</span>
           </div>
           <div className="flex-1 flex flex-col overflow-y-auto bg-white border-r border-gray-200">
             <nav className="flex-1 px-2 py-4 space-y-1">
@@ -69,13 +67,51 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     style={isActive ? { backgroundColor: 'var(--primary)' } : {}}
                   >
                     <item.icon className={`flex-shrink-0 h-5 w-5 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-500'}`} />
-                    {sidebarOpen && (
-                      <span className="ml-3">{item.name}</span>
-                    )}
+                    <span className="ml-3">{item.name}</span>
+                  </Link>
+                )
+              })}
+              
+              {/* More items */}
+              {moreItems.map((item) => {
+                const isActive = location.pathname === item.href
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors ${
+                      isActive
+                        ? 'text-white'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                    style={isActive ? { backgroundColor: 'var(--primary)' } : {}}
+                  >
+                    <item.icon className={`flex-shrink-0 h-5 w-5 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-500'}`} />
+                    <span className="ml-3">{item.name}</span>
                   </Link>
                 )
               })}
             </nav>
+            
+            {/* Footer with support info */}
+            <div className="p-4 border-t border-gray-200 bg-gray-50">
+              <div className="text-xs text-gray-500 space-y-2">
+                <div>
+                  <strong>📱 Suporte WhatsApp:</strong>
+                  <br />
+                  <a href="https://wa.me/385915561776" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                    +385 915561776
+                  </a>
+                </div>
+                <div className="pt-2 border-t border-gray-200">
+                  <span className="text-orange-600 font-medium">⚠️ App em Beta</span>
+                  <br />
+                  Todo feedback será bem-vindo!
+                  <br />
+                  Reporte bugs por favor.
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -83,16 +119,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Main content */}
       <div className="flex flex-col w-0 flex-1 overflow-hidden">
         {/* Header */}
-        <div className="relative z-10 flex-shrink-0 flex h-16 bg-white shadow-sm border-gray-200 lg:border-b">{/* Removed mobile hamburger menu */}
-          
-          <button
-            className="hidden lg:flex items-center justify-center w-12 h-12 border-r border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-inset transition-colors"
-            style={{ '--tw-ring-color': 'var(--primary)' } as React.CSSProperties}
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            title={sidebarOpen ? 'Fechar menu' : 'Abrir menu'}
-          >
-            <Menu className="h-5 w-5" />
-          </button>
+        <div className="relative z-10 flex-shrink-0 flex h-16 bg-white shadow-sm border-gray-200 lg:border-b">
 
           <div className="flex-1 px-4 lg:px-4 flex justify-between">{/* Consistent padding */}
             <div className="flex-1 flex">

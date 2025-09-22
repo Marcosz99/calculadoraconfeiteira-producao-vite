@@ -211,7 +211,7 @@ export default function CustomCatalogPage() {
   }
 
   const gerarLinkCatalogo = () => {
-    return `${window.location.origin}/catalogo/${user?.id}`
+    return `${window.location.origin}/catalogo-publico?user=${user?.id}`
   }
 
   const produtosAtivos = produtos.filter(p => p.ativo)

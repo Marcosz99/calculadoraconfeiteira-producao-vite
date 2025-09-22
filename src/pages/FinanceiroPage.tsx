@@ -1,4 +1,6 @@
 import { useState, useRef } from 'react'
+import { Link } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
@@ -249,8 +251,23 @@ export default function FinanceiroPage() {
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
+      {/* Back Button */}
+      <Link 
+        to="/dashboard" 
+        className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors mb-4"
+      >
+        <ArrowLeft className="h-5 w-5 mr-2" />
+        Voltar ao Dashboard
+      </Link>
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex items-center gap-4 mb-6">
+        <Link 
+          to="/dashboard" 
+          className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5 mr-2" />
+          Voltar
+        </Link>
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center">
             💰 Controle Financeiro

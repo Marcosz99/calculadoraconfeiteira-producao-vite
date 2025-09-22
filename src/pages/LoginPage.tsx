@@ -180,11 +180,6 @@ export default function LoginPage() {
           </button>
         </div>
 
-        <div className="mt-8 p-4 bg-blue-50/50 rounded-lg border border-blue-200 animate-fade-in">
-          <p className="text-sm text-blue-700 text-center">
-            <strong>💡 Demo:</strong> Use qualquer email e senha para testar o sistema completo gratuitamente.
-          </p>
-        </div>
 
         {/* Features Preview */}
         <div className="mt-6 grid grid-cols-3 gap-2 text-center">
