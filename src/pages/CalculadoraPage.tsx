@@ -673,3 +673,4 @@ export default function CalculadoraPage() {
     </AppLayout>
   )
 }
+export default CalculadoraPage;
