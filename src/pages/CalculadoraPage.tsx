@@ -7,6 +7,8 @@ import { IngredienteUsuario, Receita, CalculoPreco } from '../types'
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage, saveToLocalStorage } from '../utils/localStorage'
 import { parseNumericInput, formatForInput } from '../utils/numberUtils'
 import CurrencyInput from '../components/ui/CurrencyInput'
+import { useSubscriptionLimits } from '../hooks/useSubscriptionLimits'
+import { UpgradeModal } from '../components/UpgradeModal'
 
 interface Ingrediente {
   id: string
@@ -18,6 +20,8 @@ interface Ingrediente {
 
 export default function CalculadoraPage() {
   const { user } = useAuth()
+  const { canUseCalculadora, incrementCalculos, isProfessional, usage, limits } = useSubscriptionLimits()
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   
   // Estados existentes (mantendo funcionalidade)
   const [ingredientesDisponiveis, setIngredientesDisponiveis] = useState<IngredienteUsuario[]>([])
@@ -98,6 +102,45 @@ export default function CalculadoraPage() {
   }
 
   const calcularPrecoFinal = () => {
+    const custoIngredientes = calcularCustoIngredientes()
+    const custoMaoObraCalculado = (tempoPreparoHoras || 0) * (custoHora || 0)
+    const custoTotal = custoIngredientes + (custoFixo || 0) + custoMaoObraCalculado
+    const precoComMargem = custoTotal * (1 + (margem || 0) / 100)
+    return precoComMargem
+  }
+
+  const calcularReceita = () => {
+    if (!canUseCalculadora()) {
+      setShowUpgradeModal(true)
+      return
+    }
+
+    const incrementado = incrementCalculos()
+    if (!incrementado) {
+      setShowUpgradeModal(true)
+      return
+    }
+
+    const calculo: CalculoPreco = {
+      id: Date.now().toString(),
+      usuario_id: user?.id || '',
+      nome_receita: nomeReceita || 'Receita sem nome',
+      ingredientes: ingredientes,
+      custo_ingredientes: calcularCustoIngredientes(),
+      custo_fixo: custoFixo || 0,
+      custo_mao_obra: (tempoPreparoHoras || 0) * (custoHora || 0),
+      margem_lucro: margem || 0,
+      preco_final: calcularPrecoFinal(),
+      data_calculo: new Date().toISOString(),
+      observacoes: ''
+    }
+
+    const novoHistorico = [calculo, ...historico.slice(0, 19)]
+    setHistorico(novoHistorico)
+    saveToLocalStorage('doce_historico_calculos', novoHistorico)
+    
+    setShowBreakdown(true)
+  }
     const custoIngredientes = calcularCustoIngredientes()
     const tempo = tempoPreparoHoras || 0
     const valorHora = custoHora || 0

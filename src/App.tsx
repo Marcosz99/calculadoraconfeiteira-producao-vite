@@ -50,8 +50,8 @@ function AppContent() {
             <Route path="/calculadora" element={<ProtectedRoute><CalculadoraPage /></ProtectedRoute>} />
             <Route path="/receitas" element={<ProtectedRoute><ReceitasPage /></ProtectedRoute>} />
             <Route path="/ingredientes" element={<ProtectedRoute><IngredientesPage /></ProtectedRoute>} />
-            <Route path="/clientes" element={<ProtectedRoute><ClientesPage /></ProtectedRoute>} />
-            <Route path="/orcamentos" element={<ProtectedRoute><OrcamentosPage /></ProtectedRoute>} />
+            <Route path="/clientes" element={<ProtectedRoute requiresPro={true}><ClientesPage /></ProtectedRoute>} />
+            <Route path="/orcamentos" element={<ProtectedRoute requiresPro={true}><OrcamentosPage /></ProtectedRoute>} />
             <Route path="/relatorios-avancados" element={<ProtectedRoute requiresPro={true}><RelatoriosAvancadosPage /></ProtectedRoute>} />
             <Route path="/ferramentas" element={<ProtectedRoute><FerramentasPage /></ProtectedRoute>} />
             <Route path="/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
@@ -60,17 +60,17 @@ function AppContent() {
             <Route path="/upgrade-success" element={<ProtectedRoute><UpgradeSuccessPage /></ProtectedRoute>} />
             <Route path="/subscription" element={<ProtectedRoute><SubscriptionDashboardPage /></ProtectedRoute>} />
             <Route path="/como-usar" element={<ProtectedRoute><ComoUsarPage /></ProtectedRoute>} />
-            <Route path="/meu-catalogo" element={<ProtectedRoute><MeuCatalogoPage /></ProtectedRoute>} />
+            <Route path="/meu-catalogo" element={<ProtectedRoute requiresPro={true}><MeuCatalogoPage /></ProtectedRoute>} />
             <Route path="/catalogo/:userId" element={<CatalogoPublicoPage />} />
-            <Route path="/encomendas" element={<ProtectedRoute><EncomendasPage /></ProtectedRoute>} />
+            <Route path="/encomendas" element={<ProtectedRoute requiresPro={true}><EncomendasPage /></ProtectedRoute>} />
             <Route path="/comunidade" element={<ProtectedRoute><ComunidadePage /></ProtectedRoute>} />
-            <Route path="/backup-emergencial" element={<ProtectedRoute><BackupEmergencialPage /></ProtectedRoute>} />
+            <Route path="/backup-emergencial" element={<ProtectedRoute requiresPro={true}><BackupEmergencialPage /></ProtectedRoute>} />
             {/* Removed credit test route for production */}
             <Route path="/ai-assistant" element={<ProtectedRoute><AiAssistantPage /></ProtectedRoute>} />
-            <Route path="/marketplace" element={<ProtectedRoute><MarketplacePage /></ProtectedRoute>} />
-            <Route path="/advanced-calculator" element={<ProtectedRoute><AdvancedCalculatorPage /></ProtectedRoute>} />
-            <Route path="/custom-catalog" element={<ProtectedRoute><CustomCatalogPage /></ProtectedRoute>} />
-            <Route path="/financeiro" element={<ProtectedRoute><FinanceiroPage /></ProtectedRoute>} />
+            <Route path="/marketplace" element={<ProtectedRoute requiresPro={true}><MarketplacePage /></ProtectedRoute>} />
+            <Route path="/advanced-calculator" element={<ProtectedRoute requiresPro={true}><AdvancedCalculatorPage /></ProtectedRoute>} />
+            <Route path="/custom-catalog" element={<ProtectedRoute requiresPro={true}><CustomCatalogPage /></ProtectedRoute>} />
+            <Route path="/financeiro" element={<ProtectedRoute requiresPro={true}><FinanceiroPage /></ProtectedRoute>} />
             <Route path="/perfil" element={<ProtectedRoute><PerfilPage /></ProtectedRoute>} />
       </Routes>
       
