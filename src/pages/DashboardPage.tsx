@@ -164,7 +164,7 @@ export default function DashboardPage() {
             Olá, {profile?.nome}! 👋
           </h1>
           <p className="text-muted-foreground text-sm lg:text-base">
-            Bem-vinda ao seu painel de controle
+            Bem-vindo! (a) ao seu painel de controle
           </p>
         </div>
         
