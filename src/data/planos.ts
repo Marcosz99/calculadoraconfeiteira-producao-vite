@@ -22,7 +22,7 @@ export const planos: Plano[] = [
     preco_mensal: 19.90,
     limite_receitas: null,
     limite_orcamentos: null,
-    descricao: 'Plano anual com 100% das funcionalidades',
+    descricao: 'Plano mensal com 100% das funcionalidades',
     popular: true,
     funcionalidades: [
       'Receitas ilimitadas',

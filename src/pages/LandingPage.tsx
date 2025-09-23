@@ -411,22 +411,12 @@ export default function LandingPage() {
                 <p className="text-gray-600">Para sempre</p>
               </div>
               <ul className="space-y-3 mb-8">
-                <li className="flex items-center">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-sm sm:text-base">3 receitas cadastradas</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-sm sm:text-base">Calculadora básica</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-sm sm:text-base">Base de ingredientes</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-sm sm:text-base">Suporte por email</span>
-                </li>
+                {planos.find(p => p.id === 'free')?.funcionalidades.map((funcionalidade, index) => (
+                  <li key={index} className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0" />
+                    <span className="text-sm sm:text-base">{funcionalidade}</span>
+                  </li>
+                ))}
               </ul>
               <Link
                 to="/login"
