@@ -122,8 +122,10 @@ export default function CalculadoraPage() {
     }
 
     const calculo: CalculoPreco = {
+      id: Date.now().toString(),
       usuario_id: user?.id || '',
       nome_receita: nomeReceita || 'Receita sem nome',
+      ingredientes: ingredientes,
       custo_ingredientes: calcularCustoIngredientes(),
       custo_fixo: custoFixo || 0,
       custo_mao_obra: (tempoPreparoHoras || 0) * (custoHora || 0),
@@ -133,12 +135,20 @@ export default function CalculadoraPage() {
       observacoes: ''
     }
 
-    const calculoComId = { ...calculo, id: Date.now().toString() }
-    const novoHistorico = [calculoComId, ...historico.slice(0, 19)]
+    const novoHistorico = [calculo, ...historico.slice(0, 19)]
     setHistorico(novoHistorico)
     saveToLocalStorage('doce_historico_calculos', novoHistorico)
     
     setShowBreakdown(true)
+  }
+    const custoIngredientes = calcularCustoIngredientes()
+    const tempo = tempoPreparoHoras || 0
+    const valorHora = custoHora || 0
+    const fixo = custoFixo || 0
+    const margemCalculo = margem || 0
+    const custoMaoObraTotal = tempo * valorHora
+    const custoTotal = custoIngredientes + fixo + custoMaoObraTotal
+    return custoTotal * (1 + margemCalculo / 100)
   }
 
   const carregarReceita = (receitaId: string) => {
@@ -172,7 +182,7 @@ export default function CalculadoraPage() {
     { number: 1, title: 'Receita', description: 'Escolha ou crie' },
     { number: 2, title: 'Ingredientes', description: 'Adicione e configure' },
     { number: 3, title: 'Configurações', description: 'Custos e margem' },
-    { number: 4, title: 'Resultado', description: 'Preço final' }
+    { number:4, title: 'Resultado', description: 'Preço final' }
   ]
 
   const formatCurrency = (value: number) => {
@@ -659,14 +669,6 @@ export default function CalculadoraPage() {
             </button>
           </div>
         </div>
-
-        {/* Modals */}
-        {showUpgradeModal && (
-          <UpgradeModal 
-            isOpen={showUpgradeModal} 
-            onClose={() => setShowUpgradeModal(false)} 
-          />
-        )}
       </div>
     </AppLayout>
   )
