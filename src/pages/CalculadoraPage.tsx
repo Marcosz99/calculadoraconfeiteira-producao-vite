@@ -141,15 +141,6 @@ export default function CalculadoraPage() {
     
     setShowBreakdown(true)
   }
-    const custoIngredientes = calcularCustoIngredientes()
-    const tempo = tempoPreparoHoras || 0
-    const valorHora = custoHora || 0
-    const fixo = custoFixo || 0
-    const margemCalculo = margem || 0
-    const custoMaoObraTotal = tempo * valorHora
-    const custoTotal = custoIngredientes + fixo + custoMaoObraTotal
-    return custoTotal * (1 + margemCalculo / 100)
-  }
 
   const carregarReceita = (receitaId: string) => {
     const receita = receitas.find(r => r.id === receitaId)
@@ -182,7 +173,7 @@ export default function CalculadoraPage() {
     { number: 1, title: 'Receita', description: 'Escolha ou crie' },
     { number: 2, title: 'Ingredientes', description: 'Adicione e configure' },
     { number: 3, title: 'Configurações', description: 'Custos e margem' },
-    { number:4, title: 'Resultado', description: 'Preço final' }
+    { number: 4, title: 'Resultado', description: 'Preço final' }
   ]
 
   const formatCurrency = (value: number) => {
@@ -669,6 +660,14 @@ export default function CalculadoraPage() {
             </button>
           </div>
         </div>
+
+        {/* Modals */}
+        {showUpgradeModal && (
+          <UpgradeModal 
+            isOpen={showUpgradeModal} 
+            onClose={() => setShowUpgradeModal(false)} 
+          />
+        )}
       </div>
     </AppLayout>
   )
