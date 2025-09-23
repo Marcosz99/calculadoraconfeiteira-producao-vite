@@ -122,10 +122,8 @@ export default function CalculadoraPage() {
     }
 
     const calculo: CalculoPreco = {
-      id: Date.now().toString(),
       usuario_id: user?.id || '',
       nome_receita: nomeReceita || 'Receita sem nome',
-      ingredientes: ingredientes,
       custo_ingredientes: calcularCustoIngredientes(),
       custo_fixo: custoFixo || 0,
       custo_mao_obra: (tempoPreparoHoras || 0) * (custoHora || 0),
@@ -135,7 +133,8 @@ export default function CalculadoraPage() {
       observacoes: ''
     }
 
-    const novoHistorico = [calculo, ...historico.slice(0, 19)]
+    const calculoComId = { ...calculo, id: Date.now().toString() }
+    const novoHistorico = [calculoComId, ...historico.slice(0, 19)]
     setHistorico(novoHistorico)
     saveToLocalStorage('doce_historico_calculos', novoHistorico)
     
