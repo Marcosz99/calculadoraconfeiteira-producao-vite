@@ -5,6 +5,7 @@ import { ArrowLeft, Save, Eye, QrCode, Share2, Upload, Palette, Type, Layout, Sh
 import { useAuth } from '../contexts/AuthContext'
 import { Receita, ProdutoCatalogo } from '../types'
 import { LOCAL_STORAGE_KEYS, getFromLocalStorage, saveToLocalStorage } from '../utils/localStorage'
+import { useSupabaseReceitas } from '../hooks/useSupabaseReceitas'
 import QRCodeGenerator from '../components/QRCodeGenerator'
 
 interface CatalogoBranding {
@@ -48,8 +49,8 @@ const CORES_SUGERIDAS = [
 
 export default function CustomCatalogPage() {
   const { user, profile } = useAuth()
+  const { receitas, loading: receitasLoading } = useSupabaseReceitas()
   const [activeTab, setActiveTab] = useState<'design' | 'produtos'>('design')
-  const [receitas, setReceitas] = useState<Receita[]>([])
   const [produtos, setProdutos] = useState<ProdutoCatalogo[]>([])
   const [showQRModal, setShowQRModal] = useState(false)
   const [showColorPicker, setShowColorPicker] = useState(false)
@@ -109,10 +110,6 @@ export default function CustomCatalogPage() {
 
   useEffect(() => {
     if (user) {
-      // Carregar receitas do usuário
-      const savedReceitas = getFromLocalStorage<Receita[]>(LOCAL_STORAGE_KEYS.RECEITAS, [])
-      setReceitas(savedReceitas.filter(r => r.usuario_id === user.id && r.ativo))
-      
       // Carregar configurações de branding salvas
       const savedBranding = getFromLocalStorage<CatalogoBranding[]>('catalogo_branding', [])
       const userBranding = savedBranding.find(b => b.usuario_id === user.id)
@@ -125,7 +122,7 @@ export default function CustomCatalogPage() {
       const savedProdutos = getFromLocalStorage<ProdutoCatalogo[]>('catalogo_produtos', [])
       setProdutos(savedProdutos.filter(p => p.usuario_id === user.id))
     }
-  }, [user, profile])
+  }, [user, profile, receitas]) // Adicionando receitas como dependência
 
   const salvarBranding = () => {
     if (!user) return

@@ -8,6 +8,8 @@ import { LOCAL_STORAGE_KEYS, getFromLocalStorage, saveToLocalStorage } from '../
 import { parseNumericInput, formatForInput } from '../utils/numberUtils'
 import CurrencyInput from '../components/ui/CurrencyInput'
 import { useSubscriptionLimits } from '../hooks/useSubscriptionLimits'
+import { useSupabaseReceitas } from '../hooks/useSupabaseReceitas'
+import { useSupabaseIngredientes } from '../hooks/useSupabaseIngredientes'
 import { UpgradeModal } from '../components/UpgradeModal'
 
 interface Ingrediente {
@@ -21,11 +23,11 @@ interface Ingrediente {
 export default function CalculadoraPage() {
   const { user } = useAuth()
   const { canUseCalculadora, incrementCalculos, isProfessional, usage, limits } = useSubscriptionLimits()
+  const { receitas, loading: receitasLoading } = useSupabaseReceitas()
+  const { ingredientes: ingredientesDisponiveis, loading: ingredientesLoading } = useSupabaseIngredientes()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   
   // Estados existentes (mantendo funcionalidade)
-  const [ingredientesDisponiveis, setIngredientesDisponiveis] = useState<IngredienteUsuario[]>([])
-  const [receitas, setReceitas] = useState<Receita[]>([])
   const [ingredientes, setIngredientes] = useState<Ingrediente[]>([])
   const [nomeReceita, setNomeReceita] = useState('')
   const [receitaSelecionada, setReceitaSelecionada] = useState('')
@@ -47,12 +49,7 @@ export default function CalculadoraPage() {
   
   useEffect(() => {
     if (user) {
-      const savedIngredientes = getFromLocalStorage<IngredienteUsuario[]>(LOCAL_STORAGE_KEYS.INGREDIENTES_USUARIO, [])
-      const savedReceitas = getFromLocalStorage<Receita[]>(LOCAL_STORAGE_KEYS.RECEITAS, [])
       const savedHistorico = getFromLocalStorage<CalculoPreco[]>('doce_historico_calculos', [])
-      
-      setIngredientesDisponiveis(savedIngredientes.filter(i => i.usuario_id === user.id))
-      setReceitas(savedReceitas.filter(r => r.usuario_id === user.id && r.ativo))
       setHistorico(savedHistorico)
     }
   }, [user])
@@ -76,8 +73,8 @@ export default function CalculadoraPage() {
         id: Date.now().toString(),
         nome: ingredienteRef.nome,
         quantidade: null,
-        unidade: ingredienteRef.unidade,
-        precoUnitario: ingredienteRef.preco_atual
+        unidade: ingredienteRef.unidade_padrao,
+        precoUnitario: ingredienteRef.preco_medio
       }
       setIngredientes([...ingredientes, novoIngrediente])
     }
@@ -150,16 +147,16 @@ export default function CalculadoraPage() {
       setReceitaSelecionada(receitaId)
       
       // Carregar ingredientes da receita
-      const ingredientesReceita = receita.ingredientes?.map(ing => {
+      const ingredientesReceita = Array.isArray(receita.ingredientes) ? receita.ingredientes.map((ing: any) => {
         const ingredienteRef = ingredientesDisponiveis.find(i => i.id === ing.ingrediente_id)
         return {
           id: Date.now().toString() + Math.random(),
-          nome: ingredienteRef?.nome || 'Ingrediente não encontrado',
+          nome: ingredienteRef?.nome || ing.nome || 'Ingrediente não encontrado',
           quantidade: ing.quantidade,
           unidade: ing.unidade,
-          precoUnitario: ingredienteRef?.preco_atual || null
+          precoUnitario: ingredienteRef?.preco_medio || null
         }
-      }) || []
+      }) : []
       
       setIngredientes(ingredientesReceita)
       setCurrentStep(3) // Pular para configurações
@@ -347,7 +344,7 @@ export default function CalculadoraPage() {
                           className="text-left p-2 bg-white rounded border hover:border-pink-300 transition-colors"
                         >
                           <p className="text-sm font-medium text-gray-900">{ing.nome}</p>
-                          <p className="text-xs text-gray-600">{formatCurrency(ing.preco_atual || 0)}/{ing.unidade}</p>
+                          <p className="text-xs text-gray-600">{formatCurrency(ing.preco_medio || 0)}/{ing.unidade_padrao}</p>
                         </button>
                       ))}
                     </div>
