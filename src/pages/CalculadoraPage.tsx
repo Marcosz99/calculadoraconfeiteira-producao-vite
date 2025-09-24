@@ -122,17 +122,18 @@ export default function CalculadoraPage() {
     }
 
     const calculo: CalculoPreco = {
-      id: Date.now().toString(),
-      usuario_id: user?.id || '',
-      nome_receita: nomeReceita || 'Receita sem nome',
-      ingredientes: ingredientes,
+      receita_id: receitaSelecionada || Date.now().toString(),
       custo_ingredientes: calcularCustoIngredientes(),
       custo_fixo: custoFixo || 0,
       custo_mao_obra: (tempoPreparoHoras || 0) * (custoHora || 0),
       margem_lucro: margem || 0,
       preco_final: calcularPrecoFinal(),
-      data_calculo: new Date().toISOString(),
-      observacoes: ''
+      breakdown: ingredientes.map(ing => ({
+        ingrediente_id: ing.id,
+        nome: ing.nome,
+        quantidade: ing.quantidade || 0,
+        custo: (ing.quantidade || 0) * (ing.precoUnitario || 0)
+      }))
     }
 
     const novoHistorico = [calculo, ...historico.slice(0, 19)]
@@ -140,15 +141,6 @@ export default function CalculadoraPage() {
     saveToLocalStorage('doce_historico_calculos', novoHistorico)
     
     setShowBreakdown(true)
-  }
-    const custoIngredientes = calcularCustoIngredientes()
-    const tempo = tempoPreparoHoras || 0
-    const valorHora = custoHora || 0
-    const fixo = custoFixo || 0
-    const margemCalculo = margem || 0
-    const custoMaoObraTotal = tempo * valorHora
-    const custoTotal = custoIngredientes + fixo + custoMaoObraTotal
-    return custoTotal * (1 + margemCalculo / 100)
   }
 
   const carregarReceita = (receitaId: string) => {
