@@ -5,30 +5,36 @@
 @layer base {
   :root {
     /* DoceCalc Unified Color System */
-    /* Cores principais */
-    --primary: #ec4899; /* rosa vibrante */
-    --primary-light: #f9a8d4; /* rosa claro */
-    --secondary: #fbbf24; /* laranja - upgrades */
-    --success: #10b981; /* verde */
-    --warning: #f59e0b; /* laranja */
-    --error: #ef4444; /* vermelho */
+    /* Cores principais - convertidas para HSL */
+    --primary: 322.2 84% 64.9%; /* rosa vibrante */
+    --primary-light: 322.2 60% 80%; /* rosa claro */
+    --secondary: 42.2 91% 54.9%; /* laranja - upgrades */
+    --success: 158.1 64.4% 51.6%; /* verde */
+    --warning: 37.7 92.1% 50.2%; /* laranja */
+    --error: 0 72.2% 50.6%; /* vermelho */
     
-    /* Neutros */
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-800: #1f2937;
-    --gray-900: #111827;
+    /* Neutros - em HSL */
+    --gray-50: 210 40% 98%;
+    --gray-100: 210 20% 95%;
+    --gray-200: 214.3 31.8% 91.4%;
+    --gray-800: 215 28% 17%;
+    --gray-900: 224 71% 4%;
     
-    /* System colors (mantendo compatibilidade) */
+    /* System colors (usando valores HSL corretos) */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
+    --primary-foreground: 0 0% 100%;
+    --secondary-foreground: 0 0% 0%;
     --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 0 0% 100%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 322.2 84% 64.9%;
