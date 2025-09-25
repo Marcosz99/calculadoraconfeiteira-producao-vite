@@ -160,7 +160,7 @@ Foque na PRECISÃO e COMPLETUDE das informações extraídas.`
     
     return new Response(
       JSON.stringify({
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         nome: 'Erro no Processamento',
         ingredientes: [],
         modo_preparo: ['Não foi possível extrair o modo de preparo'],

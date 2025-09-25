@@ -30,7 +30,7 @@ export default function ProtectedRoute({ children, requiresPro = false }: Protec
 
   // Verificar se precisa do plano Pro
   if (requiresPro && profile?.plano !== 'professional') {
-    return <Navigate to="/upgrade" replace />
+    return <Navigate to="/checkout" replace />
   }
 
   return <>{children}</>

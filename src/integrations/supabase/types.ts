@@ -586,6 +586,7 @@ export type Database = {
           nome_negocio: string | null
           password: string
           plano: string | null
+          subscription_status: string | null
           telefone: string | null
           updated_at: string | null
           valor_hora: number | null
@@ -607,6 +608,7 @@ export type Database = {
           nome_negocio?: string | null
           password: string
           plano?: string | null
+          subscription_status?: string | null
           telefone?: string | null
           updated_at?: string | null
           valor_hora?: number | null
@@ -628,6 +630,7 @@ export type Database = {
           nome_negocio?: string | null
           password?: string
           plano?: string | null
+          subscription_status?: string | null
           telefone?: string | null
           updated_at?: string | null
           valor_hora?: number | null
@@ -696,6 +699,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean | null
+          created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          customer_id: string
+          id: string
+          plan_id: string
+          status: string
+          subscription_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          customer_id: string
+          id?: string
+          plan_id?: string
+          status?: string
+          subscription_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean | null
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          customer_id?: string
+          id?: string
+          plan_id?: string
+          status?: string
+          subscription_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       transacoes_financeiras: {
         Row: {

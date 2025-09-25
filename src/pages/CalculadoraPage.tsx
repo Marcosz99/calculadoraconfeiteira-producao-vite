@@ -278,25 +278,11 @@ export default function CalculadoraPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Selecione uma receita
                   </label>
-                  <div className="space-y-2 max-h-60 overflow-y-auto">
-                    {receitas.map((receita) => (
-                      <button
-                        key={receita.id}
-                        onClick={() => carregarReceita(receita.id)}
-                        className="w-full text-left p-3 border border-gray-200 rounded-lg hover:border-pink-300 hover:bg-pink-50 transition-colors"
-                      >
-                        <h4 className="font-medium text-gray-900">{receita.nome}</h4>
-                        <p className="text-sm text-gray-600">{receita.categoria_id || 'Sem categoria'}</p>
-                      </button>
-                    ))}
-                    {receitas.length === 0 && (
-                      <div className="text-center py-8 text-gray-500">
-                        <p>Nenhuma receita encontrada.</p>
-                        <Link to="/receitas" className="text-pink-500 hover:text-pink-600">
-                          Cadastre sua primeira receita
-                        </Link>
-                      </div>
-                    )}
+                  <div className="bg-blue-50 p-6 rounded-lg text-center">
+                    <div className="text-blue-600 text-lg font-medium mb-2">🚀 Em breve</div>
+                    <p className="text-blue-500 text-sm">
+                      Funcionalidade sendo desenvolvida para uma melhor experiência
+                    </p>
                   </div>
                 </div>
               )}

@@ -18,7 +18,7 @@ import RelatoriosAvancadosPage from './pages/RelatoriosAvancadosPage'
 import FerramentasPage from './pages/FerramentasPage'
 import UpgradePage from './pages/UpgradePage'
 import { UpgradePixPage } from './pages/UpgradePixPage'
-import { UpgradeStripePage } from './pages/UpgradeStripePage'
+import CheckoutStripePage from './pages/CheckoutStripePage'
 import { UpgradeSuccessPage } from './pages/UpgradeSuccessPage'
 import SubscriptionDashboardPage from './pages/SubscriptionDashboardPage'
 import ComoUsarPage from './pages/ComoUsarPage'
@@ -46,17 +46,17 @@ function AppContent() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/dashboard" element={<ProtectedRoute><DashboardSimplePage /></ProtectedRoute>} />
-            <Route path="/calculadora" element={<ProtectedRoute><CalculadoraPage /></ProtectedRoute>} />
-            <Route path="/receitas" element={<ProtectedRoute><ReceitasPage /></ProtectedRoute>} />
-            <Route path="/ingredientes" element={<ProtectedRoute><IngredientesPage /></ProtectedRoute>} />
+            <Route path="/checkout" element={<ProtectedRoute><CheckoutStripePage /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute requiresPro={true}><DashboardSimplePage /></ProtectedRoute>} />
+            <Route path="/calculadora" element={<ProtectedRoute requiresPro={true}><CalculadoraPage /></ProtectedRoute>} />
+            <Route path="/receitas" element={<ProtectedRoute requiresPro={true}><ReceitasPage /></ProtectedRoute>} />
+            <Route path="/ingredientes" element={<ProtectedRoute requiresPro={true}><IngredientesPage /></ProtectedRoute>} />
             <Route path="/clientes" element={<ProtectedRoute requiresPro={true}><ClientesPage /></ProtectedRoute>} />
             <Route path="/orcamentos" element={<ProtectedRoute requiresPro={true}><OrcamentosPage /></ProtectedRoute>} />
             <Route path="/relatorios-avancados" element={<ProtectedRoute requiresPro={true}><RelatoriosAvancadosPage /></ProtectedRoute>} />
             <Route path="/ferramentas" element={<ProtectedRoute><FerramentasPage /></ProtectedRoute>} />
             <Route path="/upgrade" element={<ProtectedRoute><UpgradePage /></ProtectedRoute>} />
             <Route path="/upgrade/pix" element={<ProtectedRoute><UpgradePixPage /></ProtectedRoute>} />
-            <Route path="/upgrade/stripe" element={<ProtectedRoute><UpgradeStripePage /></ProtectedRoute>} />
             <Route path="/upgrade-success" element={<ProtectedRoute><UpgradeSuccessPage /></ProtectedRoute>} />
             <Route path="/subscription" element={<ProtectedRoute><SubscriptionDashboardPage /></ProtectedRoute>} />
             <Route path="/como-usar" element={<ProtectedRoute><ComoUsarPage /></ProtectedRoute>} />

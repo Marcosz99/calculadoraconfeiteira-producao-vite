@@ -141,7 +141,7 @@ Dica: faça o teste com 50 unidades para ter uma base precisa! 🍫"`
     
     return new Response(
       JSON.stringify({
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         response: 'Desculpe, estou com dificuldades técnicas no momento. Tente novamente em alguns instantes. 🤖✨'
       }),
       {

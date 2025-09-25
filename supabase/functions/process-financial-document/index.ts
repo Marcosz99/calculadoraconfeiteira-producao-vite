@@ -146,7 +146,7 @@ Tipo de transação solicitado: ${tipo === 'receita' ? 'RECEITA (venda)' : 'DESP
     
     return new Response(
       JSON.stringify({
-        error: error.message,
+        error: error instanceof Error ? error.message : 'Unknown error',
         valor_total: 0,
         data: new Date().toISOString().split('T')[0],
         empresa_emitente: 'Não foi possível extrair',
