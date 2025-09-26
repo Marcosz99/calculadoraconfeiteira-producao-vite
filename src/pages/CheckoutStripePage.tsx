@@ -24,6 +24,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess }) => {
   const [loading, setLoading] = useState(false)
   const [customerName, setCustomerName] = useState('')
   const [customerEmail, setCustomerEmail] = useState(user?.email || '')
+  const [customerPhone, setCustomerPhone] = useState('')
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -59,6 +60,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess }) => {
         body: {
           customerEmail,
           customerName,
+          customerPhone,
           paymentMethodId: paymentMethod.id
         },
         headers: {
@@ -124,6 +126,20 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess }) => {
             value={customerEmail}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomerEmail(e.target.value)}
             placeholder="seu@email.com"
+            required
+            className="w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            WhatsApp/Telefone
+          </label>
+          <Input
+            type="tel"
+            value={customerPhone}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomerPhone(e.target.value)}
+            placeholder="(11) 99999-9999"
             required
             className="w-full"
           />
@@ -250,8 +266,8 @@ export default function CheckoutStripePage() {
                 R$ 19,90
                 <span className="text-base font-normal text-gray-600">/mês</span>
               </div>
-              <CardDescription>
-                Compromisso mínimo de 12 meses
+              <CardDescription className="text-green-600 font-medium">
+                🎉 7 DIAS GRÁTIS • Depois R$19,90/mês
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -332,7 +348,7 @@ export default function CheckoutStripePage() {
                 
                 <p className="text-xs text-gray-400">
                   Ao confirmar, você concorda com nossos termos de uso.
-                  Compromisso mínimo de 12 meses.
+                  Teste grátis por 7 dias, depois R$19,90/mês.
                 </p>
               </div>
             </CardContent>
@@ -347,9 +363,10 @@ export default function CheckoutStripePage() {
           <p className="text-gray-600 mb-4">
             Nossa equipe está aqui para ajudar você a começar
           </p>
-          <Button variant="outline" onClick={() => window.open('https://wa.me/5511999999999', '_blank')}>
-            Falar com Suporte
-          </Button>
+          <div className="text-center">
+            <p className="text-gray-600 mb-2">💬 Suporte via WhatsApp:</p>
+            <p className="text-lg font-semibold text-primary">(11) 99999-9999</p>
+          </div>
         </div>
       </div>
     </div>

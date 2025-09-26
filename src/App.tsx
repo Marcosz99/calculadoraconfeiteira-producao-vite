@@ -18,6 +18,7 @@ import RelatoriosAvancadosPage from './pages/RelatoriosAvancadosPage'
 import FerramentasPage from './pages/FerramentasPage'
 import UpgradePage from './pages/UpgradePage'
 import { UpgradePixPage } from './pages/UpgradePixPage'
+import HistoricoCalculosPage from './pages/HistoricoCalculosPage'
 import CheckoutStripePage from './pages/CheckoutStripePage'
 import { UpgradeSuccessPage } from './pages/UpgradeSuccessPage'
 import SubscriptionDashboardPage from './pages/SubscriptionDashboardPage'
@@ -46,7 +47,8 @@ function AppContent() {
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
-            <Route path="/checkout" element={<ProtectedRoute><CheckoutStripePage /></ProtectedRoute>} />
+            <Route path="/checkout" element={<CheckoutStripePage />} />
+            <Route path="/historico-calculos" element={<ProtectedRoute><HistoricoCalculosPage /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute requiresPro={true}><DashboardSimplePage /></ProtectedRoute>} />
             <Route path="/calculadora" element={<ProtectedRoute requiresPro={true}><CalculadoraPage /></ProtectedRoute>} />
             <Route path="/receitas" element={<ProtectedRoute requiresPro={true}><ReceitasPage /></ProtectedRoute>} />

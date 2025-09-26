@@ -40,7 +40,7 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const { customerEmail, customerName, paymentMethodId } = await req.json();
+    const { customerEmail, customerName, customerPhone, paymentMethodId } = await req.json();
     
     if (!customerEmail || !paymentMethodId) {
       throw new Error("Missing required fields: customerEmail and paymentMethodId");
@@ -60,6 +60,7 @@ serve(async (req) => {
       const customer = await stripe.customers.create({
         email: customerEmail,
         name: customerName || customerEmail,
+        phone: customerPhone,
         metadata: {
           user_id: user.id
         }

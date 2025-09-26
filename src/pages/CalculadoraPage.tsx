@@ -138,6 +138,28 @@ export default function CalculadoraPage() {
     saveToLocalStorage('doce_historico_calculos', novoHistorico)
     
     setShowBreakdown(true)
+    setCurrentStep(4)
+  }
+
+  const exportToPDF = () => {
+    const calculo = {
+      nomeReceita: nomeReceita || 'Receita',
+      custoIngredientes: calcularCustoIngredientes(),
+      custoMaoObra: (tempoPreparoHoras || 0) * (custoHora || 0),
+      custoFixo: custoFixo || 0,
+      margem: margem || 0,
+      precoFinal: calcularPrecoFinal(),
+      ingredientes: ingredientes,
+      dataCalculo: new Date().toLocaleDateString('pt-BR')
+    }
+
+    const element = document.createElement("a")
+    const file = new Blob([JSON.stringify(calculo, null, 2)], { type: 'application/json' })
+    element.href = URL.createObjectURL(file)
+    element.download = `calculo-${calculo.nomeReceita.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}.json`
+    document.body.appendChild(element)
+    element.click()
+    document.body.removeChild(element)
   }
 
   const carregarReceita = (receitaId: string) => {
@@ -596,9 +618,19 @@ export default function CalculadoraPage() {
                   <Save className="h-4 w-4 mr-2" />
                   Salvar Cálculo
                 </button>
-                <button className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center">
+                <button 
+                  onClick={() => exportToPDF()}
+                  className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center"
+                >
                   <Download className="h-4 w-4 mr-2" />
                   Exportar PDF
+                </button>
+                <button 
+                  onClick={() => setShowHistorico(true)}
+                  className="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 flex items-center"
+                >
+                  <History className="h-4 w-4 mr-2" />
+                  Ver Histórico ({historico.length})
                 </button>
                 <button 
                   onClick={() => {
@@ -643,7 +675,118 @@ export default function CalculadoraPage() {
               <ArrowRight className="h-4 w-4 ml-2" />
             </button>
           </div>
+          {/* Modal Histórico */}
+          {showHistorico && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                <div className="p-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">Histórico de Cálculos</h3>
+                    <button 
+                      onClick={() => setShowHistorico(false)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  
+                  {historico.length === 0 ? (
+                    <div className="text-center py-8">
+                      <History className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-500">Nenhum cálculo realizado ainda</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <p className="text-sm text-gray-600">{historico.length} cálculos salvos</p>
+                        <Link to="/historico-calculos">
+                          <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                            Ver histórico completo →
+                          </button>
+                        </Link>
+                      </div>
+                      {historico.slice(0, 5).map((calculo, index) => (
+                        <div key={index} className="border border-gray-200 rounded-lg p-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <h4 className="font-medium">Cálculo #{historico.length - index}</h4>
+                              <p className="text-sm text-gray-500">
+                                {calculo.breakdown.length} ingredientes
+                              </p>
+                            </div>
+                            <span className="font-bold text-pink-600">
+                              {formatCurrency(calculo.preco_final)}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2 text-xs">
+                            <div>
+                              <span className="text-gray-500">Ingredientes: </span>
+                              <span>{formatCurrency(calculo.custo_ingredientes)}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">M. Obra: </span>
+                              <span>{formatCurrency(calculo.custo_mao_obra)}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Margem: </span>
+                              <span>{calculo.margem_lucro}%</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <div className="flex gap-3 mt-6">
+                    <button 
+                      onClick={() => setShowHistorico(false)}
+                      className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                    >
+                      Fechar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Modal Save */}
+        {showSaveModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-md w-full p-6">
+              <h3 className="text-lg font-semibold mb-4">Salvar Cálculo</h3>
+              <p className="text-gray-600 mb-4">
+                Deseja salvar este cálculo no histórico?
+              </p>
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setShowSaveModal(false)}
+                  className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  onClick={() => {
+                    // O cálculo já foi salvo automaticamente
+                    setShowSaveModal(false)
+                  }}
+                  className="flex-1 px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600"
+                >
+                  Salvar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Upgrade Modal */}
+        <UpgradeModal 
+          isOpen={showUpgradeModal} 
+          onClose={() => setShowUpgradeModal(false)} 
+          feature="Calculadora de Preços"
+          onUpgrade={() => setShowUpgradeModal(false)}
+        />
       </div>
     </AppLayout>
   )
