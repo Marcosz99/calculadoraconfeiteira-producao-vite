@@ -219,10 +219,10 @@ export default function DashboardPage() {
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Mais Funcionalidades</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all group relative cursor-not-allowed opacity-75">
-              <div className="absolute top-2 right-2 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">
-                Em breve
-              </div>
+            <Link 
+              to="/clientes"
+              className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all group"
+            >
               <div className="text-center">
                 <div className="p-3 rounded-lg bg-blue-100 group-hover:bg-blue-500 transition-colors inline-block mb-3">
                   <Users className="h-6 w-6 text-blue-600 group-hover:text-white" />
@@ -230,12 +230,12 @@ export default function DashboardPage() {
                 <h3 className="font-medium text-gray-900 mb-1">Clientes</h3>
                 <p className="text-xs text-gray-600">CRM completo</p>
               </div>
-            </div>
+            </Link>
             
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md hover:border-indigo-200 transition-all group relative cursor-not-allowed opacity-75">
-              <div className="absolute top-2 right-2 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">
-                Em breve
-              </div>
+            <Link 
+              to="/orcamentos"
+              className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md hover:border-indigo-200 transition-all group"
+            >
               <div className="text-center">
                 <div className="p-3 rounded-lg bg-indigo-100 group-hover:bg-indigo-500 transition-colors inline-block mb-3">
                   <FileText className="h-6 w-6 text-indigo-600 group-hover:text-white" />
@@ -243,7 +243,7 @@ export default function DashboardPage() {
                 <h3 className="font-medium text-gray-900 mb-1">Orçamentos</h3>
                 <p className="text-xs text-gray-600">Crie propostas</p>
               </div>
-            </div>
+            </Link>
             
 
             <Link 
@@ -259,10 +259,10 @@ export default function DashboardPage() {
               </div>
             </Link>
 
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md hover:border-red-200 transition-all group relative cursor-not-allowed opacity-75">
-              <div className="absolute top-2 right-2 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">
-                Em breve
-              </div>
+            <Link 
+              to="/marketplace"
+              className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md hover:border-red-200 transition-all group"
+            >
               <div className="text-center">
                 <div className="p-3 rounded-lg bg-red-100 group-hover:bg-red-500 transition-colors inline-block mb-3">
                   <ShoppingBag className="h-6 w-6 text-red-600 group-hover:text-white" />
@@ -270,12 +270,12 @@ export default function DashboardPage() {
                 <h3 className="font-medium text-gray-900 mb-1">Marketplace</h3>
                 <p className="text-xs text-gray-600">E-books</p>
               </div>
-            </div>
+            </Link>
 
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md hover:border-rose-200 transition-all group relative cursor-not-allowed opacity-75">
-              <div className="absolute top-2 right-2 bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">
-                Em breve
-              </div>
+            <Link 
+              to="/catalogo"
+              className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 hover:shadow-md hover:border-rose-200 transition-all group"
+            >
               <div className="text-center">
                 <div className="p-3 rounded-lg bg-rose-100 group-hover:bg-rose-500 transition-colors inline-block mb-3">
                   <Palette className="h-6 w-6 text-rose-600 group-hover:text-white" />
@@ -283,7 +283,7 @@ export default function DashboardPage() {
                 <h3 className="font-medium text-gray-900 mb-1">Catálogo</h3>
                 <p className="text-xs text-gray-600">Personalize</p>
               </div>
-            </div>
+            </Link>
 
           </div>
         </div>

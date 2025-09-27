@@ -207,9 +207,18 @@ export default function CalculadoraPage() {
     <AppLayout>
       <div className="px-4 py-6 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Calculadora de Preços</h1>
-          <p className="text-gray-600">Calcule o preço ideal para suas receitas</p>
+        <div className="mb-8 flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Calculadora de Preços</h1>
+            <p className="text-gray-600">Calcule o preço ideal para suas receitas</p>
+          </div>
+          <Link 
+            to="/historico-calculos"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <History className="w-4 h-4" />
+            Ver Histórico
+          </Link>
         </div>
 
         {/* Stepper */}
