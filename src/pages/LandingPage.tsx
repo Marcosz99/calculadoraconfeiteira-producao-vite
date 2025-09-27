@@ -68,9 +68,9 @@ export default function LandingPage() {
     },
     {
       icon: Cake,
-      titulo: "Banco de Receitas",
-      descricao: "Base completa com receitas já calculadas e organizadas por categoria",
-      beneficio: "Economize horas de cálculo",
+      titulo: "Gestão de Receitas",
+      descricao: "Cadastre e organize todas suas receitas com cálculos automáticos de custo e preço",
+      beneficio: "Receitas sempre organizadas",
       cor: "from-pink-400 to-pink-600"
     },
     {
@@ -82,9 +82,9 @@ export default function LandingPage() {
     },
     {
       icon: BarChart3,
-      titulo: "Relatórios Inteligentes",
-      descricao: "Veja quais produtos dão mais lucro, custos por período e onde está perdendo dinheiro",
-      beneficio: "Controle total do seu negócio",
+      titulo: "Relatórios Financeiros",
+      descricao: "Controle completo de vendas, gastos, lucros e veja onde está perdendo dinheiro",
+      beneficio: "Controle total do negócio",
       cor: "from-purple-400 to-purple-600"
     },
     {
@@ -103,38 +103,17 @@ export default function LandingPage() {
     },
     {
       icon: Store,
-      titulo: "Marketplace Exclusivo",
+      titulo: "Marketplace de Ebooks",
       descricao: "Acesso a ebooks premium com receitas de alta margem como chocolates gourmet e mini donuts",
       beneficio: "Receitas que faturam +R$ 2.000/mês",
       cor: "from-orange-400 to-orange-600"
     },
     {
-      icon: DollarSign,
-      titulo: "Gestão Financeira",
-      descricao: "Controle completo de vendas, gastos, lucros e fluxo de caixa do seu negócio",
-      beneficio: "Nunca mais perca dinheiro",
-      cor: "from-emerald-400 to-emerald-600"
-    },
-    {
       icon: Target,
-      titulo: "Catálogo Digital",
-      descricao: "Crie seu catálogo personalizado com fotos e preços para enviar aos clientes",
+      titulo: "Catálogo Personalizado",
+      descricao: "Crie seu catálogo digital com fotos, preços e link compartilhável para clientes",
       beneficio: "Venda mais profissionalmente",
       cor: "from-cyan-400 to-cyan-600"
-    },
-    {
-      icon: TrendingUp,
-      titulo: "Análise de Tendências",
-      descricao: "Descubra quais produtos estão vendendo mais e quando aumentar ou baixar preços",
-      beneficio: "Maximize seus lucros",
-      cor: "from-rose-400 to-rose-600"
-    },
-    {
-      icon: Clock,
-      titulo: "Controle de Tempo",
-      descricao: "Cronometragem automática do tempo de preparo para cálculo preciso da mão de obra",
-      beneficio: "Precifique seu tempo corretamente",
-      cor: "from-violet-400 to-violet-600"
     }
   ]
 
@@ -386,7 +365,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              11 Ferramentas Poderosas
+              8 Ferramentas Poderosas
               <span className="block text-transparent bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text">
                 em um Só App
               </span>
@@ -503,7 +482,7 @@ export default function LandingPage() {
               </span>
             </h2>
             <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-              Use todas as 11 ferramentas sem limitações durante sua semana de teste
+              Use todas as 8 ferramentas sem limitações durante sua semana de teste
             </p>
           </div>
 
@@ -542,11 +521,7 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center">
                   <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Relatórios avançados completos</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Gestão financeira total</span>
+                  <span className="text-gray-700 font-medium">Relatórios financeiros completos</span>
                 </div>
                 <div className="flex items-center">
                   <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
@@ -559,14 +534,6 @@ export default function LandingPage() {
                 <div className="flex items-center">
                   <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
                   <span className="text-gray-700 font-medium">Comunidade exclusiva</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Análise de tendências</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Controle de tempo automatizado</span>
                 </div>
               </div>
 
