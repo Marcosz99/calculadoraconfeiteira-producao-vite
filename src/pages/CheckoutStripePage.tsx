@@ -267,7 +267,7 @@ export default function CheckoutStripePage() {
                 <span className="text-base font-normal text-gray-600">/mês</span>
               </div>
               <CardDescription className="text-green-600 font-medium">
-                🎉 7 DIAS GRÁTIS • Depois R$19,90/mês
+                🎉 7 DIAS GRÁTIS • Depois R$19,90/mês • Compromisso de 12 meses
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -348,7 +348,8 @@ export default function CheckoutStripePage() {
                 
                 <p className="text-xs text-gray-400">
                   Ao confirmar, você concorda com nossos termos de uso.
-                  Teste grátis por 7 dias, depois R$19,90/mês.
+                  <br /><strong>7 dias GRÁTIS</strong>, depois R$19,90/mês com compromisso de 12 meses.
+                  <br />Cancelamento antecipado sujeito à multa proporcional.
                 </p>
               </div>
             </CardContent>
