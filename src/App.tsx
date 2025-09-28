@@ -20,6 +20,7 @@ import UpgradePage from './pages/UpgradePage'
 import { UpgradePixPage } from './pages/UpgradePixPage'
 import HistoricoCalculosPage from './pages/HistoricoCalculosPage'
 import CheckoutStripePage from './pages/CheckoutStripePage'
+import CheckoutSuccessPage from './pages/CheckoutSuccessPage'
 import { UpgradeSuccessPage } from './pages/UpgradeSuccessPage'
 import SubscriptionDashboardPage from './pages/SubscriptionDashboardPage'
 import ComoUsarPage from './pages/ComoUsarPage'
@@ -48,6 +49,7 @@ function AppContent() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/checkout" element={<CheckoutStripePage />} />
+            <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
             <Route path="/historico-calculos" element={<ProtectedRoute><HistoricoCalculosPage /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute requiresPro={true}><DashboardSimplePage /></ProtectedRoute>} />
             <Route path="/calculadora" element={<ProtectedRoute requiresPro={true}><CalculadoraPage /></ProtectedRoute>} />

@@ -2,6 +2,14 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
+// Função para gerar hash SHA256 (necessário para Meta Conversions API)
+async function sha256(message: string): Promise<string> {
+  const msgUint8 = new TextEncoder().encode(message)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, stripe-signature",
@@ -64,6 +72,67 @@ serve(async (req) => {
           customerId: invoice.customer,
           subscriptionId: invoice.subscription 
         });
+
+        // Buscar dados do customer
+        const customer = await stripe.customers.retrieve(invoice.customer as string) as Stripe.Customer;
+
+        // Enviar evento Purchase para Meta Pixel via Conversions API
+        try {
+          if (invoice.amount_paid && customer.email) {
+            const purchaseAmount = invoice.amount_paid / 100 // Convertendo de centavos
+
+            logStep('Sending Meta Pixel Purchase event', {
+              email: customer.email,
+              amount: purchaseAmount,
+              currency: invoice.currency?.toUpperCase()
+            })
+
+            // Meta Conversions API data
+            const metaPixelData = {
+              data: [{
+                event_name: 'Purchase',
+                event_time: Math.floor(Date.now() / 1000),
+                action_source: 'website',
+                user_data: {
+                  em: await sha256(customer.email.toLowerCase()),
+                  fn: customer.name ? await sha256(customer.name.split(' ')[0].toLowerCase()) : null,
+                  ln: customer.name ? await sha256(customer.name.split(' ').slice(-1)[0].toLowerCase()) : null
+                },
+                custom_data: {
+                  currency: invoice.currency?.toUpperCase() || 'BRL',
+                  value: purchaseAmount,
+                  content_name: 'DoceCalc Professional Subscription',
+                  content_type: 'product',
+                  content_ids: ['docecalc_professional']
+                }
+              }],
+              access_token: Deno.env.get('META_CONVERSIONS_API_TOKEN')
+            }
+
+            // Enviar para Meta Conversions API se token estiver configurado
+            if (Deno.env.get('META_CONVERSIONS_API_TOKEN')) {
+              const metaResponse = await fetch(`https://graph.facebook.com/v18.0/24319925394345055/events`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(metaPixelData)
+              })
+
+              if (metaResponse.ok) {
+                logStep('Meta Pixel Purchase event sent successfully')
+              } else {
+                const errorText = await metaResponse.text()
+                logStep('Meta Pixel event failed', { status: metaResponse.status, error: errorText })
+              }
+            } else {
+              logStep('META_CONVERSIONS_API_TOKEN not configured, skipping CAPI')
+            }
+          }
+        } catch (pixelError) {
+          logStep('Pixel tracking error', { error: pixelError })
+          // Não falha o webhook por causa do pixel
+        }
 
         // Atualizar status da assinatura para ativa
         if (invoice.subscription) {

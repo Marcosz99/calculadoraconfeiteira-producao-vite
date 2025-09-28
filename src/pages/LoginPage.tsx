@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { Calculator, Mail, Lock, User, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { PixelService } from '../services/pixelService'
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -23,7 +24,12 @@ export default function LoginPage() {
       if (isLogin) {
         await signIn(email, password)
       } else {
-        await signUp(email, password, nome, nomeConfeitaria)
+        const result = await signUp(email, password, nome, nomeConfeitaria)
+        // Disparar evento CompleteRegistration quando o usuário se cadastra
+        PixelService.trackCompleteRegistration({
+          email: email,
+          name: nome
+        })
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Erro desconhecido')

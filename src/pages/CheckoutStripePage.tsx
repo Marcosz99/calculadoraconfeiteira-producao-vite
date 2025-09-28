@@ -36,57 +36,22 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess }) => {
     setLoading(true)
 
     try {
-      const cardElement = elements.getElement(CardElement)
-      if (!cardElement) {
-        throw new Error('Elemento do cartão não encontrado')
-      }
-
-      // Criar método de pagamento
-      const { error: paymentMethodError, paymentMethod } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
-        billing_details: {
-          name: customerName,
-          email: customerEmail,
-        },
-      })
-
-      if (paymentMethodError) {
-        throw new Error(paymentMethodError.message)
-      }
-
-      // Criar assinatura no backend
-      const { data, error } = await supabase.functions.invoke('create-subscription', {
+      // Criar checkout session usando edge function
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
-          customerEmail,
-          customerName,
-          customerPhone,
-          paymentMethodId: paymentMethod.id
-        },
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+          userEmail: customerEmail,
+          userName: customerName
         }
       })
 
       if (error) throw error
 
-      // Se precisar confirmar o pagamento
-      if (data.clientSecret) {
-        const { error: confirmError } = await stripe.confirmCardPayment(data.clientSecret)
-        
-        if (confirmError) {
-          throw new Error(confirmError.message)
-        }
+      if (data.url) {
+        // Redirecionar para checkout do Stripe
+        window.location.href = data.url
+      } else {
+        throw new Error('URL de checkout não recebida')
       }
-
-      toast({
-        title: "Assinatura criada com sucesso!",
-        description: "Bem-vindo ao DoceCalc Professional. Aguarde alguns segundos...",
-      })
-
-      setTimeout(() => {
-        onSuccess()
-      }, 2000)
 
     } catch (error: any) {
       console.error('Erro no checkout:', error)

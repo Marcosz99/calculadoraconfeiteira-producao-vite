@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { PixelService } from '../services/pixelService'
 import { 
   Calculator, 
   TrendingUp, 
@@ -142,11 +143,19 @@ export default function LandingPage() {
   ]
 
   useEffect(() => {
+    // Disparar evento ViewContent quando a página carregar
+    PixelService.trackViewContent()
+    
     const interval = setInterval(() => {
       setCurrentTestimonial((prev) => (prev + 1) % depoimentos.length)
     }, 5000)
     return () => clearInterval(interval)
   }, [])
+
+  // Função para lidar com clique em "Teste Grátis"
+  const handleTesteGratisClick = () => {
+    PixelService.trackLead()
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50">
@@ -185,6 +194,7 @@ export default function LandingPage() {
             </Link>
             <Link
               to="/login"
+              onClick={handleTesteGratisClick}
               className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-medium"
             >
               TESTAR GRÁTIS
@@ -258,6 +268,7 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Link
               to="/login"
+              onClick={handleTesteGratisClick}
               className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-green-600 text-white px-10 py-5 rounded-lg text-xl font-black hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-3"
             >
               <Sparkles className="h-6 w-6" />
