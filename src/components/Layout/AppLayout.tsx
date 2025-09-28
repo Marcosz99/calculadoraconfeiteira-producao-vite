@@ -99,8 +99,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 <div>
                   <strong>📱 Suporte WhatsApp:</strong>
                   <br />
-                  <a href="https://wa.me/385915561776" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                    +385 915561776
+                  <a href="https://wa.me/5515997041319" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                    (15) 99704-1319
                   </a>
                 </div>
                 <div className="pt-2 border-t border-gray-200">

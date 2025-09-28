@@ -331,7 +331,7 @@ export default function CheckoutStripePage() {
           </p>
           <div className="text-center">
             <p className="text-gray-600 mb-2">💬 Suporte via WhatsApp:</p>
-            <p className="text-lg font-semibold text-primary">(11) 99999-9999</p>
+            <p className="text-lg font-semibold text-primary">(15) 99704-1319</p>
           </div>
         </div>
       </div>
