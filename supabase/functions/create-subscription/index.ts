@@ -83,7 +83,7 @@ serve(async (req) => {
 
     logStep("Payment method attached and set as default");
 
-    // Criar assinatura com compromisso de 12 meses e trial de 7 dias
+    // Criar assinatura com compromisso de 12 meses - cobrança imediata
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
       items: [
@@ -91,7 +91,6 @@ serve(async (req) => {
           price: "price_1SBmVuEkyU3B9iiUXLPYuCZl", // Novo preço com compromisso 12 meses
         },
       ],
-      trial_period_days: 7, // Trial de 7 dias
       payment_behavior: "default_incomplete",
       payment_settings: { save_default_payment_method: "on_subscription" },
       expand: ["latest_invoice.payment_intent"],
@@ -100,7 +99,6 @@ serve(async (req) => {
         minimum_commitment_months: "12",
         commitment_start_date: new Date().toISOString(),
         early_cancellation_fee: "238.8", // 12 x R$19,90 = multa por cancelamento antecipado
-        trial_end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
       },
       // Impedir cancelamento nos primeiros 12 meses (será tratado via webhook)
       cancel_at_period_end: false,
