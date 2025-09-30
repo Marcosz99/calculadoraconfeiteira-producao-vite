@@ -51,7 +51,7 @@ export default function LandingPage() {
     {
       problema: "Quero vender mais mas não sei como",
       consequencia: "Fica limitada a vender só para conhecidos",
-      solucao: "Comunidade com 1.200+ mulheres compartilhando dicas"
+      solucao: "Comunidade com 4.200 mulheres compartilhando dicas"
     },
     {
       problema: "Não sei quais doces dão mais dinheiro",
@@ -77,7 +77,7 @@ export default function LandingPage() {
     },
     {
       icon: Users,
-      titulo: "Comunidade de 1.200+ Mulheres",
+      titulo: "Comunidade de 4.200+ Mulheres",
       descricao: "Troque experiências, tire dúvidas e aprenda com outras mulheres que também vendem doces",
       beneficio: "Você não está sozinha",
       cor: "from-yellow-400 to-yellow-600"
@@ -260,7 +260,7 @@ export default function LandingPage() {
           </h1>
           
           <p className="text-xl sm:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed font-medium">
-            O DoceCalc é o <strong className="text-pink-600">app mais usado por 4.200+ mulheres</strong> que querem 
+            O DoceCalc é o <strong className="text-pink-600">app mais usado por 1200+ mulheres</strong> que querem 
             <strong className="text-purple-600"> ganhar renda extra fazendo docinhos - do jeito certo e lucrativo</strong>
           </p>
           
@@ -276,7 +276,7 @@ export default function LandingPage() {
             </Link>
             
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">✓ Teste 7 dias grátis ✓ Sem cartão</div>
+              <div className="text-sm text-gray-500 mb-1"></div>
               <div className="text-sm font-bold text-green-600">Comece hoje mesmo!</div>
             </div>
           </div>
@@ -300,7 +300,7 @@ export default function LandingPage() {
               
               <div className="text-center">
                 <Users className="h-12 w-12 text-yellow-500 mx-auto mb-3" />
-                <h4 className="font-bold text-gray-900 mb-2">4.200+ Mulheres</h4>
+                <h4 className="font-bold text-gray-900 mb-2">1.200 Mulheres</h4>
                 <p className="text-sm text-gray-600">Comunidade de apoio</p>
               </div>
               
@@ -488,11 +488,11 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-6">
               Comece a Ganhar Hoje
               <span className="block text-transparent bg-gradient-to-r from-green-600 to-green-700 bg-clip-text">
-                Teste Grátis por 7 Dias
+                Teste agora mesmo!
               </span>
             </h2>
             <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-              Sem cartão de crédito, sem compromisso. Cancele quando quiser.
+              Caso não goste seu dinheiro devolta!
             </p>
           </div>
 
@@ -501,7 +501,7 @@ export default function LandingPage() {
             <div className="bg-white rounded-2xl shadow-2xl p-8 relative border-4 border-green-500">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-2 rounded-full text-sm font-black shadow-lg">
-                  🔥 TESTE 7 DIAS GRÁTIS
+                  🔥 TESTE AGORA MESMO!
                 </div>
               </div>
 
@@ -523,7 +523,7 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center">
                   <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Comunidade com 1.200+ mulheres</span>
+                  <span className="text-gray-700 font-medium">Comunidade com 4.200+ mulheres</span>
                 </div>
                 <div className="flex items-center">
                   <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
@@ -550,7 +550,7 @@ export default function LandingPage() {
               <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl mb-6 border-2 border-green-200">
                 <p className="text-center font-black text-green-700 mb-2">🎯 EXPERIMENTE SEM RISCO:</p>
                 <p className="text-center text-green-600 font-semibold mb-2">
-                  7 dias para testar tudo de graça
+                  7 dias para reembolso, não pagará nada!
                 </p>
                 <p className="text-center text-sm text-gray-600">
                   Não gostou? Cancela e não paga nada
@@ -566,9 +566,8 @@ export default function LandingPage() {
               </Link>
 
               <div className="text-center text-sm text-gray-500 space-y-1">
-                <p>✓ Sem cartão de crédito</p>
                 <p>✓ Cancele quando quiser</p>
-                <p>✓ 7 dias totalmente grátis</p>
+                <p>✓ Dentro dos primeiros 7 dias totalmente grátis</p>
               </div>
             </div>
           </div>
@@ -583,7 +582,7 @@ export default function LandingPage() {
                 🛡️ Garantia Total
               </h3>
               <p className="text-lg text-gray-700 mb-6">
-                Teste grátis por 7 dias. Se depois que começar a pagar não gostar, 
+               Garantia em até 7 dias. Se depois que começar a pagar não gostar, 
                 devolvemos 100% do seu dinheiro nos primeiros 30 dias.
               </p>
               <p className="text-sm text-gray-600">
@@ -668,7 +667,7 @@ export default function LandingPage() {
                   <p className="text-green-700 font-bold">✅ Ter renda extra que ajuda nas contas</p>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg">
-                  <p className="text-green-700 font-bold">✅ Fazer parte de comunidade com 1.200+ mulheres</p>
+                  <p className="text-green-700 font-bold">✅ Fazer parte de comunidade com 4.200+ mulheres</p>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg">
                   <p className="text-green-700 font-bold">✅ Ter mais independência financeira</p>
@@ -683,7 +682,7 @@ export default function LandingPage() {
                   💰 Resultado: Renda extra todo mês
                 </p>
                 <p className="text-green-700 text-center font-semibold">
-                  Acesso completo imediato
+                  Teste 7 dias grátis - Sem risco
                 </p>
               </div>
 
@@ -692,7 +691,7 @@ export default function LandingPage() {
                 onClick={handleTesteGratisClick}
                 className="w-full mt-6 py-4 px-6 rounded-xl font-black transition-all text-center block bg-gradient-to-r from-green-500 to-green-600 text-white hover:shadow-xl hover:scale-105 text-lg"
               >
-                COMEÇAR AGORA
+                ESCOLHER O CAMINHO CERTO
               </Link>
             </div>
           </div>
@@ -752,7 +751,7 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center space-x-3">
                   <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0" />
-                  <span className="font-semibold">1.200+ mulheres com você</span>
+                  <span className="font-semibold">4.200+ mulheres com você</span>
                 </div>
               </div>
             </div>
@@ -769,10 +768,9 @@ export default function LandingPage() {
               </Link>
               
               <div className="text-lg opacity-90 space-y-2">
-                <p>✓ Sem cartão de crédito</p>
                 <p>✓ 7 dias totalmente grátis</p>
                 <p>✓ Cancele quando quiser</p>
-                <p>✓ Junte-se a 4.200+ mulheres</p>
+                <p>✓ Junte-se a 1200+ de mulheres</p>
               </div>
 
               <div className="bg-yellow-400/20 rounded-xl p-6 mt-8 max-w-2xl mx-auto">
@@ -802,15 +800,6 @@ export default function LandingPage() {
           </div>
 
           <div className="max-w-4xl mx-auto space-y-6">
-            <div className="bg-gray-50 rounded-xl p-8 border-l-8 border-green-500">
-              <h3 className="text-xl font-black text-gray-900 mb-4">
-                Como funciona o teste grátis?
-              </h3>
-              <p className="text-gray-700">
-                Você usa tudo de graça por 7 dias. Não precisa cartão de crédito. 
-                Depois dos 7 dias, se quiser continuar, aí sim paga R$ 19,90/mês.
-              </p>
-            </div>
 
             <div className="bg-gray-50 rounded-xl p-8 border-l-8 border-blue-500">
               <h3 className="text-xl font-black text-gray-900 mb-4">
@@ -837,8 +826,7 @@ export default function LandingPage() {
                 Posso cancelar quando quiser?
               </h3>
               <p className="text-gray-700">
-                Sim! Não tem contrato, não tem multa. Cancela quando quiser pelo próprio app. 
-                Se cancelar nos primeiros 7 dias, não paga nada.
+                Sim! pode cancelar em até 7 dias e não paga nada.
               </p>
             </div>
 
@@ -878,7 +866,7 @@ export default function LandingPage() {
             </div>
             
             <p className="text-gray-300 text-lg mb-6 font-semibold">
-              Ajudando 1.200+ mulheres a ganhar renda extra
+              Ajudando 4.200+ mulheres a ganhar renda extra
             </p>
 
             <div className="border-t border-gray-700 pt-6">
@@ -895,7 +883,7 @@ export default function LandingPage() {
                 🔒 100% SEGURO
               </div>
               <div className="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold">
-                🛡️ 7 DIAS GRÁTIS
+                🛡️ 7 DIAS DE GARANTIA
               </div>
             </div>
           </div>
