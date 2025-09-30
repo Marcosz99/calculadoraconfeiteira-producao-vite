@@ -300,7 +300,7 @@ export default function LandingPage() {
               
               <div className="text-center">
                 <Users className="h-12 w-12 text-yellow-500 mx-auto mb-3" />
-                <h4 className="font-bold text-gray-900 mb-2">4.200+ Mulheres</h4>
+                <h4 className="font-bold text-gray-900 mb-2">1.200 Mulheres</h4>
                 <p className="text-sm text-gray-600">Comunidade de apoio</p>
               </div>
               
