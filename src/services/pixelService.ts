@@ -60,7 +60,10 @@ export class PixelService {
   static trackMetaEvent(eventName: string, parameters: any = {}) {
     if (typeof window !== 'undefined' && window.fbq) {
       window.fbq('track', eventName, parameters)
-      console.log('Meta Pixel Event:', eventName, parameters)
+      // Only log in development mode, never log sensitive data in production
+      if (import.meta.env.DEV) {
+        console.log('Meta Pixel Event:', eventName)
+      }
     }
   }
 
@@ -68,7 +71,10 @@ export class PixelService {
   static trackTikTokEvent(eventName: string, parameters: any = {}) {
     if (typeof window !== 'undefined' && window.ttq) {
       window.ttq.track(eventName, parameters)
-      console.log('TikTok Pixel Event:', eventName, parameters)
+      // Only log in development mode, never log sensitive data in production
+      if (import.meta.env.DEV) {
+        console.log('TikTok Pixel Event:', eventName)
+      }
     }
   }
 
@@ -101,11 +107,10 @@ export class PixelService {
 
   // CompleteRegistration - Cadastro
   static trackCompleteRegistration(userData: { email: string; name?: string }) {
+    // Never send PII (email, name) to tracking pixels
     const parameters = {
       content_name: 'DoceCalc Registration',
-      currency: 'BRL',
-      user_email: userData.email,
-      user_name: userData.name
+      currency: 'BRL'
     }
     this.trackEvent('CompleteRegistration', parameters)
   }
@@ -115,17 +120,16 @@ export class PixelService {
     value: number;
     currency: string;
     transaction_id: string;
-    customer_email: string;
+    customer_email?: string;
     customer_name?: string;
   }) {
+    // Never send PII (email, name) to tracking pixels
     const parameters = {
       value: purchaseData.value,
       currency: purchaseData.currency,
       content_name: 'DoceCalc Professional Subscription',
       content_type: 'product',
-      transaction_id: purchaseData.transaction_id,
-      customer_email: purchaseData.customer_email,
-      customer_name: purchaseData.customer_name
+      transaction_id: purchaseData.transaction_id
     }
     this.trackEvent('Purchase', parameters)
   }

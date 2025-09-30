@@ -3,6 +3,8 @@ import { useAuth } from '../contexts/AuthContext'
 import { Calculator, Mail, Lock, User, ArrowLeft, Eye, EyeOff } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { PixelService } from '../services/pixelService'
+import { loginSchema, signupSchema } from '../utils/validation'
+import { z } from 'zod'
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -21,18 +23,30 @@ export default function LoginPage() {
     setError('')
 
     try {
+      // Validate input before submission
       if (isLogin) {
-        await signIn(email, password)
+        const validated = loginSchema.parse({ email, password })
+        await signIn(validated.email, validated.password)
       } else {
-        const result = await signUp(email, password, nome, nomeConfeitaria)
+        const validated = signupSchema.parse({ 
+          email, 
+          password, 
+          nome, 
+          nomeConfeitaria 
+        })
+        await signUp(validated.email, validated.password, validated.nome, validated.nomeConfeitaria)
         // Disparar evento CompleteRegistration quando o usuário se cadastra
         PixelService.trackCompleteRegistration({
-          email: email,
-          name: nome
+          email: validated.email,
+          name: validated.nome
         })
       }
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Erro desconhecido')
+      if (error instanceof z.ZodError) {
+        setError(error.errors[0].message)
+      } else {
+        setError(error instanceof Error ? error.message : 'Erro desconhecido')
+      }
     }
   }
 

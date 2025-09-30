@@ -584,7 +584,6 @@ export type Database = {
           instagram: string | null
           nome: string
           nome_negocio: string | null
-          password: string
           plano: string | null
           subscription_status: string | null
           telefone: string | null
@@ -606,7 +605,6 @@ export type Database = {
           instagram?: string | null
           nome: string
           nome_negocio?: string | null
-          password: string
           plano?: string | null
           subscription_status?: string | null
           telefone?: string | null
@@ -628,7 +626,6 @@ export type Database = {
           instagram?: string | null
           nome?: string
           nome_negocio?: string | null
-          password?: string
           plano?: string | null
           subscription_status?: string | null
           telefone?: string | null

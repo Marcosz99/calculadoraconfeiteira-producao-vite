@@ -9,6 +9,8 @@ import { useToast } from '../hooks/use-toast'
 import { CreditCard, ArrowLeft, Shield, Check, Star } from 'lucide-react'
 import { loadStripe } from '@stripe/stripe-js'
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import { checkoutSchema } from '../utils/validation'
+import { z } from 'zod'
 
 const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
 
@@ -36,11 +38,18 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess }) => {
     setLoading(true)
 
     try {
+      // Validate input before submission
+      const validated = checkoutSchema.parse({
+        customerName,
+        customerEmail,
+        customerPhone: customerPhone || ''
+      })
+
       // Criar checkout session usando edge function
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
-          userEmail: customerEmail,
-          userName: customerName
+          userEmail: validated.customerEmail,
+          userName: validated.customerName
         }
       })
 
@@ -54,12 +63,19 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess }) => {
       }
 
     } catch (error: any) {
-      console.error('Erro no checkout:', error)
-      toast({
-        title: "Erro no pagamento",
-        description: error.message || "Tente novamente em alguns segundos",
-        variant: "destructive",
-      })
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Erro de validação",
+          description: error.errors[0].message,
+          variant: "destructive",
+        })
+      } else {
+        toast({
+          title: "Erro no pagamento",
+          description: error.message || "Tente novamente em alguns segundos",
+          variant: "destructive",
+        })
+      }
     } finally {
       setLoading(false)
     }
