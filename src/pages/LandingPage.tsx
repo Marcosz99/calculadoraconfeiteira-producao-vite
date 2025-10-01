@@ -519,11 +519,11 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center">
                   <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Receitas de chocolates e mini donuts</span>
+                  <span className="text-gray-700 font-medium">Receitas de chocolates, mini donuts e muito mais!</span>
                 </div>
                 <div className="flex items-center">
                   <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Comunidade com 4.200+ mulheres</span>
+                  <span className="text-gray-700 font-medium">Comunidade com 1.200+ mulheres</span>
                 </div>
                 <div className="flex items-center">
                   <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
