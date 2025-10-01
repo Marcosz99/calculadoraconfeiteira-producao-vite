@@ -90,3 +90,12 @@ verify_jwt = false
 
 [functions.stripe-webhook]
 verify_jwt = false
+
+[functions.create-ebook-checkout]
+verify_jwt = false
+
+[functions.verify-ebook-payment]
+verify_jwt = false
+
+[functions.send-ebook-email]
+verify_jwt = false

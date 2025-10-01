@@ -258,6 +258,8 @@ export type Database = {
           descricao: string | null
           id: string
           preco: number
+          stripe_price_id: string | null
+          stripe_product_id: string | null
           tags: string[] | null
           titulo: string
           updated_at: string
@@ -272,6 +274,8 @@ export type Database = {
           descricao?: string | null
           id?: string
           preco?: number
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
           tags?: string[] | null
           titulo: string
           updated_at?: string
@@ -286,6 +290,8 @@ export type Database = {
           descricao?: string | null
           id?: string
           preco?: number
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
           tags?: string[] | null
           titulo?: string
           updated_at?: string
