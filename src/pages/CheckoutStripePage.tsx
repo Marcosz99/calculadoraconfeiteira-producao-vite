@@ -248,7 +248,7 @@ export default function CheckoutStripePage() {
                 <span className="text-base font-normal text-gray-600">/mês</span>
               </div>
               <CardDescription className="text-primary font-medium">
-                💳 Cobrança imediata • Compromisso de 12 meses
+                💳 Cobrança imediata: Cancele em até 7 Dias sem problemas nenhum.
               </CardDescription>
             </CardHeader>
             <CardContent>
