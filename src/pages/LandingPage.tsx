@@ -567,15 +567,15 @@ export default function LandingPage() {
             <div className="bg-white rounded-2xl shadow-2xl p-8 relative border-4 border-green-500">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-2 rounded-full text-sm font-black shadow-lg">
-                  🔥 TESTE 7 DIAS GRÁTIS
+                  🔥 TESTE AGORA MESMO!
                 </div>
               </div>
 
               <div className="text-center mb-8 mt-4">
                 <h3 className="text-2xl font-black text-gray-900 mb-4">Acesso Completo</h3>
                 <div className="text-5xl font-black text-green-600 mb-2">R$ 19,90</div>
-                <p className="text-gray-600 font-semibold">Por mês (só paga após o teste)</p>
-                <p className="text-sm text-gray-500 mt-2">✨ Uma semana GRÁTIS para testar tudo</p>
+                <p className="text-gray-600 font-semibold">Por mês | Cancele a hora que quiser! </p>
+                <p className="text-sm text-gray-500 mt-2">✨ Faça parte da comunidade exclusiva!</p>
               </div>
               
               <div className="space-y-4 mb-8">
@@ -585,7 +585,7 @@ export default function LandingPage() {
                 </div>
                 <div className="flex items-center">
                   <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Receitas de chocolates e mini donuts</span>
+                  <span className="text-gray-700 font-medium">Receitas de chocolates e mini donuts e muita mais!</span>
                 </div>
                 <div className="flex items-center">
                   <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
