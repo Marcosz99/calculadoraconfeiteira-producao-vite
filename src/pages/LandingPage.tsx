@@ -554,7 +554,7 @@ export default function LandingPage() {
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-6">
               Comece a Ganhar Hoje
               <span className="block text-transparent bg-gradient-to-r from-green-600 to-green-700 bg-clip-text">
-                Teste Grátis por 7 Dias
+                Garantia por 7 Dias
               </span>
             </h2>
             <p className="text-xl text-gray-700 max-w-3xl mx-auto">
@@ -628,7 +628,7 @@ export default function LandingPage() {
                 onClick={handleTesteGratisClick}
                 className="w-full py-4 px-6 rounded-xl font-black transition-all text-center block bg-gradient-to-r from-green-500 to-green-600 text-white hover:shadow-xl hover:scale-105 text-lg mb-4"
               >
-                COMEÇAR MEU TESTE GRÁTIS
+                TESTE AGORA MESMO!
               </Link>
 
               <div className="text-center text-sm text-gray-500 space-y-1">
@@ -649,7 +649,7 @@ export default function LandingPage() {
                 🛡️ Garantia Total
               </h3>
               <p className="text-lg text-gray-700 mb-6">
-                Teste grátis por 7 dias. Se depois que começar a pagar não gostar, 
+                Garantia total em até 7 Dias. 
                 devolvemos 100% do seu dinheiro nos primeiros 30 dias.
               </p>
               <p className="text-sm text-gray-600">
