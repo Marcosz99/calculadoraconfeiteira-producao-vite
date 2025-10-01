@@ -276,7 +276,7 @@ export default function LandingPage() {
             </Link>
             
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">✓ Teste 7 dias grátis ✓ Sem cartão</div>
+              <div className="text-sm text-gray-500 mb-1"></div>
               <div className="text-sm font-bold text-green-600">Comece hoje mesmo!</div>
             </div>
           </div>
