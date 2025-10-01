@@ -260,7 +260,7 @@ export default function LandingPage() {
           </h1>
           
           <p className="text-xl sm:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed font-medium">
-            O DoceCalc é o <strong className="text-pink-600">app mais usado por 4.200+ mulheres</strong> que querem 
+            O DoceCalc é o <strong className="text-pink-600">app mais usado por 1.200+ mulheres</strong> que querem 
             <strong className="text-purple-600"> ganhar renda extra fazendo docinhos - do jeito certo e lucrativo</strong>
           </p>
           
@@ -300,7 +300,7 @@ export default function LandingPage() {
               
               <div className="text-center">
                 <Users className="h-12 w-12 text-yellow-500 mx-auto mb-3" />
-                <h4 className="font-bold text-gray-900 mb-2">4.200+ Mulheres</h4>
+                <h4 className="font-bold text-gray-900 mb-2">1.200+ Mulheres</h4>
                 <p className="text-sm text-gray-600">Comunidade de apoio</p>
               </div>
               
@@ -838,7 +838,7 @@ export default function LandingPage() {
                 <p>✓ Sem cartão de crédito</p>
                 <p>✓ 7 dias totalmente grátis</p>
                 <p>✓ Cancele quando quiser</p>
-                <p>✓ Junte-se a 4.200+ mulheres</p>
+                <p>✓ Junte-se a 1.200+ mulheres</p>
               </div>
 
               <div className="bg-yellow-400/20 rounded-xl p-6 mt-8 max-w-2xl mx-auto">
@@ -893,7 +893,7 @@ export default function LandingPage() {
                 Funciona mesmo para ganhar renda extra?
               </h3>
               <p className="text-gray-700">
-                Sim! Mais de 4.200 mulheres já estão usando. A calculadora te ajuda a cobrar o preço certo, 
+                Sim! Mais de 1.200 mulheres já estão usando. A calculadora te ajuda a cobrar o preço certo, 
                 e as receitas do marketplace são produtos que vendem bem e dão lucro.
               </p>
             </div>
