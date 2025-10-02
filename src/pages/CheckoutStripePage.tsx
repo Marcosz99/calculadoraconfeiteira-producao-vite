@@ -16,64 +16,26 @@ const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx')
 
 interface CheckoutFormProps {
   onSuccess: () => void
+  onNavigate: (path: string) => void
 }
 
-const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess }) => {
+const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess, onNavigate }) => {
   const { user } = useAuth()
   const { toast } = useToast()
-  const stripe = useStripe()
-  const elements = useElements()
   const [loading, setLoading] = useState(false)
-  const [customerName, setCustomerName] = useState('')
-  const [customerEmail, setCustomerEmail] = useState(user?.email || '')
-  const [customerPhone, setCustomerPhone] = useState('')
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
-
-    setLoading(true)
-
-    try {
-      // Criar checkout session usando edge function
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          userEmail: user?.email,
-          userName: user?.user_metadata?.name || user?.email?.split('@')[0] || 'Cliente'
-        }
-      })
-
-      if (error) throw error
-
-      if (data.url) {
-        // Redirecionar para checkout do Stripe
-        window.location.href = data.url
-      } else {
-        throw new Error('URL de checkout não recebida')
-      }
-
-    } catch (error: any) {
-      toast({
-        title: "Erro no pagamento",
-        description: error.message || "Tente novamente em alguns segundos",
-        variant: "destructive",
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <div className="space-y-6">
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
         <p className="text-sm text-blue-800">
-          Você será redirecionado para o checkout seguro do Stripe para finalizar o pagamento.
+          Escolha sua forma de pagamento preferida
         </p>
       </div>
 
       <div className="space-y-3">
         <Button
           type="button"
-          onClick={() => navigate('/upgrade/stripe')}
+          onClick={() => onNavigate('/upgrade/stripe')}
           disabled={loading}
           className="w-full bg-primary hover:bg-primary/90"
         >
@@ -83,7 +45,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess }) => {
 
         <Button
           type="button"
-          onClick={() => navigate('/upgrade/pix')}
+          onClick={() => onNavigate('/upgrade/pix')}
           disabled={loading}
           variant="outline"
           className="w-full border-primary text-primary hover:bg-primary/10"
@@ -91,7 +53,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess }) => {
           PIX - R$ 19,90/mês
         </Button>
       </div>
-    </form>
+    </div>
   )
 }
 
@@ -237,7 +199,7 @@ export default function CheckoutStripePage() {
             </CardHeader>
             <CardContent>
               <Elements stripe={stripePromise}>
-                <CheckoutForm onSuccess={handleSuccess} />
+                <CheckoutForm onSuccess={handleSuccess} onNavigate={navigate} />
               </Elements>
 
               <div className="mt-6 text-center space-y-2">
