@@ -28,7 +28,9 @@ import {
   BookOpen,
   BarChart3,
   Lightbulb,
-  Heart
+  Heart,
+  Download,
+  Gift
 } from 'lucide-react'
 
 export default function LandingPage() {
@@ -37,109 +39,27 @@ export default function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
   
-  const problemas = [
-    {
-      problema: "Faço doce mas no fim do mês não sobra nada",
-      consequencia: "Trabalha muito, vende barato e não consegue pagar as contas",
-      solucao: "Descubra quanto cobrar para realmente lucrar"
-    },
-    {
-      problema: "Não sei se meu preço está certo",
-      consequencia: "Clientes reclamam que é caro, mas você mal lucra",
-      solucao: "Calculadora mostra o preço justo que dá lucro real"
-    },
-    {
-      problema: "Quero vender mais mas não sei como",
-      consequencia: "Fica limitada a vender só para conhecidos",
-      solucao: "Comunidade com 1.200+ mulheres compartilhando dicas"
-    },
-    {
-      problema: "Não sei quais doces dão mais dinheiro",
-      consequencia: "Faz o que sabe, mas poderia ganhar 3x mais",
-      solucao: "Receitas validadas que faturam +R$ 2.000/mês"
-    }
-  ]
-
-  const funcionalidades = [
-    {
-      icon: Calculator,
-      titulo: "Calculadora Simples",
-      descricao: "Descubra quanto cobrar em cada doce para ter lucro de verdade, considerando tudo que você gasta",
-      beneficio: "Nunca mais venda barato demais",
-      cor: "from-green-400 to-green-600"
-    },
-    {
-      icon: BookOpen,
-      titulo: "Receitas Exclusivas que Vendem",
-      descricao: "Chocolates gourmet, mini donuts, pudins premium e mais. Receitas testadas e validadas que você baixa em PDF",
-      beneficio: "Produtos de alta margem validados",
-      cor: "from-pink-400 to-pink-600"
-    },
-    {
-      icon: Users,
-      titulo: "Comunidade de 1.200+ Mulheres",
-      descricao: "Troque experiências, tire dúvidas e aprenda com outras mulheres que também vendem doces",
-      beneficio: "Você não está sozinha",
-      cor: "from-yellow-400 to-yellow-600"
-    },
-    {
-      icon: Target,
-      titulo: "Seu Catálogo Digital",
-      descricao: "Mostre seus doces de forma bonita com link compartilhável no WhatsApp",
-      beneficio: "Venda mais e melhor",
-      cor: "from-cyan-400 to-cyan-600"
-    },
-    {
-      icon: Bot,
-      titulo: "Assistente Inteligente",
-      descricao: "Tire dúvidas sobre receitas, preços e vendas a qualquer hora com nossa IA",
-      beneficio: "Ajuda sempre que precisar",
-      cor: "from-indigo-400 to-indigo-600"
-    },
-    {
-      icon: FileText,
-      titulo: "Orçamentos Bonitos",
-      descricao: "Envie orçamentos organizados que impressionam e ajudam a fechar mais vendas",
-      beneficio: "Pareça mais profissional",
-      cor: "from-blue-400 to-blue-600"
-    },
-    {
-      icon: BarChart3,
-      titulo: "Controle suas Vendas",
-      descricao: "Veja quanto vendeu, quanto gastou e quanto realmente lucrou no mês",
-      beneficio: "Saiba para onde vai seu dinheiro",
-      cor: "from-purple-400 to-purple-600"
-    },
-    {
-      icon: Cake,
-      titulo: "Organize suas Receitas",
-      descricao: "Tenha todas suas receitas salvas com os custos já calculados",
-      beneficio: "Tudo em um só lugar",
-      cor: "from-orange-400 to-orange-600"
-    }
-  ]
-
   const depoimentos = [
     {
-      nome: "Ana Paula",
+      nome: "Maria Silva",
       cidade: "São Paulo - SP",
       foto: "👩",
-      depoimento: "Comecei fazendo brigadeiro em casa para ajudar nas contas. Com o DoceCalc descobri que podia cobrar mais e ganhar R$ 1.500 por mês!",
-      resultado: "R$ 1.500/mês de renda extra"
+      depoimento: "Comecei fazendo bolo de pote em casa. Com as receitas do ebook já faturei R$ 980 no primeiro mês só vendendo pros vizinhos!",
+      resultado: "R$ 980 no primeiro mês"
     },
     {
-      nome: "Juliana Santos",
+      nome: "Juliana Costa",
       cidade: "Rio de Janeiro - RJ", 
       foto: "👩‍🦰",
-      depoimento: "Fazia doce mas mal sobrava dinheiro. A calculadora me mostrou meus erros. Hoje lucro R$ 2.400/mês e ajudo em casa!",
-      resultado: "R$ 2.400/mês extras"
+      depoimento: "Achei que ia ser difícil, mas as receitas são simples demais! Fiz o de Ninho e já vendi 45 potes. Minha renda extra chegou!",
+      resultado: "45 potes vendidos"
     },
     {
-      nome: "Mariana Costa",
+      nome: "Ana Paula",
       cidade: "Belo Horizonte - MG",
       foto: "👩‍🦱",
-      depoimento: "As receitas do marketplace mudaram minha vida. Chocolates gourmet vendem muito! Consigo pagar minhas contas e ainda sobra.",
-      resultado: "Conquistou independência financeira"
+      depoimento: "O bolo de Ferrero Rocher é meu favorito. Cobro R$ 15 cada e sempre falta. Consegui pagar minhas contas com a renda extra!",
+      resultado: "R$ 1.200/mês de renda extra"
     }
   ]
 
@@ -152,12 +72,12 @@ export default function LandingPage() {
     return () => clearInterval(interval)
   }, [])
 
-  const handleTesteGratisClick = () => {
+  const handleComprarClick = () => {
     PixelService.trackLead()
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
       
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
@@ -172,31 +92,25 @@ export default function LandingPage() {
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#problemas" className="text-gray-600 hover:text-pink-500 transition-colors">
-              Como Funciona
+            <a href="#receitas" className="text-gray-600 hover:text-pink-500 transition-colors">
+              Receitas
             </a>
-            <a href="#solucao" className="text-gray-600 hover:text-pink-500 transition-colors">
-              Benefícios
+            <a href="#depoimentos" className="text-gray-600 hover:text-pink-500 transition-colors">
+              Depoimentos
             </a>
-            <a href="#planos" className="text-gray-600 hover:text-pink-500 transition-colors">
-              Preço
+            <a href="#garantia" className="text-gray-600 hover:text-pink-500 transition-colors">
+              Garantia
             </a>
           </div>
 
-          {/* Desktop Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
+          {/* Desktop Button */}
+          <div className="hidden md:flex items-center">
             <Link
               to="/login"
-              className="text-gray-600 hover:text-gray-900 transition-colors font-medium"
+              onClick={handleComprarClick}
+              className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-bold"
             >
-              Entrar
-            </Link>
-            <Link
-              to="/login"
-              onClick={handleTesteGratisClick}
-              className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-medium"
-            >
-              COMEÇAR AGORA
+              QUERO AS RECEITAS
             </Link>
           </div>
 
@@ -214,33 +128,33 @@ export default function LandingPage() {
           <div className="md:hidden absolute top-16 left-0 right-0 bg-white/95 backdrop-blur-sm border-b shadow-lg">
             <div className="px-4 py-4 space-y-4">
               <a 
-                href="#problemas" 
+                href="#receitas" 
                 className="block text-gray-600 hover:text-pink-500 transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Como Funciona
+                Receitas
               </a>
               <a 
-                href="#solucao" 
+                href="#depoimentos" 
                 className="block text-gray-600 hover:text-pink-500 transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Benefícios
+                Depoimentos
               </a>
               <a 
-                href="#planos" 
+                href="#garantia" 
                 className="block text-gray-600 hover:text-pink-500 transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Preço
+                Garantia
               </a>
               <div className="border-t pt-4">
                 <Link
                   to="/login"
-                  className="block text-center bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-200 font-medium"
+                  className="block text-center bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-200 font-bold"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  COMEÇAR AGORA
+                  QUERO AS RECEITAS
                 </Link>
               </div>
             </div>
@@ -253,261 +167,232 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-pink-100/20 to-purple-100/20"></div>
         <div className="container mx-auto text-center max-w-5xl relative">
           
+          <div className="mb-6">
+            <div className="inline-block bg-gradient-to-r from-orange-400 to-pink-500 text-white px-6 py-2 rounded-full text-sm font-black animate-pulse">
+              🔥 OFERTA POR TEMPO LIMITADO
+            </div>
+          </div>
+
           <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-gray-900 mb-6 leading-tight">
-            Ganhe até R$ 3.000 extras
-            <span className="block text-transparent bg-gradient-to-r from-green-600 to-green-700 bg-clip-text"> Fazendo Doces em Casa</span>
-            <span className="text-3xl sm:text-4xl lg:text-5xl">Mesmo sendo iniciante</span>
+            Aprenda a Fazer Bolos de Pote
+            <span className="block text-transparent bg-gradient-to-r from-pink-600 to-purple-700 bg-clip-text"> Que Vendem Só Pela Imagem</span>
           </h1>
           
-          <p className="text-xl sm:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed font-medium">
-            O DoceCalc é o <strong className="text-pink-600">app mais usado por 1.200+ mulheres</strong> que querem 
-            <strong className="text-purple-600"> ganhar renda extra fazendo docinhos - do jeito certo e lucrativo</strong>
+          <p className="text-2xl sm:text-3xl text-gray-800 mb-4 font-bold">
+            E Ganhe de R$ 800 a R$ 1.500 Extras Por Mês
+          </p>
+
+          <p className="text-xl sm:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <strong className="text-pink-600">15 receitas completas</strong> de bolos de pote irresistíveis.
+            <strong className="text-purple-600"> Poucos ingredientes, sem complicação, lucro garantido</strong>
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Link
               to="/login"
-              onClick={handleTesteGratisClick}
+              onClick={handleComprarClick}
               className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-green-600 text-white px-10 py-5 rounded-lg text-xl font-black hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-3"
             >
-              <Sparkles className="h-6 w-6" />
-              <span>QUERO GANHAR RENDA EXTRA</span>
+              <Download className="h-6 w-6" />
+              <span>QUERO RECEBER MINHAS RECEITAS</span>
               <ArrowRight className="h-6 w-6" />
             </Link>
-            
+          </div>
+
+          <div className="flex justify-center items-center space-x-6 mb-8">
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1"></div>
-              <div className="text-sm font-bold text-green-600">Comece hoje mesmo!</div>
+              <div className="text-3xl font-black text-green-600">R$ 29</div>
+              <div className="text-sm text-gray-600">Pagamento único</div>
+            </div>
+            <div className="text-2xl text-gray-400">•</div>
+            <div className="text-center">
+              <div className="text-lg font-bold text-gray-700">Acesso imediato</div>
+              <div className="text-sm text-gray-600">Receba em 2 minutos</div>
             </div>
           </div>
 
-          {/* Preview do App */}
-          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-4xl mx-auto border-2 border-green-200">
-            <h3 className="text-2xl font-black text-gray-900 mb-6">O que você vai ter:</h3>
+          {/* Preview do que vem no Ebook */}
+          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-4xl mx-auto border-4 border-pink-200">
+            <h3 className="text-2xl font-black text-gray-900 mb-6">O Que Você Vai Receber Hoje:</h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="text-center">
-                <Calculator className="h-12 w-12 text-green-500 mx-auto mb-3" />
-                <h4 className="font-bold text-gray-900 mb-2">Calculadora Fácil</h4>
-                <p className="text-sm text-gray-600">Descubra quanto cobrar</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl p-6 border-2 border-pink-200">
+                <div className="text-5xl mb-3">🍫</div>
+                <h4 className="font-black text-gray-900 mb-2">5 Clássicos</h4>
+                <p className="text-sm text-gray-700">Chocolate, Ninho, Prestígio, Morango, Limão</p>
               </div>
               
-              <div className="text-center">
-                <BookOpen className="h-12 w-12 text-pink-500 mx-auto mb-3" />
-                <h4 className="font-bold text-gray-900 mb-2">Receitas que Vendem</h4>
-                <p className="text-sm text-gray-600">Produtos de alta margem</p>
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border-2 border-purple-200">
+                <div className="text-5xl mb-3">👑</div>
+                <h4 className="font-black text-gray-900 mb-2">5 Gourmet</h4>
+                <p className="text-sm text-gray-700">Ferrero, Oreo, Kinder, Bis, Nutella</p>
               </div>
               
-              <div className="text-center">
-                <Users className="h-12 w-12 text-yellow-500 mx-auto mb-3" />
-                <h4 className="font-bold text-gray-900 mb-2">1.200+ Mulheres</h4>
-                <p className="text-sm text-gray-600">Comunidade de apoio</p>
-              </div>
-              
-              <div className="text-center">
-                <Bot className="h-12 w-12 text-purple-500 mx-auto mb-3" />
-                <h4 className="font-bold text-gray-900 mb-2">Ajuda Inteligente</h4>
-                <p className="text-sm text-gray-600">IA que responde dúvidas</p>
-              </div>
-              
-              <div className="text-center">
-                <BarChart3 className="h-12 w-12 text-indigo-500 mx-auto mb-3" />
-                <h4 className="font-bold text-gray-900 mb-2">Controle de Vendas</h4>
-                <p className="text-sm text-gray-600">Veja seu lucro real</p>
-              </div>
-              
-              <div className="text-center">
-                <FileText className="h-12 w-12 text-blue-500 mx-auto mb-3" />
-                <h4 className="font-bold text-gray-900 mb-2">Orçamentos Bonitos</h4>
-                <p className="text-sm text-gray-600">Impressione clientes</p>
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 border-2 border-orange-200">
+                <div className="text-5xl mb-3">🎉</div>
+                <h4 className="font-black text-gray-900 mb-2">5 Especiais</h4>
+                <p className="text-sm text-gray-700">Páscoa, Natal, Festas e mais</p>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Seção dos Problemas */}
-      <section id="problemas" className="py-16 sm:py-20 bg-red-50/30">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-red-700 mb-6">
-              Por que você NÃO está ganhando o que merece?
-            </h2>
-            <p className="text-xl sm:text-2xl text-red-600 max-w-3xl mx-auto font-bold">
-              Se reconhece em alguma dessas situações?
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto mb-12">
-            {problemas.map((item, index) => (
-              <div key={index} className="bg-white border-l-8 border-red-500 shadow-xl rounded-lg p-8 hover:shadow-2xl transition-shadow">
-                <h3 className="text-xl font-black text-red-700 mb-4">
-                  "{item.problema}"
-                </h3>
-                <div className="space-y-4">
-                  <div className="bg-red-100 p-4 rounded-lg">
-                    <p className="text-red-700 font-bold mb-2">💸 O QUE ACONTECE:</p>
-                    <p className="text-red-600">{item.consequencia}</p>
-                  </div>
-                  <div className="bg-green-100 p-4 rounded-lg">
-                    <p className="text-green-700 font-bold mb-2">✅ SOLUÇÃO:</p>
-                    <p className="text-green-600 font-semibold">{item.solucao}</p>
-                  </div>
+            <div className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-lg p-6 border-2 border-yellow-300">
+              <h4 className="font-black text-gray-900 mb-4 text-xl">🎁 BÔNUS EXCLUSIVOS:</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-left">
+                <div className="flex items-start space-x-2">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm font-semibold text-gray-800">Calculadora de preços em PDF</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm font-semibold text-gray-800">Tabela de compra de ingredientes</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm font-semibold text-gray-800">Guia de validade e conservação</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm font-semibold text-gray-800">Acesso à comunidade exclusiva</span>
                 </div>
               </div>
-            ))}
-          </div>
-
-          <div className="text-center bg-gradient-to-r from-red-600 to-red-700 text-white p-8 rounded-xl max-w-4xl mx-auto">
-            <h3 className="text-2xl font-black mb-4">💰 VOCÊ MERECE GANHAR MAIS</h3>
-            <p className="text-xl mb-4">
-              Fazer doce para vender deveria <strong className="text-yellow-300">ajudar você a pagar suas contas</strong>, não só dar trabalho
-            </p>
-            <p className="text-lg opacity-90">
-              Com o DoceCalc você aprende a cobrar o preço certo e ganhar de verdade
-            </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Nossa Solução */}
-      <section id="solucao" className="py-16 sm:py-20 bg-gradient-to-br from-green-50 to-blue-50">
+      {/* Por Que Funciona */}
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-purple-50 to-pink-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              Tudo que Você Precisa
-              <span className="block text-transparent bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text">
-                para Ganhar Renda Extra com Doces
-              </span>
+              Por Que Bolo de Pote Vende Tanto?
             </h2>
             <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-              Simples, fácil de usar e feito para quem está começando ou quer vender mais
+              Imagina essa colher entrando no potinho... é por isso que todo mundo quer!
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-            {funcionalidades.map((func, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-xl p-8 hover:shadow-2xl hover:scale-105 transition-all border-2 border-transparent hover:border-green-300">
-                <div className={`bg-gradient-to-br ${func.cor} w-16 h-16 rounded-lg flex items-center justify-center mb-6`}>
-                  <func.icon className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-xl font-black text-gray-900 mb-3">{func.titulo}</h3>
-                <p className="text-gray-600 mb-4 text-sm">{func.descricao}</p>
-                <div className="bg-green-50 p-3 rounded-lg">
-                  <p className="text-green-700 font-semibold text-sm">
-                    ✨ {func.beneficio}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="bg-white rounded-xl shadow-xl p-8 text-center border-2 border-pink-200 hover:scale-105 transition-all">
+              <div className="text-6xl mb-4">📸</div>
+              <h3 className="text-xl font-black text-gray-900 mb-3">Vende Pela Imagem</h3>
+              <p className="text-gray-700">Só de olhar a foto, seus clientes já vão querer 2, 3, 4 potes</p>
+            </div>
 
-          {/* Destaque MEGA das Receitas Exclusivas */}
-          <div className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 rounded-3xl p-12 max-w-5xl mx-auto text-center shadow-2xl border-4 border-yellow-400 mb-16 relative overflow-hidden">
-            {/* Efeito de brilho */}
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-yellow-300/20 to-transparent"></div>
-            
-            <div className="relative z-10">
-              <div className="flex justify-center mb-6">
-                <div className="bg-yellow-400 text-gray-900 px-8 py-3 rounded-full text-sm font-black shadow-lg animate-pulse">
-                  ⭐ EXCLUSIVO DO DOCECALC ⭐
-                </div>
-              </div>
+            <div className="bg-white rounded-xl shadow-xl p-8 text-center border-2 border-purple-200 hover:scale-105 transition-all">
+              <div className="text-6xl mb-4">💰</div>
+              <h3 className="text-xl font-black text-gray-900 mb-3">Lucro Alto</h3>
+              <p className="text-gray-700">Venda cada pote por R$ 12-18. Custo baixo, margem boa</p>
+            </div>
 
-              <h3 className="text-4xl md:text-5xl font-black text-white mb-6 drop-shadow-lg">
-                📚 RECEITAS EXCLUSIVAS E VALIDADAS!
-              </h3>
-              
-              <p className="text-2xl text-white mb-8 font-bold drop-shadow-md">
-                Receitas testadas e aprovadas que você NÃO encontra em nenhum outro lugar
-              </p>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white/95 rounded-xl p-6 shadow-xl">
-                  <div className="text-5xl mb-3">🍫</div>
-                  <h4 className="font-black text-gray-900 mb-2 text-xl">Chocolates Gourmet</h4>
-                  <p className="text-gray-700 mb-3 font-semibold">Venda por R$ 12-15 cada</p>
-                  <p className="text-green-600 font-black text-lg">+R$ 1.500/mês</p>
-                </div>
-
-                <div className="bg-white/95 rounded-xl p-6 shadow-xl">
-                  <div className="text-5xl mb-3">🍩</div>
-                  <h4 className="font-black text-gray-900 mb-2 text-xl">Mini Donuts</h4>
-                  <p className="text-gray-700 mb-3 font-semibold">Trend que vende R$ 3-5 cada</p>
-                  <p className="text-green-600 font-black text-lg">+R$ 800/mês</p>
-                </div>
-
-                <div className="bg-white/95 rounded-xl p-6 shadow-xl">
-                  <div className="text-5xl mb-3">🍮</div>
-                  <h4 className="font-black text-gray-900 mb-2 text-xl">Pudins Premium</h4>
-                  <p className="text-gray-700 mb-3 font-semibold">Venda por R$ 35-45 cada</p>
-                  <p className="text-green-600 font-black text-lg">+R$ 1.200/mês</p>
-                </div>
-              </div>
-
-              <div className="bg-yellow-400 text-gray-900 p-6 rounded-xl mb-6">
-                <p className="text-2xl font-black mb-2">💰 POTENCIAL TOTAL</p>
-                <p className="text-3xl font-black text-green-700">+R$ 3.500/mês de renda extra</p>
-              </div>
-
-              <p className="text-white text-lg font-bold mb-4">
-                ✅ Baixe os PDFs e use para sempre<br/>
-                ✅ Receitas passo a passo detalhadas<br/>
-                ✅ Lista completa de ingredientes e custos
-              </p>
-
-              <Link
-                to="/login"
-                onClick={handleTesteGratisClick}
-                className="inline-flex items-center space-x-3 bg-yellow-400 text-gray-900 px-10 py-5 rounded-xl text-xl font-black hover:bg-yellow-300 hover:scale-105 transition-all duration-200 shadow-2xl"
-              >
-                <BookOpen className="h-7 w-7" />
-                <span>QUERO AS RECEITAS EXCLUSIVAS</span>
-                <ArrowRight className="h-7 w-7" />
-              </Link>
+            <div className="bg-white rounded-xl shadow-xl p-8 text-center border-2 border-orange-200 hover:scale-105 transition-all">
+              <div className="text-6xl mb-4">⚡</div>
+              <h3 className="text-xl font-black text-gray-900 mb-3">Fácil de Fazer</h3>
+              <p className="text-gray-700">Receitas simples. Mesmo iniciante consegue fazer e vender</p>
             </div>
           </div>
 
-          {/* Marketplace dos Ebooks */}
-          <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl p-8 max-w-4xl mx-auto text-center">
-            <h3 className="text-2xl font-black text-gray-900 mb-4">
-              🏪 RECEITAS QUE REALMENTE VENDEM
-            </h3>
-            <p className="text-gray-900 font-bold text-lg mb-6">
-              Aprenda a fazer doces que os clientes amam e pagam bem
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-              <div className="bg-white/90 rounded-lg p-6">
-                <h4 className="font-black text-gray-900 mb-3">📚 Chocolates Gourmet</h4>
-                <p className="text-gray-700 mb-3">Receitas premium que vendem por R$ 8-15 cada</p>
-                <p className="text-green-600 font-bold">Você pode ganhar: +R$ 1.500/mês</p>
-              </div>
-              <div className="bg-white/90 rounded-lg p-6">
-                <h4 className="font-black text-gray-900 mb-3">🍩 Mini Donuts</h4>
-                <p className="text-gray-700 mb-3">Trend que vende R$ 3-5 cada, todo mundo adora</p>
-                <p className="text-green-600 font-bold">Você pode ganhar: +R$ 800/mês</p>
+          <div className="mt-12 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl p-8 max-w-4xl mx-auto text-center">
+            <h3 className="text-2xl font-black mb-4">💵 FAÇA AS CONTAS:</h3>
+            <div className="bg-white/20 rounded-lg p-6 mb-4">
+              <p className="text-xl font-bold mb-2">Se você vender apenas 10 potes por semana a R$ 15:</p>
+              <p className="text-3xl font-black text-yellow-300">R$ 600/mês de renda extra</p>
+            </div>
+            <p className="text-lg">E isso é só o começo. Muitas clientes fazem o dobro ou triplo!</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Receitas Detalhadas */}
+      <section id="receitas" className="py-16 sm:py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-6">
+              15 Receitas Completas
+              <span className="block text-transparent bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text">
+                Passo a Passo, Sem Segredos
+              </span>
+            </h2>
+          </div>
+
+          <div className="max-w-6xl mx-auto">
+            {/* Clássicos */}
+            <div className="mb-12">
+              <h3 className="text-2xl font-black text-gray-900 mb-6 text-center">🍫 5 CLÁSSICOS QUE SEMPRE VENDEM</h3>
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                {['Chocolate', 'Ninho', 'Prestígio', 'Morango', 'Limão'].map((receita, index) => (
+                  <div key={index} className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-6 border-2 border-pink-200 text-center">
+                    <div className="text-4xl mb-3">🍰</div>
+                    <h4 className="font-black text-gray-900">{receita}</h4>
+                    <p className="text-xs text-gray-600 mt-2">Venda: R$ 12-15</p>
+                  </div>
+                ))}
               </div>
             </div>
-            <p className="text-gray-900 font-bold text-lg mt-6">
-              💰 Potencial total: +R$ 2.300/mês de renda extra
-            </p>
+
+            {/* Gourmet */}
+            <div className="mb-12">
+              <h3 className="text-2xl font-black text-gray-900 mb-6 text-center">👑 5 GOURMET DE ALTA MARGEM</h3>
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                {['Ferrero Rocher', 'Oreo', 'Kinder', 'Bis', 'Nutella'].map((receita, index) => (
+                  <div key={index} className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border-2 border-purple-200 text-center">
+                    <div className="text-4xl mb-3">✨</div>
+                    <h4 className="font-black text-gray-900 text-sm">{receita}</h4>
+                    <p className="text-xs text-gray-600 mt-2">Venda: R$ 15-18</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Especiais */}
+            <div className="mb-12">
+              <h3 className="text-2xl font-black text-gray-900 mb-6 text-center">🎉 5 ESPECIAIS PARA DATAS</h3>
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                {['Páscoa', 'Natal', 'Dia das Mães', 'Festas', 'Casamentos'].map((receita, index) => (
+                  <div key={index} className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border-2 border-orange-200 text-center">
+                    <div className="text-4xl mb-3">🎊</div>
+                    <h4 className="font-black text-gray-900 text-sm">{receita}</h4>
+                    <p className="text-xs text-gray-600 mt-2">Venda: R$ 18-22</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-xl p-8 border-4 border-yellow-300">
+              <h3 className="text-2xl font-black text-center text-gray-900 mb-4">✅ CADA RECEITA INCLUI:</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
+                  <span className="font-semibold text-gray-800">Passo a passo detalhado com fotos</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
+                  <span className="font-semibold text-gray-800">Lista completa de ingredientes</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
+                  <span className="font-semibold text-gray-800">Cálculo de custo e preço sugerido</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
+                  <span className="font-semibold text-gray-800">Dicas de montagem e apresentação</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Depoimentos */}
-      <section className="py-16 sm:py-20 bg-gradient-to-br from-purple-50 to-pink-50">
+      <section id="depoimentos" className="py-16 sm:py-20 bg-gradient-to-br from-gray-50 to-pink-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              Mulheres como Você
+              Mulheres Como Você
               <span className="block text-transparent bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text">
-                Conquistando Renda Extra
+                Já Estão Ganhando Renda Extra
               </span>
             </h2>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-              Veja como elas estão ganhando dinheiro fazendo doces em casa
-            </p>
           </div>
 
           <div className="max-w-4xl mx-auto">
@@ -525,7 +410,7 @@ export default function LandingPage() {
               
               <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg border-2 border-green-200">
                 <p className="text-green-700 font-black">
-                  💰 Resultado: {depoimentos[currentTestimonial].resultado}
+                  💰 {depoimentos[currentTestimonial].resultado}
                 </p>
               </div>
               
@@ -536,7 +421,7 @@ export default function LandingPage() {
                     onClick={() => setCurrentTestimonial(index)}
                     className={`w-3 h-3 rounded-full transition-all ${
                       index === currentTestimonial 
-                        ? 'bg-purple-500' 
+                        ? 'bg-purple-500 w-8' 
                         : 'bg-gray-300 hover:bg-purple-300'
                     }`}
                   />
@@ -547,307 +432,133 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Seção de Planos */}
-      <section id="planos" className="py-16 sm:py-20 bg-gradient-to-br from-gray-50 to-white">
+      {/* Oferta */}
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-600 text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              Comece a Ganhar Hoje
-              <span className="block text-transparent bg-gradient-to-r from-green-600 to-green-700 bg-clip-text">
-                Garantia por 7 Dias
-              </span>
-            </h2>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-              Sem cartão de crédito, sem compromisso. Cancele quando quiser.
-            </p>
-          </div>
-
-          <div className="max-w-2xl mx-auto">
-            {/* Plano Único */}
-            <div className="bg-white rounded-2xl shadow-2xl p-8 relative border-4 border-green-500">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-2 rounded-full text-sm font-black shadow-lg">
-                  🔥 TESTE AGORA MESMO!
-                </div>
-              </div>
-
-              <div className="text-center mb-8 mt-4">
-                <h3 className="text-2xl font-black text-gray-900 mb-4">Acesso Completo</h3>
-                <div className="text-5xl font-black text-green-600 mb-2">R$ 19,90</div>
-                <p className="text-gray-600 font-semibold">Por mês | Cancele a hora que quiser! </p>
-                <p className="text-sm text-gray-500 mt-2">✨ Faça parte da comunidade exclusiva!</p>
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="mb-8">
+              <div className="inline-block bg-yellow-400 text-gray-900 px-6 py-3 rounded-full text-sm font-black animate-pulse mb-6">
+                ⚡ OFERTA ESPECIAL DE LANÇAMENTO
               </div>
               
-              <div className="space-y-4 mb-8">
-                <div className="flex items-center">
-                  <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Calculadora para saber quanto cobrar</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Receitas de chocolates e mini donuts e muita mais!</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Comunidade com 1.200+ mulheres</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Assistente inteligente 24h</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Orçamentos bonitos em PDF</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Controle de vendas e lucro</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Catálogo digital para WhatsApp</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 font-medium">Organize todas suas receitas</span>
-                </div>
-              </div>
+              <h2 className="text-4xl sm:text-5xl font-black mb-6">
+                Comece Hoje Mesmo
+                <span className="block text-yellow-300">Por Apenas R$ 29</span>
+              </h2>
 
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl mb-6 border-2 border-green-200">
-                <p className="text-center font-black text-green-700 mb-2">🎯 EXPERIMENTE SEM RISCO:</p>
-                <p className="text-center text-green-600 font-semibold mb-2">
-                  7 dias para testar tudo de graça
-                </p>
-                <p className="text-center text-sm text-gray-600">
-                  Não gostou? Cancela e não paga nada
-                </p>
-              </div>
+              <p className="text-2xl mb-8 opacity-90">
+                Valor real: <span className="line-through">R$ 147</span>
+              </p>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
+              <h3 className="text-2xl font-black mb-6">🎁 VOCÊ RECEBE TUDO ISSO:</h3>
               
-              <Link
-                to="/login"
-                onClick={handleTesteGratisClick}
-                className="w-full py-4 px-6 rounded-xl font-black transition-all text-center block bg-gradient-to-r from-green-500 to-green-600 text-white hover:shadow-xl hover:scale-105 text-lg mb-4"
-              >
-                TESTE AGORA MESMO!
-              </Link>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left mb-6">
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
+                  <span className="font-semibold">15 receitas completas de bolo de pote</span>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
+                  <span className="font-semibold">Calculadora de preços em PDF</span>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
+                  <span className="font-semibold">Tabela de compra de ingredientes</span>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
+                  <span className="font-semibold">Guia de validade e conservação</span>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
+                  <span className="font-semibold">Acesso à comunidade exclusiva</span>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
+                  <span className="font-semibold">Suporte para tirar dúvidas</span>
+                </div>
+              </div>
 
-              <div className="text-center text-sm text-gray-500 space-y-1">
-                <p>✓ Sem cartão de crédito</p>
-                <p>✓ Cancele quando quiser</p>
-                <p>✓ 7 dias totalmente grátis</p>
+              <div className="bg-green-500 text-white p-6 rounded-xl">
+                <p className="text-2xl font-black mb-2">💰 POTENCIAL DE GANHO:</p>
+                <p className="text-3xl font-black">R$ 800 a R$ 1.500/mês</p>
               </div>
             </div>
-          </div>
 
-          {/* Garantia */}
-          <div className="max-w-4xl mx-auto mt-16 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border-4 border-blue-200">
-            <div className="text-center">
-              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Shield className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-2xl font-black text-gray-900 mb-4">
-                🛡️ Garantia Total
-              </h3>
-              <p className="text-lg text-gray-700 mb-6">
-                Garantia total em até 7 Dias. 
-                devolvemos 100% do seu dinheiro nos primeiros 30 dias.
-              </p>
-              <p className="text-sm text-gray-600">
-                Você não tem nada a perder
-              </p>
+            <Link
+              to="/login"
+              onClick={handleComprarClick}
+              className="inline-flex items-center space-x-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-12 py-6 rounded-xl text-2xl font-black hover:shadow-2xl hover:scale-105 transition-all duration-200 mb-6"
+            >
+              <Download className="h-8 w-8" />
+              <span>QUERO MINHAS RECEITAS AGORA</span>
+              <ArrowRight className="h-8 w-8" />
+            </Link>
+
+            <div className="text-lg space-y-2 opacity-90">
+              <p>✓ Acesso imediato após o pagamento</p>
+              <p>✓ Receba tudo por email em até 2 minutos</p>
+              <p>✓ Garantia de 7 dias - risco zero</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Bifurcação - Negativo vs Positivo */}
-      <section className="py-16 sm:py-20 bg-gradient-to-br from-gray-100 to-gray-200">
+      {/* Garantia */}
+      <section id="garantia" className="py-16 sm:py-20 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              Você Tem 2 Caminhos
-            </h2>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-              Qual você vai escolher?
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {/* Caminho Negativo */}
-            <div className="bg-white border-l-8 border-red-500 shadow-xl rounded-lg p-8">
-              <div className="text-center mb-6">
-                <div className="bg-red-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <X className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-black text-red-700 mb-4">
-                  Continuar Ganhando Pouco
-                </h3>
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="mb-12">
+              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full mb-6">
+                <Shield className="h-12 w-12 text-white" />
               </div>
               
-              <div className="space-y-4">
-                <div className="bg-red-50 p-4 rounded-lg">
-                  <p className="text-red-700 font-bold">❌ Vender barato e mal lucrar</p>
-                </div>
-                <div className="bg-red-50 p-4 rounded-lg">
-                  <p className="text-red-700 font-bold">❌ Trabalhar muito por pouco dinheiro</p>
-                </div>
-                <div className="bg-red-50 p-4 rounded-lg">
-                  <p className="text-red-700 font-bold">❌ Nunca conseguir uma renda extra boa</p>
-                </div>
-                <div className="bg-red-50 p-4 rounded-lg">
-                  <p className="text-red-700 font-bold">❌ Ficar sempre dependendo de outros</p>
-                </div>
-                <div className="bg-red-50 p-4 rounded-lg">
-                  <p className="text-red-700 font-bold">❌ Continuar na mesma situação</p>
-                </div>
-              </div>
-
-              <div className="bg-red-100 border border-red-300 p-6 rounded-lg mt-6">
-                <p className="text-red-800 font-black text-center">
-                  💸 Resultado: Continuar sem dinheiro extra
-                </p>
-              </div>
-            </div>
-
-            {/* Caminho Positivo */}
-            <div className="bg-white border-l-8 border-green-500 shadow-xl rounded-lg p-8 relative">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-gradient-to-r from-green-500 to-green-600 text-white px-4 py-2 rounded-full text-sm font-black">
-                  🏆 CAMINHO INTELIGENTE
-                </div>
-              </div>
-
-              <div className="text-center mb-6 mt-4">
-                <div className="bg-green-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Check className="h-8 w-8 text-white" />
-                </div>
-                <h3 className="text-2xl font-black text-green-700 mb-4">
-                  Ganhar R$ 1.500-3.000/mês
-                </h3>
-              </div>
+              <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-6">
+                Garantia Incondicional de 7 Dias
+              </h2>
               
-              <div className="space-y-4">
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <p className="text-green-700 font-bold">✅ Cobrar o preço certo e lucrar de verdade</p>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <p className="text-green-700 font-bold">✅ Ter renda extra que ajuda nas contas</p>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <p className="text-green-700 font-bold">✅ Fazer parte de comunidade com 1.200+ mulheres</p>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <p className="text-green-700 font-bold">✅ Ter mais independência financeira</p>
-                </div>
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <p className="text-green-700 font-bold">✅ Conquistar seus objetivos</p>
-                </div>
-              </div>
-
-              <div className="bg-green-100 border border-green-300 p-6 rounded-lg mt-6">
-                <p className="text-green-800 font-black text-center mb-2">
-                  💰 Resultado: Renda extra todo mês
-                </p>
-                <p className="text-green-700 text-center font-semibold">
-                  Acesso completo imediato
-                </p>
-              </div>
-
-              <Link
-                to="/login"
-                onClick={handleTesteGratisClick}
-                className="w-full mt-6 py-4 px-6 rounded-xl font-black transition-all text-center block bg-gradient-to-r from-green-500 to-green-600 text-white hover:shadow-xl hover:scale-105 text-lg"
-              >
-                COMEÇAR AGORA
-              </Link>
-            </div>
-          </div>
-
-          <div className="text-center mt-12 max-w-3xl mx-auto">
-            <div className="bg-yellow-100 border border-yellow-400 p-6 rounded-xl">
-              <p className="text-yellow-800 font-black text-lg mb-2">
-                ⏰ HORA DE DECIDIR
-              </p>
-              <p className="text-yellow-700">
-                Cada dia que passa é uma oportunidade perdida de ganhar dinheiro. 
-                Você pode continuar como está ou começar a ganhar renda extra hoje mesmo. 
-                <strong>A escolha é sua.</strong>
+              <p className="text-xl text-gray-700 mb-8 leading-relaxed">
+                Você tem <strong className="text-green-600">7 dias completos</strong> para testar todas as receitas. 
+                Se você não gostar por QUALQUER motivo, devolvemos 100% do seu dinheiro. 
+                <strong> Sem perguntas, sem burocracia.</strong>
               </p>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* CTA Final */}
-      <section className="py-16 sm:py-20 bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 text-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-4xl sm:text-5xl font-black mb-8">
-              Você Merece Ganhar Mais
-              <span className="block text-yellow-300">Fazendo o que Você Gosta</span>
-            </h2>
-            
-            <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-              Pare de trabalhar de graça. Pare de vender barato. 
-              <strong className="text-yellow-300">Comece a ganhar o que você merece</strong> fazendo 
-              doces em casa.
-            </p>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-12 max-w-3xl mx-auto">
-              <h3 className="text-2xl font-black mb-6">O que você ganha hoje:</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0" />
-                  <span className="font-semibold">Saber quanto cobrar</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0" />
-                  <span className="font-semibold">Receitas que vendem bem</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0" />
-                  <span className="font-semibold">Comunidade de apoio</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0" />
-                  <span className="font-semibold">Controle de lucro</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0" />
-                  <span className="font-semibold">Ajuda sempre que precisar</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0" />
-                  <span className="font-semibold">1.200+ mulheres com você</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <Link
-                to="/login"
-                onClick={handleTesteGratisClick}
-                className="inline-flex items-center space-x-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-12 py-6 rounded-xl text-2xl font-black hover:shadow-2xl hover:scale-105 transition-all duration-200"
-              >
-                <Sparkles className="h-8 w-8" />
-                <span>COMEÇAR AGORA GRÁTIS</span>
-                <ArrowRight className="h-8 w-8" />
-              </Link>
+            <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-8 border-2 border-green-200">
+              <h3 className="text-2xl font-black text-gray-900 mb-6">Como Funciona:</h3>
               
-              <div className="text-lg opacity-90 space-y-2">
-                <p>✓ Sem cartão de crédito</p>
-                <p>✓ 7 dias totalmente grátis</p>
-                <p>✓ Cancele quando quiser</p>
-                <p>✓ Junte-se a 1.200+ mulheres</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+                <div className="flex flex-col items-center text-center">
+                  <div className="bg-white rounded-full p-4 mb-4 shadow-lg">
+                    <span className="text-3xl font-black text-green-600">1</span>
+                  </div>
+                  <h4 className="font-black text-gray-900 mb-2">Compre Agora</h4>
+                  <p className="text-gray-700 text-sm">Acesso imediato a todas as 15 receitas + bônus</p>
+                </div>
+
+                <div className="flex flex-col items-center text-center">
+                  <div className="bg-white rounded-full p-4 mb-4 shadow-lg">
+                    <span className="text-3xl font-black text-blue-600">2</span>
+                  </div>
+                  <h4 className="font-black text-gray-900 mb-2">Teste 7 Dias</h4>
+                  <p className="text-gray-700 text-sm">Faça as receitas, venda, veja os resultados</p>
+                </div>
+
+                <div className="flex flex-col items-center text-center">
+                  <div className="bg-white rounded-full p-4 mb-4 shadow-lg">
+                    <span className="text-3xl font-black text-purple-600">3</span>
+                  </div>
+                  <h4 className="font-black text-gray-900 mb-2">Satisfação Total</h4>
+                  <p className="text-gray-700 text-sm">Não gostou? Email para nós e devolvemos tudo</p>
+                </div>
               </div>
 
-              <div className="bg-yellow-400/20 rounded-xl p-6 mt-8 max-w-2xl mx-auto">
-                <p className="text-yellow-200 font-black text-lg mb-2">
-                  💡 Lembre-se:
-                </p>
-                <p className="text-white">
-                  Cada dia que passa é uma chance de ganhar dinheiro extra. 
-                  <strong className="text-yellow-300">Comece hoje</strong> e veja a diferença já na próxima venda.
+              <div className="mt-8 bg-white rounded-xl p-6 border-2 border-green-300">
+                <p className="text-lg text-gray-800">
+                  <strong className="text-green-600">O risco é todo nosso.</strong> Você só ganha: 
+                  ou fatura sua renda extra, ou recebe seu dinheiro de volta. Simples assim.
                 </p>
               </div>
             </div>
@@ -856,75 +567,142 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-gray-50 to-purple-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-6">
-              Dúvidas Frequentes
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl font-black text-center text-gray-900 mb-12">
+              Perguntas Frequentes
             </h2>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-              Respondemos as principais perguntas
-            </p>
+
+            <div className="space-y-4">
+              <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
+                <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
+                  <span>🤔 Nunca fiz bolo de pote. Vou conseguir?</span>
+                  <ArrowRight className="h-5 w-5" />
+                </summary>
+                <p className="mt-4 text-gray-700 leading-relaxed">
+                  <strong>SIM!</strong> As receitas são feitas para iniciantes. Tudo é explicado passo a passo, com fotos e medidas exatas. 
+                  Se você consegue fazer um bolo comum, vai conseguir fazer bolo de pote. É até mais fácil!
+                </p>
+              </details>
+
+              <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
+                <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
+                  <span>⏰ Quanto tempo leva para começar a vender?</span>
+                  <ArrowRight className="h-5 w-5" />
+                </summary>
+                <p className="mt-4 text-gray-700 leading-relaxed">
+                  Você pode fazer sua primeira receita <strong>hoje mesmo</strong> e vender amanhã. 
+                  Os ingredientes são simples e você encontra em qualquer supermercado. Muitas clientes fazem e vendem no mesmo dia!
+                </p>
+              </details>
+
+              <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
+                <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
+                  <span>💰 Vou realmente ganhar R$ 800-1.500/mês?</span>
+                  <ArrowRight className="h-5 w-5" />
+                </summary>
+                <p className="mt-4 text-gray-700 leading-relaxed">
+                  Depende de você! Se vender 10 potes por semana a R$ 15, são R$ 600/mês. 
+                  Se vender 20 potes, são R$ 1.200/mês. <strong>O potencial está nas suas mãos.</strong> 
+                  As receitas vendem sozinhas - você só precisa fazer e divulgar.
+                </p>
+              </details>
+
+              <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
+                <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
+                  <span>📱 Como vou receber o ebook?</span>
+                  <ArrowRight className="h-5 w-5" />
+                </summary>
+                <p className="mt-4 text-gray-700 leading-relaxed">
+                  Após o pagamento, você recebe <strong>tudo por email em até 2 minutos</strong>. 
+                  Pode abrir no celular, computador ou tablet. É um PDF completo que você pode imprimir se quiser!
+                </p>
+              </details>
+
+              <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
+                <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
+                  <span>🎂 Preciso de equipamentos caros?</span>
+                  <ArrowRight className="h-5 w-5" />
+                </summary>
+                <p className="mt-4 text-gray-700 leading-relaxed">
+                  <strong>NÃO!</strong> Você só precisa: tigelas, colheres, batedeira (ou batedor manual), 
+                  forma para assar e os potinhos. Nada de equipamento profissional. 
+                  Muitas meninas começam com o que já têm em casa!
+                </p>
+              </details>
+
+              <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
+                <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
+                  <span>🏠 Posso fazer em casa mesmo? É legalizado?</span>
+                  <ArrowRight className="h-5 w-5" />
+                </summary>
+                <p className="mt-4 text-gray-700 leading-relaxed">
+                  Sim! Você pode começar vendendo para amigos, familiares e vizinhos sem problemas. 
+                  Conforme crescer, pode regularizar. <strong>Comece pequeno e vá evoluindo!</strong>
+                </p>
+              </details>
+            </div>
           </div>
+        </div>
+      </section>
 
-          <div className="max-w-4xl mx-auto space-y-6">
-            <div className="bg-gray-50 rounded-xl p-8 border-l-8 border-green-500">
-              <h3 className="text-xl font-black text-gray-900 mb-4">
-                Como funciona o teste grátis?
-              </h3>
-              <p className="text-gray-700">
-                Você usa tudo de graça por 7 dias. Não precisa cartão de crédito. 
-                Depois dos 7 dias, se quiser continuar, aí sim paga R$ 19,90/mês.
-              </p>
+      {/* CTA Final */}
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto text-center text-white">
+            <h2 className="text-4xl sm:text-5xl font-black mb-6">
+              Sua Renda Extra Está
+              <span className="block text-yellow-300">A 1 Clique de Distância</span>
+            </h2>
+
+            <p className="text-xl sm:text-2xl mb-8 opacity-90 leading-relaxed">
+              Enquanto você hesita, outras mulheres estão fazendo, vendendo e ganhando. 
+              <strong className="block mt-2">Não deixe essa oportunidade passar.</strong>
+            </p>
+
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div className="text-center">
+                  <div className="text-5xl font-black text-yellow-300 mb-2">15</div>
+                  <p className="text-sm opacity-90">Receitas Completas</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-5xl font-black text-yellow-300 mb-2">R$ 29</div>
+                  <p className="text-sm opacity-90">Investimento Único</p>
+                </div>
+                <div className="text-center">
+                  <div className="text-5xl font-black text-yellow-300 mb-2">7</div>
+                  <p className="text-sm opacity-90">Dias de Garantia</p>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl p-6 mb-6">
+                <p className="text-2xl font-black mb-2">🎁 BÔNUS ESPECIAL HOJE:</p>
+                <p className="text-lg">Guia "Como Vender pelo WhatsApp" + Modelos de Posts Prontos</p>
+                <p className="text-sm mt-2 opacity-90">(Valor R$ 47 - GRÁTIS hoje)</p>
+              </div>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-8 border-l-8 border-blue-500">
-              <h3 className="text-xl font-black text-gray-900 mb-4">
-                É difícil de usar?
-              </h3>
-              <p className="text-gray-700">
-                Não! É fácil como usar WhatsApp. Qualquer pessoa consegue usar, 
-                mesmo quem nunca usou app assim antes.
-              </p>
+            <Link
+              to="/login"
+              onClick={handleComprarClick}
+              className="inline-flex items-center space-x-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-12 py-6 rounded-xl text-2xl font-black hover:shadow-2xl hover:scale-105 transition-all duration-200 mb-6"
+            >
+              <Sparkles className="h-8 w-8" />
+              <span>SIM, QUERO COMEÇAR AGORA</span>
+              <ArrowRight className="h-8 w-8" />
+            </Link>
+
+            <div className="space-y-2 text-sm opacity-90">
+              <p>✓ Pagamento 100% seguro</p>
+              <p>✓ Acesso imediato por email</p>
+              <p>✓ Garantia de 7 dias ou seu dinheiro de volta</p>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-8 border-l-8 border-purple-500">
-              <h3 className="text-xl font-black text-gray-900 mb-4">
-                Funciona mesmo para ganhar renda extra?
-              </h3>
-              <p className="text-gray-700">
-                Sim! Mais de 1.200 mulheres já estão usando. A calculadora te ajuda a cobrar o preço certo, 
-                e as receitas do marketplace são produtos que vendem bem e dão lucro.
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-xl p-8 border-l-8 border-pink-500">
-              <h3 className="text-xl font-black text-gray-900 mb-4">
-                Posso cancelar quando quiser?
-              </h3>
-              <p className="text-gray-700">
-                Sim! Não tem contrato, não tem multa. Cancela quando quiser pelo próprio app. 
-                Se cancelar nos primeiros 7 dias, não paga nada.
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-xl p-8 border-l-8 border-yellow-500">
-              <h3 className="text-xl font-black text-gray-900 mb-4">
-                Preciso ser profissional?
-              </h3>
-              <p className="text-gray-700">
-                Não! O app é para qualquer pessoa que faz ou quer fazer doces para vender. 
-                Iniciantes são muito bem-vindas!
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-xl p-8 border-l-8 border-indigo-500">
-              <h3 className="text-xl font-black text-gray-900 mb-4">
-                Como funciona a comunidade?
-              </h3>
-              <p className="text-gray-700">
-                É um espaço onde você pode conversar com outras mulheres que também vendem doces, 
-                tirar dúvidas, compartilhar experiências e aprender juntas.
+            <div className="mt-8 pt-8 border-t border-white/20">
+              <p className="text-lg italic opacity-80">
+                "O melhor momento para começar foi ontem. O segundo melhor momento é agora."
               </p>
             </div>
           </div>
@@ -932,50 +710,35 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-gray-900 text-white">
+      <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8">
-            <div className="flex items-center justify-center space-x-3 mb-6">
-              <div className="relative">
-                <Cake className="h-10 w-10 text-pink-500" />
-                <Heart className="h-5 w-5 text-red-500 absolute -top-1 -right-1" />
-              </div>
-              <span className="text-3xl font-black">DoceCalc</span>
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="flex items-center justify-center space-x-2 mb-6">
+              <Cake className="h-8 w-8 text-pink-500" />
+              <span className="text-2xl font-bold">DoceCalc</span>
             </div>
-            
-            <p className="text-gray-300 text-lg mb-6 font-semibold">
-              Ajudando 1.200+ mulheres a ganhar renda extra
+
+            <p className="text-gray-400 mb-6">
+              Transformando sonhos em bolos de pote, e bolos de pote em renda extra.
             </p>
 
-            <div className="border-t border-gray-700 pt-6">
-              <p className="text-gray-400 text-sm">
-                © 2024 DoceCalc. Todos os direitos reservados. 
-              </p>
-              <p className="text-gray-500 text-xs mt-2">
-                Feito com carinho para mulheres que merecem ganhar mais.
-              </p>
+            <div className="flex justify-center space-x-8 mb-8 text-sm">
+              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                Termos de Uso
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                Política de Privacidade
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                Contato
+              </a>
             </div>
 
-            <div className="flex justify-center items-center space-x-6 mt-6">
-              <div className="bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-bold">
-                🔒 100% SEGURO
-              </div>
-              <div className="bg-blue-600 text-white px-4 py-2 rounded-lg text-xs font-bold">
-                🛡️ 7 DIAS GRÁTIS
-              </div>
+            <div className="text-sm text-gray-500">
+              <p>© 2024 DoceCalc. Todos os direitos reservados.</p>
+              <p className="mt-2">Este produto não garante resultados. Os ganhos dependem do seu esforço e dedicação.</p>
             </div>
           </div>
-        </div>
-
-        {/* Sticky CTA Mobile */}
-        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-gradient-to-r from-green-500 to-green-600 p-4 z-50 shadow-2xl">
-          <Link
-            to="/login"
-            onClick={handleTesteGratisClick}
-            className="w-full bg-yellow-400 text-gray-900 py-3 px-6 rounded-lg font-black text-center block hover:bg-yellow-300 transition-all"
-          >
-            COMEÇAR GRÁTIS AGORA
-          </Link>
         </div>
       </footer>
     </div>
