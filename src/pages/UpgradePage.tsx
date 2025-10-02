@@ -9,21 +9,11 @@ export default function UpgradePage() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState<'pix' | 'card' | null>(null)
 
-  const handleUpgrade = async (method: 'pix' | 'card') => {
-    setLoading(method)
-    
-    try {
-      if (method === 'pix') {
-        // PIX temporariamente desabilitado
-        alert('PIX temporariamente indisponível. Use cartão de crédito.')
-        return
-      } else {
-        navigate('/upgrade/stripe')
-      }
-    } catch (error) {
-      console.error('Erro no upgrade:', error)
-    } finally {
-      setLoading(null)
+  const handleUpgrade = (method: 'pix' | 'card') => {
+    if (method === 'pix') {
+      navigate('/upgrade/pix')
+    } else {
+      navigate('/upgrade/stripe')
     }
   }
 
@@ -178,15 +168,9 @@ export default function UpgradePage() {
                         disabled={loading !== null}
                         className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
                       >
-                        {loading === 'pix' ? (
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <QrCode className="w-5 h-5" />
-                        )}
+                        <QrCode className="w-5 h-5" />
                         Pagar com PIX
-                        {loading !== 'pix' && (
-                          <span className="bg-green-500 px-2 py-1 rounded text-xs ml-2">Instantâneo</span>
-                        )}
+                        <span className="bg-green-500 px-2 py-1 rounded text-xs ml-2">Instantâneo</span>
                       </button>
                       
                       <button
@@ -194,11 +178,7 @@ export default function UpgradePage() {
                         disabled={loading !== null}
                         className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors"
                       >
-                        {loading === 'card' ? (
-                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <CreditCard className="w-5 h-5" />
-                        )}
+                        <CreditCard className="w-5 h-5" />
                         Pagar com Cartão
                       </button>
                     </div>

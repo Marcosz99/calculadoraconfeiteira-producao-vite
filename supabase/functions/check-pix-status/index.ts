@@ -64,20 +64,58 @@ serve(async (req) => {
       
       const supabase = createClient(supabaseUrl, supabaseServiceKey)
       
-      const { error: updateError } = await supabase
-        .from('pagamentos')
-        .update({
-          status: 'aprovado',
-          data_pagamento: new Date().toISOString(),
-          dados_pagamento: responseData.data,
-          updated_at: new Date().toISOString()
-        })
-        .eq('referencia_externa', pixId)
+      // Verificar se é pagamento de assinatura ou ebook
+      const metadata = responseData.data.metadata || {}
+      
+      if (metadata.type === 'ebook') {
+        // Atualizar compra de ebook
+        const { error: updateError } = await supabase
+          .from('compras_ebooks')
+          .update({
+            status: 'aprovado',
+            dados_pagamento: responseData.data,
+            updated_at: new Date().toISOString()
+          })
+          .eq('dados_pagamento->>id', pixId)
 
-      if (updateError) {
-        console.error('Error updating payment status:', updateError)
+        if (updateError) {
+          console.error('Error updating ebook purchase:', updateError)
+        } else {
+          console.log('Ebook purchase updated successfully')
+        }
       } else {
-        console.log('Payment status updated successfully')
+        // Atualizar pagamento de assinatura
+        const { error: updateError } = await supabase
+          .from('pagamentos')
+          .update({
+            status: 'aprovado',
+            data_pagamento: new Date().toISOString(),
+            dados_pagamento: responseData.data,
+            updated_at: new Date().toISOString()
+          })
+          .eq('referencia_externa', pixId)
+
+        if (updateError) {
+          console.error('Error updating payment status:', updateError)
+        } else {
+          console.log('Payment status updated successfully')
+          
+          // Atualizar perfil do usuário para professional com data de expiração (30 dias)
+          if (metadata.userId) {
+            const dataExpiracao = new Date()
+            dataExpiracao.setDate(dataExpiracao.getDate() + 30)
+            
+            await supabase
+              .from('profiles')
+              .update({
+                plano: 'professional',
+                subscription_status: 'active'
+              })
+              .eq('id', metadata.userId)
+              
+            console.log('User upgraded to professional with expiration:', dataExpiracao)
+          }
+        }
       }
     }
 

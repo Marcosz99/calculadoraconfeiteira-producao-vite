@@ -31,25 +31,14 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess }) => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
 
-    if (!stripe || !elements) {
-      return
-    }
-
     setLoading(true)
 
     try {
-      // Validate input before submission
-      const validated = checkoutSchema.parse({
-        customerName,
-        customerEmail,
-        customerPhone: customerPhone || ''
-      })
-
       // Criar checkout session usando edge function
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: {
-          userEmail: validated.customerEmail,
-          userName: validated.customerName
+          userEmail: user?.email,
+          userName: user?.user_metadata?.name || user?.email?.split('@')[0] || 'Cliente'
         }
       })
 
@@ -63,19 +52,11 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess }) => {
       }
 
     } catch (error: any) {
-      if (error instanceof z.ZodError) {
-        toast({
-          title: "Erro de validação",
-          description: error.errors[0].message,
-          variant: "destructive",
-        })
-      } else {
-        toast({
-          title: "Erro no pagamento",
-          description: error.message || "Tente novamente em alguns segundos",
-          variant: "destructive",
-        })
-      }
+      toast({
+        title: "Erro no pagamento",
+        description: error.message || "Tente novamente em alguns segundos",
+        variant: "destructive",
+      })
     } finally {
       setLoading(false)
     }
@@ -83,86 +64,26 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nome Completo
-          </label>
-          <Input
-            type="text"
-            value={customerName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomerName(e.target.value)}
-            placeholder="Seu nome completo"
-            required
-            className="w-full"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Email
-          </label>
-          <Input
-            type="email"
-            value={customerEmail}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomerEmail(e.target.value)}
-            placeholder="seu@email.com"
-            required
-            className="w-full"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            WhatsApp/Telefone
-          </label>
-          <Input
-            type="tel"
-            value={customerPhone}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomerPhone(e.target.value)}
-            placeholder="(11) 99999-9999"
-            required
-            className="w-full"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Dados do Cartão
-          </label>
-          <div className="p-3 border border-gray-300 rounded-md">
-            <CardElement 
-              options={{
-                style: {
-                  base: {
-                    fontSize: '16px',
-                    color: '#424770',
-                    '::placeholder': {
-                      color: '#aab7c4',
-                    },
-                  },
-                },
-                hidePostalCode: true,
-              }}
-            />
-          </div>
-        </div>
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <p className="text-sm text-blue-800">
+          Você será redirecionado para o checkout seguro do Stripe para finalizar o pagamento.
+        </p>
       </div>
 
       <Button
         type="submit"
-        disabled={!stripe || loading}
+        disabled={loading}
         className="w-full bg-primary hover:bg-primary/90"
       >
         {loading ? (
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            Processando...
+            Redirecionando...
           </div>
         ) : (
           <div className="flex items-center gap-2">
             <CreditCard className="w-4 h-4" />
-            Confirmar Assinatura - R$ 19,90/mês
+            Continuar para Stripe - R$ 19,90/mês
           </div>
         )}
       </Button>

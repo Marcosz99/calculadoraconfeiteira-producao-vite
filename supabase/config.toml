@@ -73,6 +73,10 @@ gw_port = 54331
 [functions.create-pix]
 verify_jwt = false
 
+
+[functions.create-ebook-pix]
+verify_jwt = false
+
 [functions.check-pix-status]
 verify_jwt = false
 
