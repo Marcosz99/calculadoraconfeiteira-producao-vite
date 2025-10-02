@@ -70,23 +70,27 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSuccess }) => {
         </p>
       </div>
 
-      <Button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-primary hover:bg-primary/90"
-      >
-        {loading ? (
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            Redirecionando...
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <CreditCard className="w-4 h-4" />
-            Continuar para Stripe - R$ 19,90/mês
-          </div>
-        )}
-      </Button>
+      <div className="space-y-3">
+        <Button
+          type="button"
+          onClick={() => navigate('/upgrade/stripe')}
+          disabled={loading}
+          className="w-full bg-primary hover:bg-primary/90"
+        >
+          <CreditCard className="w-4 h-4 mr-2" />
+          Cartão de Crédito - R$ 19,90/mês
+        </Button>
+
+        <Button
+          type="button"
+          onClick={() => navigate('/upgrade/pix')}
+          disabled={loading}
+          variant="outline"
+          className="w-full border-primary text-primary hover:bg-primary/10"
+        >
+          PIX - R$ 19,90/mês
+        </Button>
+      </div>
     </form>
   )
 }

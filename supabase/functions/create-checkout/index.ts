@@ -77,14 +77,12 @@ serve(async (req) => {
         commitment_start_date: new Date().toISOString()
       },
       subscription_data: {
-        trial_period_days: 7, // Trial de 7 dias
         metadata: {
           userEmail: userEmail,
           userName: userName || '',
           plan: 'professional',
           commitment_months: '12',
-          commitment_start_date: new Date().toISOString(),
-          trial_end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+          commitment_start_date: new Date().toISOString()
         }
       }
     })
