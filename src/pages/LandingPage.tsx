@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState, useEffect, useRef } from 'react'
 import { PixelService } from '../services/pixelService'
 import { 
   Calculator, 
@@ -34,10 +33,12 @@ import {
 } from 'lucide-react'
 
 export default function LandingPage() {
-  const [emailDemo, setEmailDemo] = useState('')
-  const [showCalculatorDemo, setShowCalculatorDemo] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [currentTestimonial, setCurrentTestimonial] = useState(0)
+  const [videoPlaying, setVideoPlaying] = useState(false)
+  const videoRef = useRef(null)
+  
+  const CHECKOUT_URL = "https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK?utm_source=FB&utm_campaign={{campaign.name}}|{{campaign.id}}&utm_medium={{adset.name}}|{{adset.id}}&utm_content={{ad.name}}|{{ad.id}}&utm_term={{placement}}"
   
   const depoimentos = [
     {
@@ -72,8 +73,16 @@ export default function LandingPage() {
     return () => clearInterval(interval)
   }, [])
 
-  const handleComprarClick = () => {
+  const handleCTAClick = () => {
     PixelService.trackLead()
+    window.location.href = CHECKOUT_URL
+  }
+
+  const handleVideoPlay = () => {
+    setVideoPlaying(true)
+    if (videoRef.current) {
+      videoRef.current.play()
+    }
   }
 
   return (
@@ -92,11 +101,11 @@ export default function LandingPage() {
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
+            <a href="#video" className="text-gray-600 hover:text-pink-500 transition-colors">
+              Vídeo
+            </a>
             <a href="#receitas" className="text-gray-600 hover:text-pink-500 transition-colors">
               Receitas
-            </a>
-            <a href="#depoimentos" className="text-gray-600 hover:text-pink-500 transition-colors">
-              Depoimentos
             </a>
             <a href="#garantia" className="text-gray-600 hover:text-pink-500 transition-colors">
               Garantia
@@ -105,13 +114,12 @@ export default function LandingPage() {
 
           {/* Desktop Button */}
           <div className="hidden md:flex items-center">
-            <a
-              href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK?utm_source=FB&utm_campaign={{campaign.name}}|{{campaign.id}}&utm_medium={{adset.name}}|{{adset.id}}&utm_content={{ad.name}}|{{ad.id}}&utm_term={{placement}}"
-              onClick={handleComprarClick}
+            <button
+              onClick={handleCTAClick}
               className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-bold"
             >
               QUERO AS RECEITAS
-            </a>
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -128,18 +136,18 @@ export default function LandingPage() {
           <div className="md:hidden absolute top-16 left-0 right-0 bg-white/95 backdrop-blur-sm border-b shadow-lg">
             <div className="px-4 py-4 space-y-4">
               <a 
+                href="#video" 
+                className="block text-gray-600 hover:text-pink-500 transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Vídeo
+              </a>
+              <a 
                 href="#receitas" 
                 className="block text-gray-600 hover:text-pink-500 transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Receitas
-              </a>
-              <a 
-                href="#depoimentos" 
-                className="block text-gray-600 hover:text-pink-500 transition-colors py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Depoimentos
               </a>
               <a 
                 href="#garantia" 
@@ -149,57 +157,83 @@ export default function LandingPage() {
                 Garantia
               </a>
               <div className="border-t pt-4">
-                <a
-                  href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK?utm_source=FB&utm_campaign={{campaign.name}}|{{campaign.id}}&utm_medium={{adset.name}}|{{adset.id}}&utm_content={{ad.name}}|{{ad.id}}&utm_term={{placement}}"
-                  className="block text-center bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-200 font-bold"
-                  onClick={() => setMobileMenuOpen(false)}
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false)
+                    handleCTAClick()
+                  }}
+                  className="w-full text-center bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-200 font-bold"
                 >
                   QUERO AS RECEITAS
-                </a>
+                </button>
               </div>
             </div>
           </div>
         )}
       </header>
 
-      {/* Hero Section */}
-      <section className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Hero Section com VSL */}
+      <section id="video" className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-pink-100/20 to-purple-100/20"></div>
-        <div className="container mx-auto text-center max-w-5xl relative">
+        <div className="container mx-auto max-w-6xl relative">
           
-          <div className="mb-6">
-            <div className="inline-block bg-gradient-to-r from-orange-400 to-pink-500 text-white px-6 py-2 rounded-full text-sm font-black animate-pulse">
+          <div className="text-center mb-8">
+            <div className="inline-block bg-gradient-to-r from-orange-400 to-pink-500 text-white px-6 py-2 rounded-full text-sm font-black animate-pulse mb-6">
               🔥 OFERTA POR TEMPO LIMITADO
+            </div>
+
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 mb-6 leading-tight">
+              Aprenda a Fazer Bolos de Pote
+              <span className="block text-transparent bg-gradient-to-r from-pink-600 to-purple-700 bg-clip-text"> Que Vendem Só Pela Imagem</span>
+            </h1>
+            
+            <p className="text-2xl sm:text-3xl text-gray-800 mb-4 font-bold">
+              E Ganhe de R$ 800 a R$ 1.500 Extras Por Mês
+            </p>
+          </div>
+
+          {/* VSL Video */}
+          <div className="max-w-4xl mx-auto mb-8">
+            <div className="relative bg-black rounded-2xl shadow-2xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+              <video
+                ref={videoRef}
+                className="absolute top-0 left-0 w-full h-full"
+                controls
+                playsInline
+                preload="metadata"
+                poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3Crect fill='%23ec4899' width='800' height='450'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='48' fill='white'%3E▶ Assistir Vídeo%3C/text%3E%3C/svg%3E"
+                onPlay={() => setVideoPlaying(true)}
+              >
+                <source src={`${window.location.origin}/landingpage/Mini VSL Frankstein.mp4`} type="video/mp4" />
+                Seu navegador não suporta vídeos.
+              </video>
+              
+              {!videoPlaying && (
+                <button
+                  onClick={handleVideoPlay}
+                  className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/30 transition-all group"
+                >
+                  <div className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-full p-8 group-hover:scale-110 transition-transform shadow-2xl">
+                    <Play className="h-16 w-16 text-white" fill="white" />
+                  </div>
+                </button>
+              )}
             </div>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-gray-900 mb-6 leading-tight">
-            Aprenda a Fazer Bolos de Pote
-            <span className="block text-transparent bg-gradient-to-r from-pink-600 to-purple-700 bg-clip-text"> Que Vendem Só Pela Imagem</span>
-          </h1>
-          
-          <p className="text-2xl sm:text-3xl text-gray-800 mb-4 font-bold">
-            E Ganhe de R$ 800 a R$ 1.500 Extras Por Mês
-          </p>
-
-          <p className="text-xl sm:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed">
-            <strong className="text-pink-600">15 receitas completas</strong> de bolos de pote irresistíveis.
-            <strong className="text-purple-600"> Poucos ingredientes, sem complicação, lucro garantido</strong>
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <a
-              href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK?utm_source=FB&utm_campaign={{campaign.name}}|{{campaign.id}}&utm_medium={{adset.name}}|{{adset.id}}&utm_content={{ad.name}}|{{ad.id}}&utm_term={{placement}}"
-              onClick={handleComprarClick}
-              className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-green-600 text-white px-10 py-5 rounded-lg text-xl font-black hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-3"
+          {/* CTA Principal */}
+          <div className="text-center mb-8">
+            <button
+              onClick={handleCTAClick}
+              className="bg-gradient-to-r from-green-500 to-green-600 text-white px-10 py-5 rounded-lg text-xl font-black hover:shadow-xl hover:scale-105 transition-all duration-200 inline-flex items-center space-x-3"
             >
               <Download className="h-6 w-6" />
               <span>QUERO RECEBER MINHAS RECEITAS</span>
               <ArrowRight className="h-6 w-6" />
-            </a>
+            </button>
           </div>
 
-          <div className="flex justify-center items-center space-x-6 mb-8">
+          <div className="flex justify-center items-center space-x-6 mb-12">
             <div className="text-center">
               <div className="text-3xl font-black text-green-600">R$ 29</div>
               <div className="text-sm text-gray-600">Pagamento único</div>
@@ -211,9 +245,9 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Preview do que vem no Ebook */}
-          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-4xl mx-auto border-4 border-pink-200">
-            <h3 className="text-2xl font-black text-gray-900 mb-6">O Que Você Vai Receber Hoje:</h3>
+          {/* Preview do Ebook */}
+          <div className="bg-white rounded-xl shadow-2xl p-8 border-4 border-pink-200">
+            <h3 className="text-2xl font-black text-gray-900 mb-6 text-center">O Que Você Vai Receber Hoje:</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
               <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl p-6 border-2 border-pink-200">
@@ -236,8 +270,8 @@ export default function LandingPage() {
             </div>
 
             <div className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-lg p-6 border-2 border-yellow-300">
-              <h4 className="font-black text-gray-900 mb-4 text-xl">🎁 BÔNUS EXCLUSIVOS:</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-left">
+              <h4 className="font-black text-gray-900 mb-4 text-xl text-center">🎁 BÔNUS EXCLUSIVOS:</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="flex items-start space-x-2">
                   <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm font-semibold text-gray-800">Calculadora de preços em PDF</span>
@@ -319,11 +353,11 @@ export default function LandingPage() {
             {/* Clássicos */}
             <div className="mb-12">
               <h3 className="text-2xl font-black text-gray-900 mb-6 text-center">🍫 5 CLÁSSICOS QUE SEMPRE VENDEM</h3>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {['Chocolate', 'Ninho', 'Prestígio', 'Morango', 'Limão'].map((receita, index) => (
                   <div key={index} className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-6 border-2 border-pink-200 text-center">
                     <div className="text-4xl mb-3">🍰</div>
-                    <h4 className="font-black text-gray-900">{receita}</h4>
+                    <h4 className="font-black text-gray-900 text-sm">{receita}</h4>
                     <p className="text-xs text-gray-600 mt-2">Venda: R$ 12-15</p>
                   </div>
                 ))}
@@ -333,7 +367,7 @@ export default function LandingPage() {
             {/* Gourmet */}
             <div className="mb-12">
               <h3 className="text-2xl font-black text-gray-900 mb-6 text-center">👑 5 GOURMET DE ALTA MARGEM</h3>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {['Ferrero Rocher', 'Oreo', 'Kinder', 'Bis', 'Nutella'].map((receita, index) => (
                   <div key={index} className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border-2 border-purple-200 text-center">
                     <div className="text-4xl mb-3">✨</div>
@@ -347,7 +381,7 @@ export default function LandingPage() {
             {/* Especiais */}
             <div className="mb-12">
               <h3 className="text-2xl font-black text-gray-900 mb-6 text-center">🎉 5 ESPECIAIS PARA DATAS</h3>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {['Páscoa', 'Natal', 'Dia das Mães', 'Festas', 'Casamentos'].map((receita, index) => (
                   <div key={index} className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border-2 border-orange-200 text-center">
                     <div className="text-4xl mb-3">🎊</div>
@@ -379,24 +413,52 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
+
+            {/* CTA Mid-Page */}
+            <div className="text-center mt-12">
+              <button
+                onClick={handleCTAClick}
+                className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-10 py-5 rounded-lg text-xl font-black hover:shadow-xl hover:scale-105 transition-all duration-200 inline-flex items-center space-x-3"
+              >
+                <Sparkles className="h-6 w-6" />
+                <span>QUERO COMEÇAR AGORA</span>
+                <ArrowRight className="h-6 w-6" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Depoimentos */}
-      <section id="depoimentos" className="py-16 sm:py-20 bg-gradient-to-br from-gray-50 to-pink-50">
+      {/* Depoimentos em Vídeo */}
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-gray-50 to-pink-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              Mulheres Como Você
+              Veja Quem Já Está
               <span className="block text-transparent bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text">
-                Já Estão Ganhando Renda Extra
+                Ganhando Renda Extra
               </span>
             </h2>
           </div>
 
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-2xl p-8 text-center relative">
+            {/* Vídeo de Depoimentos */}
+            <div className="bg-white rounded-2xl shadow-2xl p-4 mb-8">
+              <div className="relative bg-black rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+                <video
+                  className="absolute top-0 left-0 w-full h-full"
+                  controls
+                  playsInline
+                  preload="metadata"
+                >
+                  <source src={`${window.location.origin}/landingpage/Depoimentos Plus.mp4`} type="video/mp4" />
+                  Seu navegador não suporta vídeos.
+                </video>
+              </div>
+            </div>
+
+            {/* Depoimentos em Carrossel */}
+            <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
               <div className="text-6xl mb-4">{depoimentos[currentTestimonial].foto}</div>
               
               <blockquote className="text-xl text-gray-700 mb-6 italic leading-relaxed">
@@ -487,15 +549,14 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <a
-              href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK?utm_source=FB&utm_campaign={{campaign.name}}|{{campaign.id}}&utm_medium={{adset.name}}|{{adset.id}}&utm_content={{ad.name}}|{{ad.id}}&utm_term={{placement}}"
-              onClick={handleComprarClick}
+            <button
+              onClick={handleCTAClick}
               className="inline-flex items-center space-x-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-12 py-6 rounded-xl text-2xl font-black hover:shadow-2xl hover:scale-105 transition-all duration-200 mb-6"
             >
               <Download className="h-8 w-8" />
               <span>QUERO MINHAS RECEITAS AGORA</span>
               <ArrowRight className="h-8 w-8" />
-            </a>
+            </button>
 
             <div className="text-lg space-y-2 opacity-90">
               <p>✓ Acesso imediato após o pagamento</p>
@@ -577,7 +638,7 @@ export default function LandingPage() {
             <div className="space-y-4">
               <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
                 <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
-                  <span>🤔 Nunca fiz bolo de pote. Vou conseguir?</span>
+                  <span>Nunca fiz bolo de pote. Vou conseguir?</span>
                   <ArrowRight className="h-5 w-5" />
                 </summary>
                 <p className="mt-4 text-gray-700 leading-relaxed">
@@ -588,7 +649,7 @@ export default function LandingPage() {
 
               <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
                 <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
-                  <span>⏰ Quanto tempo leva para começar a vender?</span>
+                  <span>Quanto tempo leva para começar a vender?</span>
                   <ArrowRight className="h-5 w-5" />
                 </summary>
                 <p className="mt-4 text-gray-700 leading-relaxed">
@@ -599,7 +660,7 @@ export default function LandingPage() {
 
               <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
                 <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
-                  <span>💰 Vou realmente ganhar R$ 800-1.500/mês?</span>
+                  <span>Vou realmente ganhar R$ 800-1.500/mês?</span>
                   <ArrowRight className="h-5 w-5" />
                 </summary>
                 <p className="mt-4 text-gray-700 leading-relaxed">
@@ -611,7 +672,7 @@ export default function LandingPage() {
 
               <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
                 <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
-                  <span>📱 Como vou receber o ebook?</span>
+                  <span>Como vou receber o ebook?</span>
                   <ArrowRight className="h-5 w-5" />
                 </summary>
                 <p className="mt-4 text-gray-700 leading-relaxed">
@@ -622,7 +683,7 @@ export default function LandingPage() {
 
               <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
                 <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
-                  <span>🎂 Preciso de equipamentos caros?</span>
+                  <span>Preciso de equipamentos caros?</span>
                   <ArrowRight className="h-5 w-5" />
                 </summary>
                 <p className="mt-4 text-gray-700 leading-relaxed">
@@ -634,7 +695,7 @@ export default function LandingPage() {
 
               <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
                 <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
-                  <span>🏠 Posso fazer em casa mesmo? É legalizado?</span>
+                  <span>Posso fazer em casa mesmo? É legalizado?</span>
                   <ArrowRight className="h-5 w-5" />
                 </summary>
                 <p className="mt-4 text-gray-700 leading-relaxed">
@@ -678,21 +739,20 @@ export default function LandingPage() {
               </div>
 
               <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl p-6 mb-6">
-                <p className="text-2xl font-black mb-2">🎁 BÔNUS ESPECIAL HOJE:</p>
+                <p className="text-2xl font-black mb-2">BÔNUS ESPECIAL HOJE:</p>
                 <p className="text-lg">Guia "Como Vender pelo WhatsApp" + Modelos de Posts Prontos</p>
                 <p className="text-sm mt-2 opacity-90">(Valor R$ 47 - GRÁTIS hoje)</p>
               </div>
             </div>
 
-            <a
-              href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK?utm_source=FB&utm_campaign={{campaign.name}}|{{campaign.id}}&utm_medium={{adset.name}}|{{adset.id}}&utm_content={{ad.name}}|{{ad.id}}&utm_term={{placement}}"
-              onClick={handleComprarClick}
+            <button
+              onClick={handleCTAClick}
               className="inline-flex items-center space-x-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-12 py-6 rounded-xl text-2xl font-black hover:shadow-2xl hover:scale-105 transition-all duration-200 mb-6"
             >
               <Sparkles className="h-8 w-8" />
               <span>SIM, QUERO COMEÇAR AGORA</span>
               <ArrowRight className="h-8 w-8" />
-            </a>
+            </button>
 
             <div className="space-y-2 text-sm opacity-90">
               <p>✓ Pagamento 100% seguro</p>
@@ -741,6 +801,16 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Sticky CTA Mobile */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-gradient-to-r from-green-500 to-green-600 p-4 z-50 shadow-2xl">
+        <button
+          onClick={handleCTAClick}
+          className="w-full bg-yellow-400 text-gray-900 py-3 px-6 rounded-lg font-black text-center hover:bg-yellow-300 transition-all"
+        >
+          QUERO AS RECEITAS AGORA
+        </button>
+      </div>
     </div>
   )
 }
