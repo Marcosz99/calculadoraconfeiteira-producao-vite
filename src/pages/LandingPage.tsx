@@ -106,7 +106,7 @@ export default function LandingPage() {
           {/* Desktop Button */}
           <div className="hidden md:flex items-center">
             <a
-              href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK"
+              href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK?utm_source=FB&utm_campaign={{campaign.name}}|{{campaign.id}}&utm_medium={{adset.name}}|{{adset.id}}&utm_content={{ad.name}}|{{ad.id}}&utm_term={{placement}}"
               onClick={handleComprarClick}
               className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-bold"
             >
@@ -150,7 +150,7 @@ export default function LandingPage() {
               </a>
               <div className="border-t pt-4">
                 <a
-                  href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK"
+                  href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK?utm_source=FB&utm_campaign={{campaign.name}}|{{campaign.id}}&utm_medium={{adset.name}}|{{adset.id}}&utm_content={{ad.name}}|{{ad.id}}&utm_term={{placement}}"
                   className="block text-center bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-200 font-bold"
                   onClick={() => setMobileMenuOpen(false)}
                 >
@@ -189,7 +189,7 @@ export default function LandingPage() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <a
-              href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK"
+              href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK?utm_source=FB&utm_campaign={{campaign.name}}|{{campaign.id}}&utm_medium={{adset.name}}|{{adset.id}}&utm_content={{ad.name}}|{{ad.id}}&utm_term={{placement}}"
               onClick={handleComprarClick}
               className="w-full sm:w-auto bg-gradient-to-r from-green-500 to-green-600 text-white px-10 py-5 rounded-lg text-xl font-black hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center space-x-3"
             >
@@ -488,7 +488,7 @@ export default function LandingPage() {
             </div>
 
             <a
-              href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK"
+              href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK?utm_source=FB&utm_campaign={{campaign.name}}|{{campaign.id}}&utm_medium={{adset.name}}|{{adset.id}}&utm_content={{ad.name}}|{{ad.id}}&utm_term={{placement}}"
               onClick={handleComprarClick}
               className="inline-flex items-center space-x-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-12 py-6 rounded-xl text-2xl font-black hover:shadow-2xl hover:scale-105 transition-all duration-200 mb-6"
             >
@@ -685,7 +685,7 @@ export default function LandingPage() {
             </div>
 
             <a
-              href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK"
+              href="https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK?utm_source=FB&utm_campaign={{campaign.name}}|{{campaign.id}}&utm_medium={{adset.name}}|{{adset.id}}&utm_content={{ad.name}}|{{ad.id}}&utm_term={{placement}}"
               onClick={handleComprarClick}
               className="inline-flex items-center space-x-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-12 py-6 rounded-xl text-2xl font-black hover:shadow-2xl hover:scale-105 transition-all duration-200 mb-6"
             >
