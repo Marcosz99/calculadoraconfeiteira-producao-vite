@@ -204,7 +204,7 @@ export default function LandingPage() {
                 poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3Crect fill='%23ec4899' width='800' height='450'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='48' fill='white'%3E▶ Assistir Vídeo%3C/text%3E%3C/svg%3E"
                 onPlay={() => setVideoPlaying(true)}
               >
-                <source src={`${window.location.origin}/landingpage/Mini VSL Frankstein.mp4`} type="video/mp4" />
+                <source src="https://your-supabase-project-id.supabase.co/storage/v1/object/public/landingpage/Mini%20VSL%20Frankstein.mp4" type="video/mp4" />
                 Seu navegador não suporta vídeos.
               </video>
               
@@ -451,7 +451,7 @@ export default function LandingPage() {
                   playsInline
                   preload="metadata"
                 >
-                  <source src={`${window.location.origin}/landingpage/Depoimentos Plus.mp4`} type="video/mp4" />
+                  <source src="https://your-supabase-project-id.supabase.co/storage/v1/object/public/landingpage/Depoimentos%20Plus.mp4" type="video/mp4" />
                   Seu navegador não suporta vídeos.
                 </video>
               </div>
@@ -543,7 +543,7 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="bg-green-500 text-white p-6 rounded-xl">
+              <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl p-6">
                 <p className="text-2xl font-black mb-2">💰 POTENCIAL DE GANHO:</p>
                 <p className="text-3xl font-black">R$ 800 a R$ 1.500/mês</p>
               </div>
@@ -738,10 +738,15 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl p-6 mb-6">
-                <p className="text-2xl font-black mb-2">BÔNUS ESPECIAL HOJE:</p>
-                <p className="text-lg">Guia "Como Vender pelo WhatsApp" + Modelos de Posts Prontos</p>
-                <p className="text-sm mt-2 opacity-90">(Valor R$ 47 - GRÁTIS hoje)</p>
+              <div className="bg-gradient-to-r from-yellow-100 to-yellow-50 rounded-xl p-6 border-2 border-yellow-300">
+                <p className="text-xl font-black text-gray-900 mb-2 text-center">🎁 VOCÊ VAI RECEBER:</p>
+                <div className="space-y-2 text-gray-800">
+                  <p className="font-semibold">✅ 15 receitas completas de bolo de pote</p>
+                  <p className="font-semibold">✅ Calculadora de preços em PDF</p>
+                  <p className="font-semibold">✅ Tabela de compra de ingredientes</p>
+                  <p className="font-semibold">✅ Guia de validade e conservação</p>
+                  <p className="font-semibold">✅ Acesso à comunidade exclusiva</p>
+                </div>
               </div>
             </div>
 
