@@ -1,200 +1,96 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { PixelService } from '../services/pixelService'
-import { 
-  Calculator, 
-  TrendingUp, 
-  Clock, 
-  DollarSign, 
-  CheckCircle, 
-  ArrowRight,
-  Cake,
-  PieChart,
-  FileText,
-  Zap,
-  Star,
-  Users,
-  Play,
-  Check,
-  Menu,
-  X,
-  AlertTriangle,
-  Shield,
-  Target,
-  Crown,
-  Sparkles,
-  Bot,
-  Store,
-  BookOpen,
-  BarChart3,
-  Lightbulb,
-  Heart,
-  Download,
-  Gift
-} from 'lucide-react'
+import { ArrowRight, CheckCircle, Clock, Gift, Shield, X, Zap } from 'lucide-react'
 
-export default function LandingPage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [currentTestimonial, setCurrentTestimonial] = useState(0)
-  const [videoPlaying, setVideoPlaying] = useState(false)
+export default function LowTicketLandingPage() {
+  const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 14, seconds: 47 })
+  const [buyersCount, setBuyersCount] = useState(347)
+  const [showExitPopup, setShowExitPopup] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   
   const CHECKOUT_URL = "https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK?utm_source=FB&utm_campaign={{campaign.name}}|{{campaign.id}}&utm_medium={{adset.name}}|{{adset.id}}&utm_content={{ad.name}}|{{ad.id}}&utm_term={{placement}}"
-  
-  const depoimentos = [
-    {
-      nome: "Maria Silva",
-      cidade: "São Paulo - SP",
-      foto: "👩",
-      depoimento: "Comecei fazendo bolo de pote em casa. Com as receitas do ebook já faturei R$ 980 no primeiro mês só vendendo pros vizinhos!",
-      resultado: "R$ 980 no primeiro mês"
-    },
-    {
-      nome: "Juliana Costa",
-      cidade: "Rio de Janeiro - RJ", 
-      foto: "👩‍🦰",
-      depoimento: "Achei que ia ser difícil, mas as receitas são simples demais! Fiz o de Ninho e já vendi 45 potes. Minha renda extra chegou!",
-      resultado: "45 potes vendidos"
-    },
-    {
-      nome: "Ana Paula",
-      cidade: "Belo Horizonte - MG",
-      foto: "👩‍🦱",
-      depoimento: "O bolo de Ferrero Rocher é meu favorito. Cobro R$ 15 cada e sempre falta. Consegui pagar minhas contas com a renda extra!",
-      resultado: "R$ 1.200/mês de renda extra"
-    }
-  ]
 
+  // Timer countdown
   useEffect(() => {
-    PixelService.trackViewContent()
-    
+    const timer = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev.seconds > 0) {
+          return { ...prev, seconds: prev.seconds - 1 }
+        } else if (prev.minutes > 0) {
+          return { hours: prev.hours, minutes: prev.minutes - 1, seconds: 59 }
+        } else if (prev.hours > 0) {
+          return { hours: prev.hours - 1, minutes: 59, seconds: 59 }
+        }
+        return prev
+      })
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  // Fake buyers counter
+  useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % depoimentos.length)
-    }, 5000)
+      setBuyersCount(prev => prev + Math.floor(Math.random() * 3))
+    }, 45000)
     return () => clearInterval(interval)
   }, [])
 
+  // Exit intent
+  useEffect(() => {
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (e.clientY <= 0) {
+        setShowExitPopup(true)
+      }
+    }
+    document.addEventListener('mouseleave', handleMouseLeave)
+    return () => document.removeEventListener('mouseleave', handleMouseLeave)
+  }, [])
+
   const handleCTAClick = () => {
-    PixelService.trackLead()
     window.location.href = CHECKOUT_URL
   }
 
-  const handleVideoPlay = () => {
-    setVideoPlaying(true)
-    if (videoRef.current) {
-      videoRef.current.play()
-    }
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-orange-50">
+    <div className="min-h-screen bg-black text-white">
       
-      {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="relative">
-              <Cake className="h-8 w-8 text-pink-500" />
-              <Heart className="h-4 w-4 text-red-500 absolute -top-1 -right-1" />
-            </div>
-            <span className="text-2xl font-bold text-gray-900">DoceCalc</span>
+      {/* Barra de Urgência Fixa */}
+      <div className="fixed top-0 left-0 right-0 bg-gradient-to-r from-red-600 to-orange-600 py-3 px-4 z-50 shadow-2xl">
+        <div className="container mx-auto flex justify-center items-center space-x-4 text-sm sm:text-base font-black">
+          <Clock className="h-5 w-5 animate-pulse" />
+          <span>OFERTA EXPIRA EM:</span>
+          <div className="flex space-x-2">
+            <div className="bg-black px-2 py-1 rounded">{String(timeLeft.hours).padStart(2, '0')}</div>
+            <span>:</span>
+            <div className="bg-black px-2 py-1 rounded">{String(timeLeft.minutes).padStart(2, '0')}</div>
+            <span>:</span>
+            <div className="bg-black px-2 py-1 rounded">{String(timeLeft.seconds).padStart(2, '0')}</div>
           </div>
-          
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <a href="#video" className="text-gray-600 hover:text-pink-500 transition-colors">
-              Vídeo
-            </a>
-            <a href="#receitas" className="text-gray-600 hover:text-pink-500 transition-colors">
-              Receitas
-            </a>
-            <a href="#garantia" className="text-gray-600 hover:text-pink-500 transition-colors">
-              Garantia
-            </a>
-          </div>
-
-          {/* Desktop Button */}
-          <div className="hidden md:flex items-center">
-            <button
-              onClick={handleCTAClick}
-              className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:shadow-lg hover:scale-105 transition-all duration-200 font-bold"
-            >
-              QUERO AS RECEITAS
-            </button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden text-gray-600 hover:text-gray-900 transition-colors"
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
         </div>
+      </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden absolute top-16 left-0 right-0 bg-white/95 backdrop-blur-sm border-b shadow-lg">
-            <div className="px-4 py-4 space-y-4">
-              <a 
-                href="#video" 
-                className="block text-gray-600 hover:text-pink-500 transition-colors py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Vídeo
-              </a>
-              <a 
-                href="#receitas" 
-                className="block text-gray-600 hover:text-pink-500 transition-colors py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Receitas
-              </a>
-              <a 
-                href="#garantia" 
-                className="block text-gray-600 hover:text-pink-500 transition-colors py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Garantia
-              </a>
-              <div className="border-t pt-4">
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false)
-                    handleCTAClick()
-                  }}
-                  className="w-full text-center bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-lg hover:shadow-lg transition-all duration-200 font-bold"
-                >
-                  QUERO AS RECEITAS
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </header>
-
-      {/* Hero Section com VSL */}
-      <section id="video" className="py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-pink-100/20 to-purple-100/20"></div>
-        <div className="container mx-auto max-w-6xl relative">
+      {/* Hero com VSL */}
+      <section className="pt-20 pb-8 px-4">
+        <div className="container mx-auto max-w-5xl">
           
-          <div className="text-center mb-8">
-            <div className="inline-block bg-gradient-to-r from-orange-400 to-pink-500 text-white px-6 py-2 rounded-full text-sm font-black animate-pulse mb-6">
-              🔥 OFERTA POR TEMPO LIMITADO
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900 mb-6 leading-tight">
-              Aprenda a Fazer Bolos de Pote
-              <span className="block text-transparent bg-gradient-to-r from-pink-600 to-purple-700 bg-clip-text"> Que Vendem Só Pela Imagem</span>
+          {/* Headline Apelona */}
+          <div className="text-center mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-4 leading-tight">
+              <span className="text-yellow-400">DESCUBRA AS 50 RECEITAS</span>
+              <br />
+              <span className="text-red-500">DE BOLO DE POTE</span>
+              <br />
+              <span className="text-white">Que Estão Fazendo Donas de Casa</span>
+              <br />
+              <span className="text-green-400">FATURAREM ATÉ R$ 3.000/MÊS</span>
             </h1>
             
-            <p className="text-2xl sm:text-3xl text-gray-800 mb-4 font-bold">
-              E Ganhe de R$ 800 a R$ 1.500 Extras Por Mês
-            </p>
+            <div className="inline-block bg-yellow-400 text-black px-6 py-2 rounded text-lg font-black animate-pulse mb-4">
+              ⚡ {buyersCount} PESSOAS COMPRARAM NAS ÚLTIMAS 24H
+            </div>
           </div>
 
-          {/* VSL Video */}
-          <div className="max-w-4xl mx-auto mb-8">
-            <div className="relative bg-black rounded-2xl shadow-2xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
+          {/* VSL - Tamanho GIGANTE */}
+          <div className="mb-6">
+            <div className="relative bg-gray-900 rounded-lg shadow-2xl overflow-hidden border-4 border-red-500" style={{ paddingBottom: '56.25%' }}>
               <video
                 ref={videoRef}
                 className="absolute top-0 left-0 w-full h-full"
@@ -203,619 +99,312 @@ export default function LandingPage() {
                 autoPlay
                 muted
                 preload="metadata"
-                poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3Crect fill='%23ec4899' width='800' height='450'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='48' fill='white'%3E▶ Assistir Vídeo%3C/text%3E%3C/svg%3E"
-                onPlay={() => setVideoPlaying(true)}
               >
                 <source src="https://dbwbxzbtydeauczfleqx.supabase.co/storage/v1/object/public/landingpage/Mini%20VSL%20Frankstein.mp4" type="video/mp4" />
-                Seu navegador não suporta vídeos.
               </video>
-              
-              {!videoPlaying && (
-                <button
-                  onClick={handleVideoPlay}
-                  className="absolute inset-0 flex items-center justify-center bg-black/40 hover:bg-black/30 transition-all group"
-                >
-                  <div className="bg-gradient-to-r from-pink-500 to-purple-600 rounded-full p-8 group-hover:scale-110 transition-transform shadow-2xl">
-                    <Play className="h-16 w-16 text-white" fill="white" />
-                  </div>
-                </button>
-              )}
             </div>
           </div>
 
-          {/* CTA Principal */}
-          <div className="text-center mb-8">
+          {/* CTA Principal GIGANTE */}
+          <div className="text-center mb-6">
             <button
               onClick={handleCTAClick}
-              className="bg-gradient-to-r from-green-500 to-green-600 text-white px-10 py-5 rounded-lg text-xl font-black hover:shadow-xl hover:scale-105 transition-all duration-200 inline-flex items-center space-x-3"
+              className="w-full sm:w-auto bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-12 py-6 rounded-lg text-2xl sm:text-3xl font-black hover:scale-105 transition-all duration-200 shadow-2xl animate-pulse"
             >
-              <Download className="h-6 w-6" />
-              <span>QUERO RECEBER MINHAS RECEITAS</span>
-              <ArrowRight className="h-6 w-6" />
+              🔥 SIM! QUERO AS 50 RECEITAS AGORA
             </button>
-          </div>
-
-          <div className="flex justify-center items-center space-x-6 mb-12">
-            <div className="text-center">
-              <div className="text-3xl font-black text-green-600">R$ 29</div>
-              <div className="text-sm text-gray-600">Pagamento único</div>
-            </div>
-            <div className="text-2xl text-gray-400">•</div>
-            <div className="text-center">
-              <div className="text-lg font-bold text-gray-700">Acesso imediato</div>
-              <div className="text-sm text-gray-600">Receba em 2 minutos</div>
-            </div>
-          </div>
-
-          {/* Preview do Ebook */}
-          <div className="bg-white rounded-xl shadow-2xl p-8 border-4 border-pink-200">
-            <h3 className="text-2xl font-black text-gray-900 mb-6 text-center">O Que Você Vai Receber Hoje:</h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl p-6 border-2 border-pink-200">
-                <div className="text-5xl mb-3">🍫</div>
-                <h4 className="font-black text-gray-900 mb-2">5 Clássicos</h4>
-                <p className="text-sm text-gray-700">Chocolate, Ninho, Prestígio, Morango, Limão</p>
-              </div>
-              
-              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border-2 border-purple-200">
-                <div className="text-5xl mb-3">👑</div>
-                <h4 className="font-black text-gray-900 mb-2">5 Gourmet</h4>
-                <p className="text-sm text-gray-700">Ferrero, Oreo, Kinder, Bis, Nutella</p>
-              </div>
-              
-              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 border-2 border-orange-200">
-                <div className="text-5xl mb-3">🎉</div>
-                <h4 className="font-black text-gray-900 mb-2">5 Especiais</h4>
-                <p className="text-sm text-gray-700">Páscoa, Natal, Festas e mais</p>
-              </div>
+            <div className="mt-4 text-xl font-bold">
+              <span className="text-red-500 line-through">R$ 297</span>
+              <span className="text-yellow-400 text-4xl mx-3">R$ 29</span>
+              <span className="text-gray-400">hoje</span>
             </div>
-
-            <div className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-lg p-6 border-2 border-yellow-300">
-              <h4 className="font-black text-gray-900 mb-4 text-xl text-center">🎁 BÔNUS EXCLUSIVOS:</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <div className="flex items-start space-x-2">
-                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm font-semibold text-gray-800">Calculadora de preços em PDF</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm font-semibold text-gray-800">Tabela de compra de ingredientes</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm font-semibold text-gray-800">Guia de validade e conservação</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm font-semibold text-gray-800">Acesso à comunidade exclusiva</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Por Que Funciona */}
-      <section className="py-16 sm:py-20 bg-gradient-to-br from-purple-50 to-pink-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              Por Que Bolo de Pote Vende Tanto?
-            </h2>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-              Imagina essa colher entrando no potinho... é por isso que todo mundo quer!
+            
+            <p className="mt-2 text-green-400 font-bold">
+              ✅ PAGOU, RECEBEU NA HORA! Acesso em 2 minutos no seu email
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="bg-white rounded-xl shadow-xl p-8 text-center border-2 border-pink-200 hover:scale-105 transition-all">
-              <div className="text-6xl mb-4">📸</div>
-              <h3 className="text-xl font-black text-gray-900 mb-3">Vende Pela Imagem</h3>
-              <p className="text-gray-700">Só de olhar a foto, seus clientes já vão querer 2, 3, 4 potes</p>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-xl p-8 text-center border-2 border-purple-200 hover:scale-105 transition-all">
-              <div className="text-6xl mb-4">💰</div>
-              <h3 className="text-xl font-black text-gray-900 mb-3">Lucro Alto</h3>
-              <p className="text-gray-700">Venda cada pote por R$ 12-18. Custo baixo, margem boa</p>
-            </div>
-
-            <div className="bg-white rounded-xl shadow-xl p-8 text-center border-2 border-orange-200 hover:scale-105 transition-all">
-              <div className="text-6xl mb-4">⚡</div>
-              <h3 className="text-xl font-black text-gray-900 mb-3">Fácil de Fazer</h3>
-              <p className="text-gray-700">Receitas simples. Mesmo iniciante consegue fazer e vender</p>
-            </div>
-          </div>
-
-          <div className="mt-12 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-2xl p-8 max-w-4xl mx-auto text-center">
-            <h3 className="text-2xl font-black mb-4">💵 FAÇA AS CONTAS:</h3>
-            <div className="bg-white/20 rounded-lg p-6 mb-4">
-              <p className="text-xl font-bold mb-2">Se você vender apenas 10 potes por semana a R$ 15:</p>
-              <p className="text-3xl font-black text-yellow-300">R$ 600/mês de renda extra</p>
-            </div>
-            <p className="text-lg">E isso é só o começo. Muitas clientes fazem o dobro ou triplo!</p>
+          {/* Prova Social */}
+          <div className="bg-red-900/30 border-2 border-red-500 rounded-lg p-4 text-center">
+            <p className="text-yellow-400 font-black text-lg">
+              ⚠️ ATENÇÃO: Restam apenas 43 vagas com esse preço promocional!
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Receitas Detalhadas */}
-      <section id="receitas" className="py-16 sm:py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              15 Receitas Completas
-              <span className="block text-transparent bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text">
-                Passo a Passo, Sem Segredos
-              </span>
-            </h2>
+      {/* O Que Você Recebe - DESTAQUE NOS BÔNUS */}
+      <section className="py-12 px-4 bg-gradient-to-b from-black to-gray-900">
+        <div className="container mx-auto max-w-4xl">
+          <h2 className="text-3xl sm:text-4xl font-black text-center mb-8">
+            <span className="text-yellow-400">VEJA TUDO</span> O QUE VOCÊ VAI RECEBER <span className="text-red-500">HOJE:</span>
+          </h2>
+
+          <div className="bg-gray-800 rounded-xl p-6 sm:p-8 border-4 border-yellow-400 mb-6">
+            <div className="space-y-4">
+              
+              <div className="flex items-start space-x-3">
+                <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="text-xl font-black text-yellow-400">50 RECEITAS COMPLETAS DE BOLO DE POTE</h3>
+                  <p className="text-gray-300">Do clássico ao gourmet. Passo a passo com fotos, ingredientes, custos e preços sugeridos</p>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-700 pt-4">
+                <p className="text-red-500 font-black text-xl mb-4">🎁 BÔNUS EXCLUSIVOS (Valor R$ 197):</p>
+              </div>
+
+              <div className="flex items-start space-x-3 bg-yellow-400/10 p-3 rounded">
+                <Gift className="h-6 w-6 text-yellow-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-black text-yellow-400">BÔNUS #1: Calculadora de Preços em PDF</h4>
+                  <p className="text-sm text-gray-300">Descubra exatamente quanto cobrar para ter lucro máximo</p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3 bg-yellow-400/10 p-3 rounded">
+                <Gift className="h-6 w-6 text-yellow-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-black text-yellow-400">BÔNUS #2: Tabela de Compra de Ingredientes</h4>
+                  <p className="text-sm text-gray-300">Saiba exatamente o que comprar para 10, 20 ou 50 potes</p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3 bg-yellow-400/10 p-3 rounded">
+                <Gift className="h-6 w-6 text-yellow-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-black text-yellow-400">BÔNUS #3: Guia de Validade e Conservação</h4>
+                  <p className="text-sm text-gray-300">Quanto tempo cada bolo dura + como armazenar e transportar</p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3 bg-yellow-400/10 p-3 rounded">
+                <Gift className="h-6 w-6 text-yellow-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-black text-yellow-400">BÔNUS #4: Como Vender pelo WhatsApp</h4>
+                  <p className="text-sm text-gray-300">10 modelos de mensagens prontas + estratégias que funcionam</p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3 bg-yellow-400/10 p-3 rounded">
+                <Gift className="h-6 w-6 text-yellow-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-black text-yellow-400">BÔNUS #5: Instagram para Confeiteiras</h4>
+                  <p className="text-sm text-gray-300">Como tirar fotos que vendem + 30 ideias de posts prontos</p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3 bg-yellow-400/10 p-3 rounded">
+                <Gift className="h-6 w-6 text-yellow-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-black text-yellow-400">BÔNUS #6: Acesso à Comunidade Exclusiva</h4>
+                  <p className="text-sm text-gray-300">Troque dicas, tire dúvidas e veja o sucesso das outras</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 bg-green-600 rounded-lg p-4 text-center">
+              <p className="font-black text-2xl">VALOR TOTAL: R$ 494</p>
+              <p className="text-3xl font-black mt-2">HOJE POR APENAS: R$ 29</p>
+              <p className="text-sm mt-2">Isso é menos de R$ 0,60 por receita!</p>
+            </div>
           </div>
 
-          <div className="max-w-6xl mx-auto">
-            {/* Clássicos */}
-            <div className="mb-12">
-              <h3 className="text-2xl font-black text-gray-900 mb-6 text-center">🍫 5 CLÁSSICOS QUE SEMPRE VENDEM</h3>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {['Chocolate', 'Ninho', 'Prestígio', 'Morango', 'Limão'].map((receita, index) => (
-                  <div key={index} className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-6 border-2 border-pink-200 text-center">
-                    <div className="text-4xl mb-3">🍰</div>
-                    <h4 className="font-black text-gray-900 text-sm">{receita}</h4>
-                    <p className="text-xs text-gray-600 mt-2">Venda: R$ 12-15</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+          {/* CTA Repetido */}
+          <button
+            onClick={handleCTAClick}
+            className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-12 py-6 rounded-lg text-2xl font-black hover:scale-105 transition-all duration-200 shadow-2xl mb-4"
+          >
+            QUERO ACESSO IMEDIATO POR R$ 29
+          </button>
 
-            {/* Gourmet */}
-            <div className="mb-12">
-              <h3 className="text-2xl font-black text-gray-900 mb-6 text-center">👑 5 GOURMET DE ALTA MARGEM</h3>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {['Ferrero Rocher', 'Oreo', 'Kinder', 'Bis', 'Nutella'].map((receita, index) => (
-                  <div key={index} className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border-2 border-purple-200 text-center">
-                    <div className="text-4xl mb-3">✨</div>
-                    <h4 className="font-black text-gray-900 text-sm">{receita}</h4>
-                    <p className="text-xs text-gray-600 mt-2">Venda: R$ 15-18</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Especiais */}
-            <div className="mb-12">
-              <h3 className="text-2xl font-black text-gray-900 mb-6 text-center">🎉 5 ESPECIAIS PARA DATAS</h3>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                {['Páscoa', 'Natal', 'Dia das Mães', 'Festas', 'Casamentos'].map((receita, index) => (
-                  <div key={index} className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border-2 border-orange-200 text-center">
-                    <div className="text-4xl mb-3">🎊</div>
-                    <h4 className="font-black text-gray-900 text-sm">{receita}</h4>
-                    <p className="text-xs text-gray-600 mt-2">Venda: R$ 18-22</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-xl p-8 border-4 border-yellow-300">
-              <h3 className="text-2xl font-black text-center text-gray-900 mb-4">✅ CADA RECEITA INCLUI:</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
-                  <span className="font-semibold text-gray-800">Passo a passo detalhado com fotos</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
-                  <span className="font-semibold text-gray-800">Lista completa de ingredientes</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
-                  <span className="font-semibold text-gray-800">Cálculo de custo e preço sugerido</span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0" />
-                  <span className="font-semibold text-gray-800">Dicas de montagem e apresentação</span>
-                </div>
-              </div>
-            </div>
-
-            {/* CTA Mid-Page */}
-            <div className="text-center mt-12">
-              <button
-                onClick={handleCTAClick}
-                className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-10 py-5 rounded-lg text-xl font-black hover:shadow-xl hover:scale-105 transition-all duration-200 inline-flex items-center space-x-3"
-              >
-                <Sparkles className="h-6 w-6" />
-                <span>QUERO COMEÇAR AGORA</span>
-                <ArrowRight className="h-6 w-6" />
-              </button>
-            </div>
-          </div>
+          <p className="text-center text-green-400 font-bold">
+            ✅ Pagamento seguro | ✅ Acesso instantâneo | ✅ Garantia de 7 dias
+          </p>
         </div>
       </section>
 
       {/* Depoimentos em Vídeo */}
-      <section className="py-16 sm:py-20 bg-gradient-to-br from-gray-50 to-pink-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 mb-6">
-              Veja Quem Já Está
-              <span className="block text-transparent bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text">
-                Ganhando Renda Extra
-              </span>
-            </h2>
-          </div>
+      <section className="py-12 px-4 bg-gray-900">
+        <div className="container mx-auto max-w-4xl">
+          <h2 className="text-3xl sm:text-4xl font-black text-center mb-8">
+            <span className="text-yellow-400">VEJA QUEM JÁ ESTÁ</span>
+            <br />
+            <span className="text-red-500">FATURANDO COM BOLO DE POTE</span>
+          </h2>
 
-          <div className="max-w-4xl mx-auto">
-            {/* Vídeo de Depoimentos */}
-            <div className="bg-white rounded-2xl shadow-2xl p-4 mb-8">
-              <div className="relative bg-black rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
-                <video
-                  className="absolute top-0 left-0 w-full h-full"
-                  controls
-                  playsInline
-                  preload="metadata"
-                >
-                  <source src="https://dbwbxzbtydeauczfleqx.supabase.co/storage/v1/object/public/landingpage/Depoimentos%20Plus.mp4" type="video/mp4" />
-                  Seu navegador não suporta vídeos.
-                </video>
-              </div>
-            </div>
-
-            {/* Depoimentos em Carrossel */}
-            <div className="bg-white rounded-2xl shadow-2xl p-8 text-center">
-              <div className="text-6xl mb-4">{depoimentos[currentTestimonial].foto}</div>
-              
-              <blockquote className="text-xl text-gray-700 mb-6 italic leading-relaxed">
-                "{depoimentos[currentTestimonial].depoimento}"
-              </blockquote>
-              
-              <div className="mb-4">
-                <h4 className="text-lg font-black text-gray-900">{depoimentos[currentTestimonial].nome}</h4>
-                <p className="text-gray-600">{depoimentos[currentTestimonial].cidade}</p>
-              </div>
-              
-              <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg border-2 border-green-200">
-                <p className="text-green-700 font-black">
-                  💰 {depoimentos[currentTestimonial].resultado}
-                </p>
-              </div>
-              
-              <div className="flex justify-center space-x-2 mt-8">
-                {depoimentos.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentTestimonial(index)}
-                    className={`w-3 h-3 rounded-full transition-all ${
-                      index === currentTestimonial 
-                        ? 'bg-purple-500 w-8' 
-                        : 'bg-gray-300 hover:bg-purple-300'
-                    }`}
-                  />
-                ))}
-              </div>
+          <div className="bg-black rounded-lg overflow-hidden border-4 border-yellow-400 mb-6">
+            <div className="relative" style={{ paddingBottom: '56.25%' }}>
+              <video
+                className="absolute top-0 left-0 w-full h-full"
+                controls
+                playsInline
+                preload="metadata"
+              >
+                <source src="https://dbwbxzbtydeauczfleqx.supabase.co/storage/v1/object/public/landingpage/Depoimentos%20Plus.mp4" type="video/mp4" />
+              </video>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Oferta */}
-      <section className="py-16 sm:py-20 bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-600 text-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="mb-8">
-              <div className="inline-block bg-yellow-400 text-gray-900 px-6 py-3 rounded-full text-sm font-black animate-pulse mb-6">
-                ⚡ OFERTA ESPECIAL DE LANÇAMENTO
-              </div>
-              
-              <h2 className="text-4xl sm:text-5xl font-black mb-6">
-                Comece Hoje Mesmo
-                <span className="block text-yellow-300">Por Apenas R$ 29</span>
-              </h2>
-
-              <p className="text-2xl mb-8 opacity-90">
-                Valor real: <span className="line-through">R$ 147</span>
-              </p>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
-              <h3 className="text-2xl font-black mb-6">🎁 VOCÊ RECEBE TUDO ISSO:</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left mb-6">
-                <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
-                  <span className="font-semibold">15 receitas completas de bolo de pote</span>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
-                  <span className="font-semibold">Calculadora de preços em PDF</span>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
-                  <span className="font-semibold">Tabela de compra de ingredientes</span>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
-                  <span className="font-semibold">Guia de validade e conservação</span>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
-                  <span className="font-semibold">Acesso à comunidade exclusiva</span>
-                </div>
-                <div className="flex items-start space-x-3">
-                  <CheckCircle className="h-6 w-6 text-green-400 flex-shrink-0 mt-1" />
-                  <span className="font-semibold">Suporte para tirar dúvidas</span>
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl p-6">
-                <p className="text-2xl font-black mb-2">💰 POTENCIAL DE GANHO:</p>
-                <p className="text-3xl font-black">R$ 800 a R$ 1.500/mês</p>
-              </div>
-            </div>
-
-            <button
-              onClick={handleCTAClick}
-              className="inline-flex items-center space-x-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-12 py-6 rounded-xl text-2xl font-black hover:shadow-2xl hover:scale-105 transition-all duration-200 mb-6"
-            >
-              <Download className="h-8 w-8" />
-              <span>QUERO MINHAS RECEITAS AGORA</span>
-              <ArrowRight className="h-8 w-8" />
-            </button>
-
-            <div className="text-lg space-y-2 opacity-90">
-              <p>✓ Acesso imediato após o pagamento</p>
-              <p>✓ Receba tudo por email em até 2 minutos</p>
-              <p>✓ Garantia de 7 dias - risco zero</p>
-            </div>
-          </div>
+          <button
+            onClick={handleCTAClick}
+            className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white px-12 py-6 rounded-lg text-2xl font-black hover:scale-105 transition-all duration-200 shadow-2xl"
+          >
+            🔥 EU TAMBÉM QUERO FATURAR!
+          </button>
         </div>
       </section>
 
       {/* Garantia */}
-      <section id="garantia" className="py-16 sm:py-20 bg-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="mb-12">
-              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-green-400 to-green-600 rounded-full mb-6">
-                <Shield className="h-12 w-12 text-white" />
-              </div>
-              
-              <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-6">
-                Garantia Incondicional de 7 Dias
-              </h2>
-              
-              <p className="text-xl text-gray-700 mb-8 leading-relaxed">
-                Você tem <strong className="text-green-600">7 dias completos</strong> para testar todas as receitas. 
-                Se você não gostar por QUALQUER motivo, devolvemos 100% do seu dinheiro. 
-                <strong> Sem perguntas, sem burocracia.</strong>
+      <section className="py-12 px-4 bg-black">
+        <div className="container mx-auto max-w-3xl text-center">
+          <Shield className="h-20 w-20 text-green-400 mx-auto mb-4" />
+          <h2 className="text-3xl font-black mb-4">
+            <span className="text-green-400">GARANTIA INCONDICIONAL</span>
+            <br />
+            DE 7 DIAS
+          </h2>
+          <p className="text-xl mb-6">
+            Teste as receitas por 7 dias. Se não gostar, <span className="text-yellow-400 font-black">devolvemos 100% do seu dinheiro</span>. Sem perguntas, sem enrolação.
+          </p>
+          <p className="text-gray-400">
+            O risco é todo nosso. Você só tem a ganhar.
+          </p>
+        </div>
+      </section>
+
+      {/* FAQ Mínimo */}
+      <section className="py-12 px-4 bg-gray-900">
+        <div className="container mx-auto max-w-3xl">
+          <h2 className="text-3xl font-black text-center mb-8 text-yellow-400">
+            PERGUNTAS FREQUENTES
+          </h2>
+
+          <div className="space-y-4">
+            <details className="bg-gray-800 rounded-lg p-4 border-2 border-gray-700">
+              <summary className="font-black text-lg cursor-pointer">
+                Como vou receber as receitas?
+              </summary>
+              <p className="mt-3 text-gray-300">
+                Você recebe TUDO por email em até 2 minutos após a compra. É só clicar no link e começar!
               </p>
-            </div>
+            </details>
 
-            <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-8 border-2 border-green-200">
-              <h3 className="text-2xl font-black text-gray-900 mb-6">Como Funciona:</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-white rounded-full p-4 mb-4 shadow-lg">
-                    <span className="text-3xl font-black text-green-600">1</span>
-                  </div>
-                  <h4 className="font-black text-gray-900 mb-2">Compre Agora</h4>
-                  <p className="text-gray-700 text-sm">Acesso imediato a todas as 15 receitas + bônus</p>
-                </div>
+            <details className="bg-gray-800 rounded-lg p-4 border-2 border-gray-700">
+              <summary className="font-black text-lg cursor-pointer">
+                Nunca fiz bolo de pote. Vou conseguir?
+              </summary>
+              <p className="mt-3 text-gray-300">
+                SIM! As receitas são passo a passo para iniciantes. Se você consegue fazer um bolo comum, consegue fazer bolo de pote.
+              </p>
+            </details>
 
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-white rounded-full p-4 mb-4 shadow-lg">
-                    <span className="text-3xl font-black text-blue-600">2</span>
-                  </div>
-                  <h4 className="font-black text-gray-900 mb-2">Teste 7 Dias</h4>
-                  <p className="text-gray-700 text-sm">Faça as receitas, venda, veja os resultados</p>
-                </div>
-
-                <div className="flex flex-col items-center text-center">
-                  <div className="bg-white rounded-full p-4 mb-4 shadow-lg">
-                    <span className="text-3xl font-black text-purple-600">3</span>
-                  </div>
-                  <h4 className="font-black text-gray-900 mb-2">Satisfação Total</h4>
-                  <p className="text-gray-700 text-sm">Não gostou? Email para nós e devolvemos tudo</p>
-                </div>
-              </div>
-
-              <div className="mt-8 bg-white rounded-xl p-6 border-2 border-green-300">
-                <p className="text-lg text-gray-800">
-                  <strong className="text-green-600">O risco é todo nosso.</strong> Você só ganha: 
-                  ou fatura sua renda extra, ou recebe seu dinheiro de volta. Simples assim.
-                </p>
-              </div>
-            </div>
+            <details className="bg-gray-800 rounded-lg p-4 border-2 border-gray-700">
+              <summary className="font-black text-lg cursor-pointer">
+                Realmente vou conseguir vender?
+              </summary>
+              <p className="mt-3 text-gray-300">
+                Bolo de pote vende SOZINHO pela foto. E você recebe os bônus ensinando exatamente como divulgar e vender.
+              </p>
+            </details>
           </div>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="py-16 sm:py-20 bg-gradient-to-br from-gray-50 to-purple-50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl font-black text-center text-gray-900 mb-12">
-              Perguntas Frequentes
-            </h2>
+      {/* CTA Final Desesperado */}
+      <section className="py-16 px-4 bg-gradient-to-b from-red-900 to-black">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h2 className="text-4xl sm:text-5xl font-black mb-6">
+            <span className="text-yellow-400">ÚLTIMA CHANCE!</span>
+            <br />
+            <span className="text-white">Não Deixe Essa Oportunidade Passar</span>
+          </h2>
 
-            <div className="space-y-4">
-              <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
-                <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
-                  <span>Nunca fiz bolo de pote. Vou conseguir?</span>
-                  <ArrowRight className="h-5 w-5" />
-                </summary>
-                <p className="mt-4 text-gray-700 leading-relaxed">
-                  <strong>SIM!</strong> As receitas são feitas para iniciantes. Tudo é explicado passo a passo, com fotos e medidas exatas. 
-                  Se você consegue fazer um bolo comum, vai conseguir fazer bolo de pote. É até mais fácil!
-                </p>
-              </details>
+          <p className="text-2xl mb-8">
+            Enquanto você lê isso, <span className="text-yellow-400 font-black">{buyersCount} mulheres</span> já estão fazendo e vendendo.
+          </p>
 
-              <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
-                <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
-                  <span>Quanto tempo leva para começar a vender?</span>
-                  <ArrowRight className="h-5 w-5" />
-                </summary>
-                <p className="mt-4 text-gray-700 leading-relaxed">
-                  Você pode fazer sua primeira receita <strong>hoje mesmo</strong> e vender amanhã. 
-                  Os ingredientes são simples e você encontra em qualquer supermercado. Muitas clientes fazem e vendem no mesmo dia!
-                </p>
-              </details>
-
-              <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
-                <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
-                  <span>Vou realmente ganhar R$ 800-1.500/mês?</span>
-                  <ArrowRight className="h-5 w-5" />
-                </summary>
-                <p className="mt-4 text-gray-700 leading-relaxed">
-                  Depende de você! Se vender 10 potes por semana a R$ 15, são R$ 600/mês. 
-                  Se vender 20 potes, são R$ 1.200/mês. <strong>O potencial está nas suas mãos.</strong> 
-                  As receitas vendem sozinhas - você só precisa fazer e divulgar.
-                </p>
-              </details>
-
-              <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
-                <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
-                  <span>Como vou receber o ebook?</span>
-                  <ArrowRight className="h-5 w-5" />
-                </summary>
-                <p className="mt-4 text-gray-700 leading-relaxed">
-                  Após o pagamento, você recebe <strong>tudo por email em até 2 minutos</strong>. 
-                  Pode abrir no celular, computador ou tablet. É um PDF completo que você pode imprimir se quiser!
-                </p>
-              </details>
-
-              <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
-                <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
-                  <span>Preciso de equipamentos caros?</span>
-                  <ArrowRight className="h-5 w-5" />
-                </summary>
-                <p className="mt-4 text-gray-700 leading-relaxed">
-                  <strong>NÃO!</strong> Você só precisa: tigelas, colheres, batedeira (ou batedor manual), 
-                  forma para assar e os potinhos. Nada de equipamento profissional. 
-                  Muitas meninas começam com o que já têm em casa!
-                </p>
-              </details>
-
-              <details className="bg-white rounded-xl p-6 shadow-lg border-2 border-purple-100 hover:border-purple-300 transition-all">
-                <summary className="font-black text-lg text-gray-900 cursor-pointer flex items-center justify-between">
-                  <span>Posso fazer em casa mesmo? É legalizado?</span>
-                  <ArrowRight className="h-5 w-5" />
-                </summary>
-                <p className="mt-4 text-gray-700 leading-relaxed">
-                  Sim! Você pode começar vendendo para amigos, familiares e vizinhos sem problemas. 
-                  Conforme crescer, pode regularizar. <strong>Comece pequeno e vá evoluindo!</strong>
-                </p>
-              </details>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Final */}
-      <section className="py-16 sm:py-20 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center text-white">
-            <h2 className="text-4xl sm:text-5xl font-black mb-6">
-              Sua Renda Extra Está
-              <span className="block text-yellow-300">A 1 Clique de Distância</span>
-            </h2>
-
-            <p className="text-xl sm:text-2xl mb-8 opacity-90 leading-relaxed">
-              Enquanto você hesita, outras mulheres estão fazendo, vendendo e ganhando. 
-              <strong className="block mt-2">Não deixe essa oportunidade passar.</strong>
-            </p>
-
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <div className="text-center">
-                  <div className="text-5xl font-black text-yellow-300 mb-2">15</div>
-                  <p className="text-sm opacity-90">Receitas Completas</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-5xl font-black text-yellow-300 mb-2">R$ 29</div>
-                  <p className="text-sm opacity-90">Investimento Único</p>
-                </div>
-                <div className="text-center">
-                  <div className="text-5xl font-black text-yellow-300 mb-2">7</div>
-                  <p className="text-sm opacity-90">Dias de Garantia</p>
-                </div>
+          <div className="bg-black/50 rounded-xl p-8 mb-8 border-4 border-yellow-400">
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div>
+                <div className="text-4xl font-black text-yellow-400">50</div>
+                <div className="text-sm">Receitas</div>
               </div>
-
-              <div className="bg-gradient-to-r from-yellow-100 to-yellow-50 rounded-xl p-6 border-2 border-yellow-300">
-                <p className="text-xl font-black text-gray-900 mb-2 text-center">🎁 VOCÊ VAI RECEBER:</p>
-                <div className="space-y-2 text-gray-800">
-                  <p className="font-semibold">✅ 15 receitas completas de bolo de pote</p>
-                  <p className="font-semibold">✅ Calculadora de preços em PDF</p>
-                  <p className="font-semibold">✅ Tabela de compra de ingredientes</p>
-                  <p className="font-semibold">✅ Guia de validade e conservação</p>
-                  <p className="font-semibold">✅ Acesso à comunidade exclusiva</p>
-                </div>
+              <div>
+                <div className="text-4xl font-black text-green-400">R$ 29</div>
+                <div className="text-sm">Hoje</div>
+              </div>
+              <div>
+                <div className="text-4xl font-black text-red-400">7</div>
+                <div className="text-sm">Dias Garantia</div>
               </div>
             </div>
 
             <button
               onClick={handleCTAClick}
-              className="inline-flex items-center space-x-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-12 py-6 rounded-xl text-2xl font-black hover:shadow-2xl hover:scale-105 transition-all duration-200 mb-6"
+              className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-12 py-8 rounded-lg text-3xl font-black hover:scale-105 transition-all duration-200 shadow-2xl animate-pulse"
             >
-              <Sparkles className="h-8 w-8" />
-              <span>SIM, QUERO COMEÇAR AGORA</span>
-              <ArrowRight className="h-8 w-8" />
+              GARANTIR MINHA VAGA AGORA!
             </button>
 
-            <div className="space-y-2 text-sm opacity-90">
-              <p>✓ Pagamento 100% seguro</p>
-              <p>✓ Acesso imediato por email</p>
-              <p>✓ Garantia de 7 dias ou seu dinheiro de volta</p>
-            </div>
-
-            <div className="mt-8 pt-8 border-t border-white/20">
-              <p className="text-lg italic opacity-80">
-                "O melhor momento para começar foi ontem. O segundo melhor momento é agora."
-              </p>
-            </div>
+            <p className="mt-4 text-green-400 font-bold text-lg">
+              🔒 Pagamento 100% Seguro | ⚡ Acesso Instantâneo
+            </p>
           </div>
+
+          <p className="text-gray-400 italic">
+            "O melhor momento para começar foi ontem. O segundo melhor é AGORA."
+          </p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="flex items-center justify-center space-x-2 mb-6">
-              <Cake className="h-8 w-8 text-pink-500" />
-              <span className="text-2xl font-bold">DoceCalc</span>
-            </div>
-
-            <p className="text-gray-400 mb-6">
-              Transformando sonhos em bolos de pote, e bolos de pote em renda extra.
-            </p>
-
-            <div className="flex justify-center space-x-8 mb-8 text-sm">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                Termos de Uso
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                Política de Privacidade
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                Contato
-              </a>
-            </div>
-
-            <div className="text-sm text-gray-500">
-              <p>© 2024 DoceCalc. Todos os direitos reservados.</p>
-              <p className="mt-2">Este produto não garante resultados. Os ganhos dependem do seu esforço e dedicação.</p>
-            </div>
-          </div>
+      {/* Footer Mínimo */}
+      <footer className="bg-black py-8 px-4 border-t border-gray-800">
+        <div className="container mx-auto text-center text-gray-500 text-sm">
+          <p>© 2024 DoceCalc - Todos os direitos reservados</p>
+          <p className="mt-2">Este produto não garante resultados. Os ganhos dependem do seu esforço.</p>
         </div>
       </footer>
 
-      {/* Sticky CTA Mobile */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-gradient-to-r from-green-500 to-green-600 p-4 z-50 shadow-2xl">
+      {/* Exit Popup */}
+      {showExitPopup && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-b from-red-600 to-black rounded-xl p-8 max-w-md relative border-4 border-yellow-400">
+            <button
+              onClick={() => setShowExitPopup(false)}
+              className="absolute top-2 right-2 text-white hover:text-gray-300"
+            >
+              <X className="h-6 w-6" />
+            </button>
+            
+            <h3 className="text-3xl font-black text-yellow-400 mb-4 text-center">
+              ESPERA!
+            </h3>
+            <p className="text-xl text-white mb-6 text-center">
+              Não saia sem garantir suas <span className="text-yellow-400 font-black">50 receitas por R$ 29!</span>
+            </p>
+            <p className="text-center mb-6">
+              Essa oferta pode não estar disponível quando você voltar.
+            </p>
+            <button
+              onClick={handleCTAClick}
+              className="w-full bg-yellow-400 text-black px-8 py-4 rounded-lg text-xl font-black hover:scale-105 transition-all"
+            >
+              GARANTIR AGORA!
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Botão Flutuante Mobile */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-gradient-to-r from-yellow-400 to-orange-500 p-3 z-40 shadow-2xl">
         <button
           onClick={handleCTAClick}
-          className="w-full bg-yellow-400 text-gray-900 py-3 px-6 rounded-lg font-black text-center hover:bg-yellow-300 transition-all"
+          className="w-full bg-black text-yellow-400 py-4 rounded-lg font-black text-lg border-2 border-yellow-400"
         >
-          QUERO AS RECEITAS AGORA
+          QUERO POR R$ 29 AGORA!
         </button>
       </div>
     </div>
