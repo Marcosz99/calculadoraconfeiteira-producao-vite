@@ -200,6 +200,8 @@ export default function LandingPage() {
                 className="absolute top-0 left-0 w-full h-full"
                 controls
                 playsInline
+                autoPlay
+                muted
                 preload="metadata"
                 poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='450'%3E%3Crect fill='%23ec4899' width='800' height='450'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='48' fill='white'%3E▶ Assistir Vídeo%3C/text%3E%3C/svg%3E"
                 onPlay={() => setVideoPlaying(true)}
