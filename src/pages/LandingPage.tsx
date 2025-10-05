@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle, Clock, Gift, Shield, X, Zap } from 'lucide-rea
 
 export default function LowTicketLandingPage() {
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 14, seconds: 47 })
-  const [buyersCount, setBuyersCount] = useState(347)
+  const [pageViews] = useState(1600)
   const [showExitPopup, setShowExitPopup] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   
@@ -24,14 +24,6 @@ export default function LowTicketLandingPage() {
       })
     }, 1000)
     return () => clearInterval(timer)
-  }, [])
-
-  // Fake buyers counter
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setBuyersCount(prev => prev + Math.floor(Math.random() * 3))
-    }, 45000)
-    return () => clearInterval(interval)
   }, [])
 
   // Exit intent
@@ -84,7 +76,7 @@ export default function LowTicketLandingPage() {
             </h1>
             
             <div className="inline-block bg-yellow-400 text-black px-6 py-2 rounded text-lg font-black animate-pulse mb-4">
-              ⚡ {buyersCount} PESSOAS COMPRARAM NAS ÚLTIMAS 24H
+              ⚡ MAIS DE {pageViews.toLocaleString('pt-BR')} PESSOAS JÁ VISITARAM ESTA PÁGINA
             </div>
           </div>
 
@@ -114,20 +106,13 @@ export default function LowTicketLandingPage() {
             </button>
             
             <div className="mt-4 text-xl font-bold">
-              <span className="text-red-500 line-through">R$ 297</span>
+              <span className="text-red-500 line-through">R$ 97</span>
               <span className="text-yellow-400 text-4xl mx-3">R$ 29</span>
               <span className="text-gray-400">hoje</span>
             </div>
             
             <p className="mt-2 text-green-400 font-bold">
               ✅ PAGOU, RECEBEU NA HORA! Acesso em 2 minutos no seu email
-            </p>
-          </div>
-
-          {/* Prova Social */}
-          <div className="bg-red-900/30 border-2 border-red-500 rounded-lg p-4 text-center">
-            <p className="text-yellow-400 font-black text-lg">
-              ⚠️ ATENÇÃO: Restam apenas 43 vagas com esse preço promocional!
             </p>
           </div>
         </div>
@@ -182,7 +167,7 @@ export default function LowTicketLandingPage() {
               <div className="flex items-start space-x-3 bg-yellow-400/10 p-3 rounded">
                 <Gift className="h-6 w-6 text-yellow-400 flex-shrink-0 mt-1" />
                 <div>
-                  <h4 className="font-black text-yellow-400">BÔNUS #4: Acesso à Comunidade Exclusivap</h4>
+                  <h4 className="font-black text-yellow-400">BÔNUS #4: Acesso à Comunidade Exclusiva</h4>
                   <p className="text-sm text-gray-300">Troque dicas, tire dúvidas e veja o sucesso das outras</p>
                 </div>
               </div>
@@ -190,7 +175,7 @@ export default function LowTicketLandingPage() {
             </div>
 
             <div className="mt-6 bg-green-600 rounded-lg p-4 text-center">
-              <p className="font-black text-2xl">VALOR TOTAL: R$ 494</p>
+              <p className="font-black text-2xl">VALOR TOTAL: R$ 294</p>
               <p className="text-3xl font-black mt-2">HOJE POR APENAS: R$ 29</p>
               <p className="text-sm mt-2">Isso é menos de R$ 0,60 por receita!</p>
             </div>
@@ -307,7 +292,7 @@ export default function LowTicketLandingPage() {
           </h2>
 
           <p className="text-2xl mb-8">
-            Enquanto você lê isso, <span className="text-yellow-400 font-black">{buyersCount} mulheres</span> já estão fazendo e vendendo.
+            Enquanto você lê isso, <span className="text-yellow-400 font-black">centenas de mulheres</span> já estão fazendo e vendendo.
           </p>
 
           <div className="bg-black/50 rounded-xl p-8 mb-8 border-4 border-yellow-400">
