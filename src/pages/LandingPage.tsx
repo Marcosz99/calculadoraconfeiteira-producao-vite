@@ -5,36 +5,68 @@ export default function LowTicketLandingPage() {
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 14, seconds: 47 })
   const [pageViews] = useState(1600)
   const [showExitPopup, setShowExitPopup] = useState(false)
+  const [testimonialsVisible, setTestimonialsVisible] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const testimonialsRef = useRef<HTMLDivElement>(null)
   
   const CHECKOUT_URL = "https://www.ggcheckout.com/checkout/v2/wrM72UGZAlqMlrhoPWbK?utm_source=FB&utm_campaign={{campaign.name}}|{{campaign.id}}&utm_medium={{adset.name}}|{{adset.id}}&utm_content={{ad.name}}|{{ad.id}}&utm_term={{placement}}"
 
-  // Timer countdown
+  // Timer countdown - Otimizado para evitar re-renders
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 }
-        } else if (prev.minutes > 0) {
-          return { hours: prev.hours, minutes: prev.minutes - 1, seconds: 59 }
-        } else if (prev.hours > 0) {
-          return { hours: prev.hours - 1, minutes: 59, seconds: 59 }
-        }
-        return prev
-      })
-    }, 1000)
-    return () => clearInterval(timer)
+    let animationFrameId: number
+    let lastTime = Date.now()
+    
+    const updateTimer = () => {
+      const currentTime = Date.now()
+      if (currentTime - lastTime >= 1000) {
+        lastTime = currentTime
+        setTimeLeft(prev => {
+          if (prev.seconds > 0) {
+            return { ...prev, seconds: prev.seconds - 1 }
+          } else if (prev.minutes > 0) {
+            return { hours: prev.hours, minutes: prev.minutes - 1, seconds: 59 }
+          } else if (prev.hours > 0) {
+            return { hours: prev.hours - 1, minutes: 59, seconds: 59 }
+          }
+          return prev
+        })
+      }
+      animationFrameId = requestAnimationFrame(updateTimer)
+    }
+    
+    animationFrameId = requestAnimationFrame(updateTimer)
+    return () => cancelAnimationFrame(animationFrameId)
   }, [])
 
   // Exit intent
   useEffect(() => {
+    let hasShown = false
     const handleMouseLeave = (e: MouseEvent) => {
-      if (e.clientY <= 0) {
+      if (!hasShown && e.clientY <= 0) {
         setShowExitPopup(true)
+        hasShown = true
       }
     }
     document.addEventListener('mouseleave', handleMouseLeave)
     return () => document.removeEventListener('mouseleave', handleMouseLeave)
+  }, [])
+
+  // Lazy load vídeo de depoimentos
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setTestimonialsVisible(true)
+        }
+      },
+      { rootMargin: '200px' }
+    )
+    
+    if (testimonialsRef.current) {
+      observer.observe(testimonialsRef.current)
+    }
+    
+    return () => observer.disconnect()
   }, [])
 
   const handleCTAClick = () => {
@@ -88,8 +120,8 @@ export default function LowTicketLandingPage() {
                 className="absolute top-0 left-0 w-full h-full object-cover sm:object-contain"
                 controls
                 playsInline
-                autoPlay
-                preload="metadata"
+                preload="none"
+                poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3Crect fill='%23111' width='16' height='9'/%3E%3C/svg%3E"
               >
                 <source src="https://dbwbxzbtydeauczfleqx.supabase.co/storage/v1/object/public/landingpage/Mini%20VSL%20Frankstein.mp4" type="video/mp4" />
               </video>
@@ -100,7 +132,7 @@ export default function LowTicketLandingPage() {
           <div className="text-center mb-6">
             <button
               onClick={handleCTAClick}
-              className="w-full sm:w-auto bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-12 py-6 rounded-lg text-2xl sm:text-3xl font-black hover:scale-105 transition-all duration-200 shadow-2xl animate-pulse"
+              className="w-full sm:w-auto bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-12 py-6 rounded-lg text-2xl sm:text-3xl font-black hover:scale-105 transition-transform duration-200 shadow-2xl"
             >
               🔥 SIM! QUERO AS 50 RECEITAS AGORA
             </button>
@@ -184,7 +216,7 @@ export default function LowTicketLandingPage() {
           {/* CTA Repetido */}
           <button
             onClick={handleCTAClick}
-            className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-12 py-6 rounded-lg text-2xl font-black hover:scale-105 transition-all duration-200 shadow-2xl mb-4"
+            className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-12 py-6 rounded-lg text-2xl font-black hover:scale-105 transition-transform duration-200 shadow-2xl mb-4"
           >
             QUERO ACESSO IMEDIATO POR R$ 29
           </button>
@@ -204,22 +236,29 @@ export default function LowTicketLandingPage() {
             <span className="text-red-500">FATURANDO COM BOLO DE POTE</span>
           </h2>
 
-          <div className="bg-black rounded-lg overflow-hidden border-4 border-yellow-400 mb-6">
+          <div ref={testimonialsRef} className="bg-black rounded-lg overflow-hidden border-4 border-yellow-400 mb-6">
             <div className="relative" style={{ paddingBottom: '56.25%' }}>
-              <video
-                className="absolute top-0 left-0 w-full h-full"
-                controls
-                playsInline
-                preload="metadata"
-              >
-                <source src="https://dbwbxzbtydeauczfleqx.supabase.co/storage/v1/object/public/landingpage/Depoimentos%20Plus.mp4" type="video/mp4" />
-              </video>
+              {testimonialsVisible ? (
+                <video
+                  className="absolute top-0 left-0 w-full h-full"
+                  controls
+                  playsInline
+                  preload="none"
+                  poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 9'%3E%3Crect fill='%23000' width='16' height='9'/%3E%3C/svg%3E"
+                >
+                  <source src="https://dbwbxzbtydeauczfleqx.supabase.co/storage/v1/object/public/landingpage/Depoimentos%20Plus.mp4" type="video/mp4" />
+                </video>
+              ) : (
+                <div className="absolute top-0 left-0 w-full h-full bg-black flex items-center justify-center">
+                  <div className="text-gray-500">Carregando...</div>
+                </div>
+              )}
             </div>
           </div>
 
           <button
             onClick={handleCTAClick}
-            className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white px-12 py-6 rounded-lg text-2xl font-black hover:scale-105 transition-all duration-200 shadow-2xl"
+            className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white px-12 py-6 rounded-lg text-2xl font-black hover:scale-105 transition-transform duration-200 shadow-2xl"
           >
             🔥 EU TAMBÉM QUERO FATURAR!
           </button>
@@ -313,7 +352,7 @@ export default function LowTicketLandingPage() {
 
             <button
               onClick={handleCTAClick}
-              className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-12 py-8 rounded-lg text-3xl font-black hover:scale-105 transition-all duration-200 shadow-2xl animate-pulse"
+              className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-12 py-8 rounded-lg text-3xl font-black hover:scale-105 transition-transform duration-200 shadow-2xl"
             >
               GARANTIR MINHA VAGA AGORA!
             </button>
@@ -359,7 +398,7 @@ export default function LowTicketLandingPage() {
             </p>
             <button
               onClick={handleCTAClick}
-              className="w-full bg-yellow-400 text-black px-8 py-4 rounded-lg text-xl font-black hover:scale-105 transition-all"
+              className="w-full bg-yellow-400 text-black px-8 py-4 rounded-lg text-xl font-black hover:scale-105 transition-transform"
             >
               GARANTIR AGORA!
             </button>
