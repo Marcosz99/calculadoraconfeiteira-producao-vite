@@ -138,7 +138,7 @@ export default function LowTicketLandingPage() {
       <section className="py-12 px-4 bg-gradient-to-b from-black to-gray-900">
         <div className="container mx-auto max-w-4xl">
           <h2 className="text-3xl sm:text-4xl font-black text-center mb-8">
-            <span className="text-yellow-400">VEJA TUDO</span> O QUE VOCÊ VAI RECEBER <span className="text-red-500">HOJE:</span>
+            <span className="text-yellow-400">VEJA TUDO</spanclassName="text-gray-200" > O QUE VOCÊ VAI RECEBER <span className="text-red-500">HOJE:</span>
           </h2>
 
           <div className="bg-gray-800 rounded-xl p-6 sm:p-8 border-4 border-yellow-400 mb-6">
@@ -159,8 +159,8 @@ export default function LowTicketLandingPage() {
               <div className="flex items-start space-x-3 bg-yellow-400/10 p-3 rounded">
                 <Gift className="h-6 w-6 text-yellow-400 flex-shrink-0 mt-1" />
                 <div>
-                  <h4 className="font-black text-yellow-400">BÔNUS #1: Guia de fornecedores</h4>
-                  <p className="text-sm text-gray-300">Descubra onde pegar e leve seu negócio a outro nivel com fornecedores</p>
+                  <h4 className="font-black text-yellow-400">BÔNUS #1: Calculadora de Preços em PDF</h4>
+                  <p className="text-sm text-gray-300">Descubra exatamente quanto cobrar para ter lucro máximo</p>
                 </div>
               </div>
 
@@ -183,11 +183,26 @@ export default function LowTicketLandingPage() {
               <div className="flex items-start space-x-3 bg-yellow-400/10 p-3 rounded">
                 <Gift className="h-6 w-6 text-yellow-400 flex-shrink-0 mt-1" />
                 <div>
-                  <h4 className="font-black text-yellow-400">BÔNUS #4: Acesso à Comunidade Exclusivap</h4>
-                  <p className="text-sm text-gray-300">Troque dicas, tire dúvidas e veja o sucesso das outras</p>
+                  <h4 className="font-black text-yellow-400">BÔNUS #4: Como Vender pelo WhatsApp</h4>
+                  <p className="text-sm text-gray-300">10 modelos de mensagens prontas + estratégias que funcionam</p>
                 </div>
               </div>
 
+              <div className="flex items-start space-x-3 bg-yellow-400/10 p-3 rounded">
+                <Gift className="h-6 w-6 text-yellow-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-black text-yellow-400">BÔNUS #5: Instagram para Confeiteiras</h4>
+                  <p className="text-sm text-gray-300">Como tirar fotos que vendem + 30 ideias de posts prontos</p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3 bg-yellow-400/10 p-3 rounded">
+                <Gift className="h-6 w-6 text-yellow-400 flex-shrink-0 mt-1" />
+                <div>
+                  <h4 className="font-black text-yellow-400">BÔNUS #6: Acesso à Comunidade Exclusiva</h4>
+                  <p className="text-sm text-gray-300">Troque dicas, tire dúvidas e veja o sucesso das outras</p>
+                </div>
+              </div>
             </div>
 
             <div className="mt-6 bg-green-600 rounded-lg p-4 text-center">
