@@ -89,15 +89,14 @@ export default function LowTicketLandingPage() {
           </div>
 
           {/* VSL - Tamanho GIGANTE */}
-          <div className="mb-6">
-            <div className="relative bg-gray-900 rounded-lg shadow-2xl overflow-hidden border-4 border-red-500" style={{ paddingBottom: '56.25%' }}>
+          <div className="mb-6 -mx-4 sm:mx-0">
+            <div className="relative bg-gray-900 sm:rounded-lg shadow-2xl overflow-hidden border-4 border-red-500 aspect-video sm:aspect-video" style={{ aspectRatio: '16/12' }}>
               <video
                 ref={videoRef}
-                className="absolute top-0 left-0 w-full h-full"
+                className="absolute top-0 left-0 w-full h-full object-cover sm:object-contain"
                 controls
                 playsInline
                 autoPlay
-                muted
                 preload="metadata"
               >
                 <source src="https://dbwbxzbtydeauczfleqx.supabase.co/storage/v1/object/public/landingpage/Mini%20VSL%20Frankstein.mp4" type="video/mp4" />
